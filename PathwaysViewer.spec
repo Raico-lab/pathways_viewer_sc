@@ -14,7 +14,7 @@ a = Analysis(
     # LICENSE などは GPLv3 で配るために同梱する（アプリの「ヘルプ > このアプリについて」からも案内する）
     datas=[("tor_app/web", "tor_app/web")] + [(f"data/{name}", "data") for name in DATA_FILES]
           + [(name, ".") for name in ("LICENSE", "THIRD_PARTY_NOTICES.md", "DATA_LICENSES.md")]
-          + [(f"licenses/{name}", "licenses") for name in ("LGPL-3.0.txt", "BioGRID-MIT.txt")],   # Qt（LGPL-3.0）・BioGRID のデータ（MIT）
+          + [(f"licenses/{name}", "licenses") for name in ("LGPL-3.0.txt", "BioGRID-MIT.txt", "YeastPhosphoAtlasAnalysis-MIT.txt")],   # Qt（LGPL-3.0）・BioGRID と Leutert 2023 のリン酸化のデータ（MIT）
     hiddenimports=["sqlalchemy.dialects.sqlite"],
     # pandas・numpy・scipy はアプリでは使わない（CSV の読み込みは取り込みの道具だけ。networkx は numpy なしで動く）
     excludes=["tkinter", "matplotlib", "IPython", "pandas", "numpy", "scipy"],

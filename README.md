@@ -61,7 +61,7 @@ UTF-8 または Shift_JIS（Excel 保存）の CSV を読み込めます。書�
 | basal_activity | 上流入力がないときの活性 0〜1。空欄＝自動（シミュレーション用。今のアプリでは使わない。読み込みでは使うが、データベースの表・編集画面・CSV の書き出しには出さない） |
 
 複合体は Complex Portal のものだけを使う（以前の手作業の枠 `groups.csv` と `data/complexes.csv` は 2026-10-03 に外した。`archive/` を参照）。
-パラログ（役割が重なりうる遺伝子の組）は `tools/build_paralogs.py` が YGOB・Alliance の組を BioGRID の遺伝的相互作用と SGD の GO で裏付けて `data/paralogs.tsv` に書き、`tools/import_sources.py` がカテゴリ（出典「パラログ」）として入れる。地図では組ごとの色の二重線の枠で囲み、片方が地図にあればもう片方も加えて、上の段（注目している遺伝子があればその段）に並べる（複合体のような専用の段は作らない）。
+パラログ（役割が重なりうる遺伝子の組）は `tools/build_paralogs.py` が Alliance の組を BioGRID の遺伝的相互作用と SGD の GO で裏付けて `data/paralogs.tsv` に書き、`tools/import_sources.py` がカテゴリ（出典「パラログ」）として入れる。地図では組ごとの色の二重線の枠で囲み、片方が地図にあればもう片方も加えて、上の段（注目している遺伝子があればその段）に並べる（複合体のような専用の段は作らない）。
 
 **制御関係** (`source_protein`, `target_protein` 必須)
 

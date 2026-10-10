@@ -21,7 +21,6 @@ Pathways Viewer のソースコードは GPLv3（`LICENSE`）です。**同梱�
 | Complex Portal（EMBL-EBI） | 複合体の構成と説明 | **CC0**（Complex Portal 2022, NAR, https://pmc.ncbi.nlm.nih.gov/articles/PMC8689886/ ） | 義務なし（引用を推奨。Meldal et al. 2022 NAR、PMID 34718729） |
 | UniProt | 修飾された残基 | **CC BY 4.0**（https://www.uniprot.org/help/license ） | UniProt の論文（UniProt Consortium 2025 NAR、PMID 39552041）・CC BY 4.0 |
 | Alliance of Genome Resources | パラログ | **CC BY 4.0**（Alliance の Terms of Use） | Alliance・CC BY 4.0（Alliance of Genome Resources Consortium 2024 Genetics、PMID 38552170） |
-| YGOB（Yeast Gene Order Browser, v7 Aug 2012） | パラログ | **明示の許諾なし。** 引用の依頼だけ（"Please cite this article if using data" — http://ygob.ucd.ie/browser/info.html ）。使うのは相同の組という事実情報 | Byrne KP & Wolfe KH 2005 Genome Res 15:1456（PMID 16169922） |
 | IDEA（Hackett et al. 2020） | 転写制御の向き | 論文は **CC BY 4.0**。同じデータが **GEO GSE142864**（下の GEO の方針）。Calico の配布ファイル自体には明文なし | Hackett SR et al. 2020 Mol Syst Biol 16:e9174・GSE142864 |
 | Deleteome（Kemmeren et al. 2014） | 転写制御の向き | **GEO GSE42527**（下の GEO の方針）。Holstege lab のサイトには明文なし | Kemmeren P et al. 2014 Cell 157:740（PMID 24766815）・GSE42527 |
 | このプロジェクトの文献調査（`sample_data/literature/`） | 文献で確かめた関係（PMID・日本語の要約・性質） | 論文の文は引用せず、出典（PMID）だけを示す。記録はこのリポジトリの一部 | |
@@ -31,7 +30,7 @@ Pathways Viewer のソースコードは GPLv3（`LICENSE`）です。**同梱�
 | 出典 | 使っているもの | 利用条件と根拠 | 必要な表記・引用 |
 |---|---|---|---|
 | SGD SPELL（GEO などの公開データを SGD がまとめたもの） | 条件ごとの mRNA（93 測定の中央値） | SGD（CC BY 4.0）。元のデータは GEO（下の方針） | SPELL の論文（Hibbs et al. 2007 Bioinformatics、PMID 17724061）と、測定ごとの元の論文（アプリの説明欄と情報源タブに PMID） |
-| Leutert et al. 2023 Nat Struct Mol Biol | 条件ごとのリン酸化・タンパク質量（要約値）・キナーゼと基質の一覧 | 同じデータが **Zenodo（doi:10.5281/zenodo.10016524、CC BY 4.0）** と **PRIDE（PXD035050 ほか、CC0）** にある。論文と Supplementary Tables は Springer Nature が権利を持つ（CC ではない） | Leutert M et al. 2023（doi:10.1038/s41594-023-01115-3）・Zenodo DOI・CC BY 4.0・加工したこと |
+| Leutert et al. 2023 Nat Struct Mol Biol | 条件ごとのリン酸化（部位ごとの変化。LIMMA）・キナーゼと基質の一覧 | リン酸化は著者らの解析のリポジトリ（https://github.com/Villen-Lab/YeastPhosphoAtlasAnalysis 、**MIT**）の `notebook/output/limma_differential_expression_results.csv`（論文の補足表 6 と同じ値）から作る。許諾文は `licenses/YeastPhosphoAtlasAnalysis-MIT.txt`。キナーゼと基質の一覧は **Zenodo（doi:10.5281/zenodo.10016524、CC BY 4.0）**。論文と Supplementary Tables（Springer Nature が権利を持つ）は使わない。タンパク質量は補足表 4 にしかないので、2026-10-11 から使っていない | Leutert M et al. 2023（doi:10.1038/s41594-023-01115-3）・著作権表示と MIT の許諾文の同梱（済み）・Zenodo DOI・CC BY 4.0・加工したこと |
 | Deleteome（Kemmeren et al. 2014） | 破壊株の mRNA（p < 0.05 かつ 1.4 倍以上の値） | **GEO GSE42527**（下の方針） | Kemmeren 2014・GSE42527 |
 | Bodenmiller et al. 2010 Sci Signal（BioGRID-PTM 経由） | 破壊株のリン酸化 | **MIT**（BioGRID） | Bodenmiller B et al. 2010（PMID 21177495）・BioGRID |
 
@@ -44,9 +43,8 @@ other intellectual property rights in all or a portion of the data they have sub
 
 - `data/papers.json`: 論文の書誌（題名・著者・雑誌・年）。PubMed（NCBI E-utilities）から取得した書誌情報。
 - KEGG は利用条件のため 2026-10-03 から使っていない（`archive/` には取得の道具のコードだけがある）。
+- YGOB（Yeast Gene Order Browser）は再配布の明示の許諾がないため、2026-10-11 から使っていない（パラログの組はすべて Alliance にも含まれていたので、組は 1 つも減っていない）。
 - 機械翻訳は 2026-10-07 に廃止した。論文の文の引用は 2026-10-07 から置いていない。
 
 ## 残っている確認
 - YEASTRACT+ の再配布の了承（開発者に問い合わせる）。
-- Leutert 2023 の要約値は Supplementary Tables から作っている。根拠をはっきり CC BY にするため、Zenodo（CC BY 4.0）のファイルから作るように取り込みを変える。
-- YGOB は明示の許諾がない。気になるなら開発者（ygob@ucd.ie）に一言確認する。

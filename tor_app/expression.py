@@ -1,4 +1,4 @@
-"""条件ごとの発現・リン酸化・タンパク質量（data/expression.db。tools/build_expression.py が作る）を読む。
+"""条件ごとの発現・リン酸化（data/expression.db。tools/build_expression.py が作る）を読む。
 
 地図の DB とは別の読み取り専用のファイル。遺伝子は systematic 名（ORF）で引く。値はどれも対照（処理前・未処理）との
 log2 の比。種類（kind）:
@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from . import conditions
 from .paths import resource_path
 
-KINDS = {"mrna": "発現（mRNA）", "phospho": "リン酸化", "protein": "タンパク質量"}
-SHORT = {"mrna": "mRNA", "phospho": "リン酸化", "protein": "タンパク質"}   # 説明欄の表の見出し（折り返さない短い名前）
+KINDS = {"mrna": "発現（mRNA）", "phospho": "リン酸化"}
+SHORT = {"mrna": "mRNA", "phospho": "リン酸化"}   # 説明欄の表の見出し（折り返さない短い名前）
 
 _con: sqlite3.Connection | None = None
 _missing = False
@@ -97,7 +97,7 @@ class Point:
 
 
 def gene_points(orf: str) -> list[Point]:
-    """1 つの遺伝子の、すべての測定の値（mRNA・リン酸化の部位・タンパク質量）。"""
+    """1 つの遺伝子の、すべての測定の値（mRNA・リン酸化の部位）。"""
     con = _db()
     if con is None:
         return []
@@ -111,9 +111,6 @@ def gene_points(orf: str) -> list[Point]:
     out += [Point("phospho", c, l, s, p, v, site, pv, pa) for c, l, s, p, site, v, pv, pa in con.execute(
         "SELECT m.conditions, m.label, m.source, m.pmid, x.site, x.value, x.pval, x.padj FROM phospho x "
         "JOIN measures m ON m.id = x.measure_id WHERE x.gene_id = ? ORDER BY m.id, x.site", (gid,))]
-    out += [Point("protein", c, l, s, p, v, "", pv, pa) for c, l, s, p, v, pv, pa in con.execute(
-        "SELECT m.conditions, m.label, m.source, m.pmid, x.value, x.pval, x.padj FROM protein x "
-        "JOIN measures m ON m.id = x.measure_id WHERE x.gene_id = ? ORDER BY m.id", (gid,))]
     return out
 
 

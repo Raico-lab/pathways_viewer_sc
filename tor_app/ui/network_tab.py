@@ -175,12 +175,12 @@ class NetworkTab(QWidget):
         self.color_combo.currentIndexChanged.connect(lambda: self._save_view())
         self.color_combo.currentIndexChanged.connect(
             lambda: self._all_js(f"app.setColorMode({json.dumps(self.color_mode())})"))
-        # 発現・リン酸化・タンパク質量で色分けするときの条件（データのある条件だけ。data/expression.db）
+        # 条件の測定の値を地図に渡すときの条件（画面には出さない。データのある条件だけ。data/expression.db）
         self.data_cond_combo = QComboBox()
         labels = conditions.labels()
         for key in expression.condition_keys():
             self.data_cond_combo.addItem(labels.get(key, key), key)
-        self.data_cond_combo.setToolTip("発現・リン酸化・タンパク質量で色分けするときの条件\n"
+        self.data_cond_combo.setToolTip("発現・リン酸化の条件\n"
                                         "その種類のデータがない条件では、遺伝子はすべて灰色になります")
         saved = self._load_setting("data_condition", "", set(expression.condition_keys()))
         self.data_cond_combo.setCurrentIndex(max(0, self.data_cond_combo.findData(saved or "rapamycin")))
@@ -220,7 +220,7 @@ class NetworkTab(QWidget):
         return [("配置", self.layout_combo), ("線", self.edge_color_combo)]
 
     def data_kind(self) -> str | None:
-        """発現・リン酸化・タンパク質量で色分けしているなら、その種類（mrna / phospho / protein）。"""
+        """発現・リン酸化で色分けしているなら、その種類（mrna / phospho）。今は選べないので、いつも None。"""
         mode = self.color_mode()
         return mode if mode in expression.KINDS else None
 
@@ -875,7 +875,7 @@ class NetworkTab(QWidget):
         if expression.available():
             self.cond_mode.addItem("遺伝子", "genes")
         self.cond_mode.setToolTip("経路: チェックした条件で報告された関係（線）を目立たせます\n"
-                                  "遺伝子: チェックした条件で発現・リン酸化・タンパク質量が 2 倍以上変化した遺伝子を目立たせます")
+                                  "遺伝子: チェックした条件で発現・リン酸化が 2 倍以上変化した遺伝子を目立たせます")
         top_row.addWidget(self.cond_mode)
         self.cond_search = QLineEdit()
         self.cond_search.setPlaceholderText("名前で絞り込む")
@@ -2748,7 +2748,7 @@ class NetworkTab(QWidget):
         return f"<span style='color:{color};font-weight:{weight}'>{v:+.2f}</span>{extra}"
 
     def _data_html(self, orf: str) -> str:
-        """条件ごとの変化（data/expression.db）: 条件ごとの mRNA・リン酸化・タンパク質量のまとめの表。
+        """条件ごとの変化（data/expression.db）: 条件ごとの mRNA・リン酸化のまとめの表。
         条件の名前を押すと、その下に測定ごとの値と出典（論文へのリンク）が開く（もう一度押すと閉じる）。
         測定がない条件は、名前を灰色にして開けないようにする。
         リン酸化が測られていても p < 0.05 の部位がない条件は、0 ではなく n.s. と出す（変わらなかったとは言えないため）。"""
@@ -2762,7 +2762,7 @@ class NetworkTab(QWidget):
         # 開いた文献の欄は表の外に出す（表の中に入れると、欄の長い行が列の幅を押し広げて条件名が折り返す）。
         # 表は開いた条件のところで区切るので、値の列の幅を固定して、区切った表どうしの列をそろえる
         # リン酸化の部位は値の下の 2 行目に書くので、値の列はどれも数字の幅で足りる
-        widths = {"mrna": 64, "phospho": 72, "protein": 72}
+        widths = {"mrna": 64, "phospho": 72}
         # 条件名の欄の幅（説明欄の幅から値の列と ▸・余白の分を引いたもの）。名前はこの幅で 2 行までに収める
         name_width = max(60, (self._st.width or self.detail.viewport().width()) - sum(widths[k] for k in kinds) - 28)
         col = "<td width='{}' style='text-align:right;white-space:nowrap'>{}</td>".format
@@ -2838,11 +2838,11 @@ class NetworkTab(QWidget):
 
     @staticmethod
     def _clear(x) -> bool:
-        """はっきりした変化か。mRNA・タンパク質量はいつも True、リン酸化は p < 0.05 か 2 倍以上の部位。"""
+        """はっきりした変化か。mRNA はいつも True、リン酸化は p < 0.05 か 2 倍以上の部位。"""
         return x.kind != "phospho" or (x.pval is not None and x.pval < 0.05) or abs(x.value) >= 1
 
     def _measures_html(self, points: list) -> str:
-        """1 つの条件の測定ごとの値と出典。種類（mRNA・リン酸化・タンパク質量）ごとに小見出しを付け、
+        """1 つの条件の測定ごとの値と出典。種類（mRNA・リン酸化）ごとに小見出しを付け、
         1 つの測定を 2 行で出す: 1 行目に値・部位・出典、2 行目に説明と p 値（説明欄が狭くても崩れないように）。
         値の列は折り返さない。リン酸化は、はっきりした部位（_clear）を先に並べ、それ以外の部位は後に灰色の小さい字で並べる。"""
         parts = []

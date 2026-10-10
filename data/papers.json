@@ -5521,18 +5521,6 @@
    ]
   },
   {
-   "pmid": "16169922",
-   "cite": "Byrne et al. 2005 Genome Res",
-   "title": "The Yeast Gene Order Browser: combining curated homology and syntenic context reveals gene fate in polyploid species",
-   "url": "https://doi.org/10.1101/gr.3672305",
-   "first": "Byrne",
-   "year": "2005",
-   "authors": "Byrne KP, Wolfe KH",
-   "used": [
-    "data"
-   ]
-  },
-  {
    "pmid": "11713675",
    "cite": "Bécam et al. 2001 Mol Genet Genomics",
    "title": "Ria1p (Ynl163c), a protein similar to elongation factors 2, is involved in the biogenesis of the 60S subunit of the ribosome in Saccharomyces cerevisiae",

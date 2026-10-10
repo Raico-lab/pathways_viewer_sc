@@ -1,9 +1,9 @@
 """パラログ（役割が重なりうる遺伝子の組）の一覧 data/paralogs.tsv を作る。
 
 候補（raw_data/PARALOGS/）:
-- Pillars.tab: YGOB（Yeast Gene Order Browser, v7-Aug2012）。出芽酵母の全ゲノム重複でできた組（オーノログ）。
-  S. cerevisiae は 12 列目（A）と 22 列目（B）。両方が埋まっている行が 1 組
-- alliance_paralogy_sgd.json.gz: Alliance of Genome Resources の出芽酵母のパラログ（SGD の ID。全ゲノム重複以外も含む）
+- alliance_paralogy_sgd.json.gz: Alliance of Genome Resources の出芽酵母のパラログ（SGD の ID。全ゲノム重複でできた組も
+  それ以外も含む）。以前は YGOB（Yeast Gene Order Browser）の全ゲノム重複の組も使っていたが、その組はすべて Alliance に
+  含まれていて、YGOB には再配布の明示の許諾がないので、2026-10-11 から使わない
 
 裏付け（手元のデータ）:
 - BioGRID の遺伝的相互作用で、両方を壊すと片方より強く悪くなる記録（合成致死・生育の低下・負の遺伝的相互作用・
@@ -23,7 +23,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "raw_data"
-PILLARS = RAW / "PARALOGS" / "Pillars.tab"
 ALLIANCE = RAW / "PARALOGS" / "alliance_paralogy_sgd.json.gz"
 FEATURES = RAW / "SGD_features.tab"
 OUT = ROOT / "data" / "paralogs.tsv"
@@ -53,10 +52,6 @@ def candidates(by_id, by_sys) -> dict[tuple[str, str], dict]:
         pairs.setdefault(key, {"sources": set()})["sources"].add(source)
         pairs[key].update(info)
 
-    with open(PILLARS, encoding="utf-8") as f:
-        for c in csv.reader(f, delimiter="\t"):
-            if len(c) >= 22 and c[11] != "---" and c[21] != "---":
-                add(by_sys.get(c[11].upper()), by_sys.get(c[21].upper()), "YGOB")
     for row in json.load(gzip.open(ALLIANCE))["data"]:
         a, b = (by_id.get(g.split(":")[-1]) for g in (row["gene1"], row["gene2"]))
         add(a, b, "Alliance", confidence=row.get("confidence", ""), identity=row.get("identity", ""))
@@ -112,8 +107,7 @@ def main() -> None:
         w.writerows(rows)
     accepted = [r for r in rows if r[-1]]
     by_genetic = sum(1 for r in rows if r[5])
-    print(f"候補 {len(rows)} 組（YGOB {sum('YGOB' in r[2] for r in rows)}・Alliance {sum('Alliance' in r[2] for r in rows)}・"
-          f"両方 {sum(r[2] == 'Alliance・YGOB' for r in rows)}）")
+    print(f"候補 {len(rows)} 組（Alliance）")
     print(f"採用 {len(accepted)} 組（遺伝的相互作用の記録あり {by_genetic}・GO の重なりだけ {len(accepted) - by_genetic}）→ {OUT}")
 
 

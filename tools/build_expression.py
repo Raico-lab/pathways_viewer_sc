@@ -1,4 +1,4 @@
-"""条件ごとの発現・リン酸化・タンパク質量の DB（data/expression.db）を作る。地図の DB（tor_pathway.db）とは別のファイル。
+"""条件ごとの発現・リン酸化の DB（data/expression.db）を作る。地図の DB（tor_pathway.db）とは別のファイル。
 
 情報源と対応表:
 - mRNA: SGD の発現データ（SPELL、raw_data/SPELL/datasets/）。対応表 data/expression_sources.csv の 1 行が 1 つの測定
@@ -6,15 +6,18 @@
   正規表現（大文字小文字は区別しない）、sign: 比の向きが逆（未処理/処理）なら -1、label: 画面に出す説明）。
   値は 処理の列の平均 − 対照の列の平均（control が空なら処理の列の平均。2 色のアレイで、すでに対照との log 比のもの）。
   1 色のアレイで値が対数でなければ（中央値が LOG_MIN 以上）log2 に直してから引く。
-- リン酸化・タンパク質量: Leutert et al. 2023 Nat Struct Mol Biol（PMID 37845410、raw_data/LEUTERT2023/）。
-  補足表 6（部位ごとの変化、LIMMA）と補足表 4 の protein_diff_reg（30 条件）。対応表 data/phospho_sources.csv
-  （treatment: 論文の条件 ID、conditions、label）。「NA」（アミノ酸なし）は表 6 で欠損として書き出されていて使えない。
+- リン酸化: Leutert et al. 2023 Nat Struct Mol Biol（PMID 37845410、raw_data/LEUTERT2023/）。
+  リン酸化は、著者らの解析のリポジトリ（https://github.com/Villen-Lab/YeastPhosphoAtlasAnalysis、MIT ライセンス）の
+  notebook/output/limma_differential_expression_results.csv（部位ごとの変化、LIMMA。論文の補足表 6 と同じ値）を
+  raw_data/LEUTERT2023/github/ に置いて使う（出版社の補足表は権利が出版社にあるので使わない）。
+  タンパク質量（補足表 4 にしかない）は、2026-10-11 から使わない。対応表 data/phospho_sources.csv
+  （treatment: 論文の条件 ID、conditions、label）。「NA」（アミノ酸なし）は欠損として書き出されていて使えない。
 
 向きの点検: リボソームタンパク質（RPL・RPS）の遺伝子の平均の変化（列 rp_mean）。ストレス・飢餓・ラパマイシンでは
 下がるのがふつう（RP_DOWN の条件）、グルコースの添加では上がる。逆なら flag に書き、作り終わりに一覧を出す。
 ケモスタットの定常状態どうしの比較（弱酸・低温など）は増殖速度がそろえてあるので点検しない。
 
-条件ごとのまとめ（表 summary）: 遺伝子ごとに、その条件の測定の値の中央値（mRNA・タンパク質量）。リン酸化は、
+条件ごとのまとめ（表 summary）: 遺伝子ごとに、その条件の測定の値の中央値（mRNA）。リン酸化は、
 その条件のどれかの測定で補正前の p < PVAL になった部位のうち、変化の平均の絶対値が最も大きい部位の値（detail に部位。
 補正後の p < PADJ でもあれば部位の後に "*"）。測られていても当てはまる部位がなければ 0。
 Leutert の測定は 5 分後で反復が少なく、ラパマイシンでの SCH9・NPR1 の脱リン酸化も補正後の p は 0.1〜0.4 になるため、
@@ -29,18 +32,16 @@ import math
 import re
 import sqlite3
 import statistics
-import sys
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from xlsx_rows import rows as xlsx_rows  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "raw_data"
 SPELL = RAW / "SPELL" / "datasets"
 LEUTERT = RAW / "LEUTERT2023"
+LEUTERT_LIMMA = LEUTERT / "github" / "limma_differential_expression_results.csv"   # MIT（著者らの解析のリポジトリ）
 FEATURES = RAW / "SGD_features.tab"
 OUT = ROOT / "data" / "expression.db"
 MRNA_SOURCES = ROOT / "data" / "expression_sources.csv"
@@ -170,19 +171,29 @@ def build_mrna(con, gid, names, problems) -> None:
             problems.append(f"向き？ {s['study']} {s['file']} [{s['label']}]: {flag}")
 
 
+def limma_rows():
+    """著者らのリポジトリの LIMMA の結果を、補足表 6 と同じ列（treatment_id・systematic_name・p_site・fc_log2・p_value・
+    adj_p_value）の行にして返す（部位は「YAL012W_S_40」→ ORF YAL012W・部位 S40）。"""
+    yield ["treatment_id", "systematic_name", "p_site", "fc_log2", "p_value", "adj_p_value"]
+    with open(LEUTERT_LIMMA, encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            orf, aa, pos = r["site"].rsplit("_", 2)
+            num = lambda x: None if x in ("", "NA") else float(x)   # noqa: E731
+            yield [r["treatment"], orf, f"{aa}{pos}", num(r["coef"]), num(r["p.value"]), num(r["adj.p.value"])]
+
+
 def build_leutert(con, gid, problems) -> None:
     with open(PHOSPHO_SOURCES, encoding="utf-8") as f:
         specs = {r["treatment"]: r for r in csv.DictReader(f)}
     measure = {}
-    for kind in ("phospho", "protein"):
+    for kind in ("phospho",):
         for t, s in specs.items():
             cur = con.execute("INSERT INTO measures (kind, conditions, label, source, pmid, detail) VALUES (?, ?, ?, ?, ?, ?)",
                               (kind, s["conditions"], s["label"], "Leutert 2023", LEUTERT_PMID,
                                f"Leutert 2023 の条件 {t}。5 分（定常期は 24 時間）、未処理との比（LIMMA）"))
             measure[kind, t] = cur.lastrowid
-    for kind, table, sheet in (("phospho", "Supplementary_Table_6.xlsx", "p_site_diff_reg"),
-                               ("protein", "Supplementary_Table_4.xlsx", "protein_diff_reg")):
-        it = xlsx_rows(LEUTERT / table, sheet)
+    for kind in ("phospho",):
+        it = limma_rows()
         ix = {h: i for i, h in enumerate(next(it))}
         batch = []
         for r in it:
@@ -202,7 +213,7 @@ def build_leutert(con, gid, problems) -> None:
                                                        (measure[kind, t],)).fetchone()]
         con.executemany("DELETE FROM measures WHERE id = ?", [(measure[kind, t],) for t in missing])
         if kind == "phospho" and missing:
-            problems.append(f"Leutert の表 6 にない条件: {', '.join(missing)}")
+            problems.append(f"Leutert のリン酸化の結果にない条件: {', '.join(missing)}")
 
 
 def build_summary(con) -> None:

@@ -732,8 +732,7 @@ def add_paralog_categories(db: Database) -> int:
             if name in taken:
                 name += "（パラログ）"
             taken.add(name)
-            source = {"Alliance・YGOB": "全ゲノム重複でできた組（YGOB・Alliance）", "YGOB": "全ゲノム重複でできた組（YGOB）",
-                      "Alliance": "パラログ（Alliance）"}.get(r.sources, r.sources)
+            source = {"Alliance": "パラログ（Alliance）"}.get(r.sources, r.sources)
             lines = [source]
             if r.genetic:
                 lines.append(f"両方を壊すと強く悪くなる（BioGRID の遺伝的相互作用）: {r.genetic}"
