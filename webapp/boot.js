@@ -7,13 +7,13 @@ const PERSIST_DIR = "/persist";       // この PC のブラウザに残すも�
 const DOWNLOAD_DIR = "/downloads";    // ここに書いたファイルは、ブラウザのダウンロードとして保存する（CSV・PNG・SVG）
 
 // 起動画面の言語: Python が動く前は設定ファイル（/persist）を読めないので、Python が言語を決めたときに残す
-// localStorage の "pv-lang" を使う。なければブラウザの言語（ja で始まれば日本語、ほかは英語）
+// localStorage の "pv-lang" を使う。なければ英語（アプリの既定と同じ）
 const LANG = (() => {
   try {
     const saved = localStorage.getItem("pv-lang");
     if (saved === "ja" || saved === "en") return saved;
-  } catch (e) { /* 読めなくてもブラウザの言語で決める */ }
-  return String(navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";
+  } catch (e) { /* 読めなければ既定の英語 */ }
+  return "en";
 })();
 const T = (ja, en) => (LANG === "en" ? en : ja);
 document.documentElement.lang = LANG;

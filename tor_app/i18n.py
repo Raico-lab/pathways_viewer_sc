@@ -1,7 +1,7 @@
 """画面の言語（日本語・英語）。
 
-- 言語は user_data_dir()/settings.json の "language"（"ja" / "en"）に保存する。初めて起動したときは選んでもらう
-  （main.py・ブラウザ版の webmain.py が、画面を作る前に ask_language_if_needed を呼ぶ）。
+- 言語は user_data_dir()/settings.json の "language"（"ja" / "en"）に保存する。選んでいなければ英語
+  （メニューの「言語 / Language」で日本語を選ぶと保存する）。
 - 画面の文字は日本語を元にして tr("…") で包む。英語のときは訳の辞書（data/i18n/en/*.json。{日本語: 英語}）を引き、
   訳がなければ日本語のまま出す。差し込む値は tr("遺伝子 {n} 個", n=5) のように名前で渡す（訳の側で順番を変えられる）。
 - 多くの文字はモジュールを読み込むときに決まるので、言語を変えたら再起動（ブラウザ版は再読み込み）して反映する。
@@ -34,10 +34,10 @@ def saved_language() -> str | None:
 
 
 def language() -> str:
-    """今の画面の言語（"ja" / "en"）。選んでいなければ日本語。"""
+    """今の画面の言語（"ja" / "en"）。選んでいなければ英語。"""
     global _language
     if _language is None:
-        _language = saved_language() or "ja"
+        _language = saved_language() or "en"
     return _language
 
 
@@ -107,38 +107,3 @@ def restart() -> None:
     args = sys.argv[1:] if getattr(sys, "frozen", False) else sys.argv
     QProcess.startDetached(sys.executable, args)
     QApplication.quit()
-
-
-def ask_language_if_needed(then, parent=None) -> None:
-    """初めて起動したとき（言語をまだ選んでいないとき）、日本語か英語かを尋ねて保存し、then() を呼ぶ（選んであればすぐ呼ぶ）。
-    ブラウザ版は画面を止めて答えを待てないので、押したときに then を呼ぶ形にしている。"""
-    if saved_language() is not None:
-        then()
-        return
-    from PyQt6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
-    dialog = QDialog(parent)
-    dialog.setWindowTitle("言語 / Language")
-    layout = QVBoxLayout(dialog)
-    layout.addWidget(QLabel("表示する言語を選んでください。\nChoose the display language."))
-    row = QHBoxLayout()
-
-    def choose(lang: str) -> None:
-        global _language, _catalog
-        set_language(lang)
-        _language, _catalog = lang, None
-        dialog.accept()
-        then()
-
-    for lang, label in LANGUAGES.items():
-        button = QPushButton(label)
-        button.clicked.connect(lambda _=False, lang=lang: choose(lang))
-        row.addWidget(button)
-    layout.addLayout(row)
-    _keep_dialog.append(dialog)
-    if on_web():
-        dialog.show()
-    else:
-        dialog.exec()
-
-
-_keep_dialog: list = []   # ブラウザ版で、選ぶまでダイアログを消さないように持っておく

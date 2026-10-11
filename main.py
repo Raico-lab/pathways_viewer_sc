@@ -12,7 +12,6 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView  # noqa: F401 - QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication
 
-from tor_app import i18n
 from tor_app.ui.popup_guard import ComboPopupGuard
 
 
@@ -25,7 +24,6 @@ def main() -> int:
     app.setStyle("Fusion")
     app.setPalette(app.style().standardPalette())
     ComboPopupGuard(app)   # 配置・色などのプルダウンが稀に開かないときに開き直す
-    i18n.ask_language_if_needed(lambda: None)   # 初めてのときは言語を尋ねる（画面の文字は読み込むときに決まるので先に）
     from tor_app.ui.main_window import MainWindow
     window = MainWindow()
     if not window.start():

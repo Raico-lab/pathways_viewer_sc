@@ -199,13 +199,11 @@ _keep: list = []   # 画面の部品を消さないように持っておく
 def main() -> None:
     _patch()
     from PyQt6.QtWidgets import QApplication
-    from tor_app import i18n
 
     app = QApplication([])
     app.setApplicationName("PathwaysViewer")
     _keep.append(app)
-    # 画面の文字は読み込むときに決まるので、言語を選んでから画面を作る（初めてのときは尋ねる）
-    i18n.ask_language_if_needed(_open_window)
+    _open_window()
 
 
 def _open_window() -> None:
