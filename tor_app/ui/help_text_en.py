@@ -264,7 +264,7 @@ EDGE_DETAIL = """
 <b>Strength</b>, <b>What changes</b> (expression, activity, degradation, localization), and <b>Timing</b> (transient, sustained, returns on adaptation).</li>
 <li><b>Evidence and references</b>: one line per source. The colored [ ] is the source (literature, BioGRID, YEASTRACT+, SGD GO annotation, etc.); click a PMID to open PubMed.
 "Literature-verified" lines give what we read from the abstract, in our own words (no sentences are quoted from the paper; the source is shown by PMID).</li>
-<li>Links at the bottom let you compare with SGD's interaction and regulation lists.</li>
+<li>Links at the bottom let you compare with SGD's interaction and regulation lists. For paths with YEASTRACT+ evidence, you can also open the YEASTRACT+ evidence page for that pair (papers, experiments, conditions).</li>
 </ul>
 """
 

@@ -30,6 +30,12 @@ def _read_settings() -> dict:
 def saved_language() -> str | None:
     """保存した言語（まだ選んでいなければ None）。"""
     lang = _read_settings().get("language")
+    if lang not in LANGUAGES and on_web():
+        try:   # ブラウザ版は起動画面（boot.js）と同じく localStorage の "pv-lang" も見る
+            import js
+            lang = str(js.localStorage.getItem("pv-lang") or "")
+        except Exception:   # noqa: BLE001 - 読めなければ選んでいないものとする
+            lang = None
     return lang if lang in LANGUAGES else None
 
 

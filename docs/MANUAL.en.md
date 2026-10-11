@@ -144,6 +144,7 @@ Click a path to show the details of that path in the details panel.
 - **Type** (phosphorylation, etc.), **Effect** (activation, inhibition), **Basis for effect**, **Confidence** (A literature-verified to D inference only)
 - **Condition** (conditions under which the path was reported)
 - **Evidence and references**: one line per source. Click a PMID to open PubMed.
+- **Check in reference data** at the bottom: links to SGD's interaction and regulation pages. For paths with YEASTRACT+ evidence, a link to the YEASTRACT+ evidence page for that pair (papers, experiments, conditions) is also shown.
 - For literature-verified paths, the modified site, supporting experiment (in vivo, in vitro, etc.), redundant upstream regulators, and more are also shown.
 
 ### Back and forward

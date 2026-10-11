@@ -6,6 +6,7 @@
 import html
 import json
 import re
+import urllib.parse
 from dataclasses import dataclass, field
 
 from PyQt6.QtCore import QObject, Qt, QTimer, QUrl, pyqtSignal
@@ -3011,7 +3012,12 @@ class NetworkTab(QWidget):
                         f"<td>{v}</td></tr>" for k, v in rows)
         a, b = it.source.gene_name, it.target.gene_name
         # 参照データのリンクは、リンクの途中で折り返さないよう 1 つずつ改行して並べる
-        sgd = (f"<p style='font-size:11px;color:#888'>{tr('参照データで確かめる:')}<br>"
+        # YEASTRACT+ が根拠にある経路は、その組の根拠のページ（論文・実験・条件の一覧）へ案内する
+        yeastract = (f"<a href='https://yeastract-plus.org/yeastract/scerevisiae/view.php?existing=regulation"
+                     f"&amp;proteinname={urllib.parse.quote(a)}&amp;orfname={urllib.parse.quote(b)}'>"
+                     f"{tr('YEASTRACT+ の {a} → {b} の根拠', a=html.escape(a), b=html.escape(b))}</a><br>"
+                     if "YEASTRACT" in (it.evidence or "") else "")
+        sgd = (f"<p style='font-size:11px;color:#888'>{tr('参照データで確かめる:')}<br>{yeastract}"
                f"<a href='https://www.yeastgenome.org/locus/{a}/interaction'>{tr('SGD {gene} の相互作用', gene=html.escape(a))}</a><br>"
                f"<a href='https://www.yeastgenome.org/locus/{a}/regulation'>{tr('{gene} の制御', gene=html.escape(a))}</a><br>"
                f"<a href='https://www.yeastgenome.org/locus/{b}/interaction'>{tr('SGD {gene} の相互作用', gene=html.escape(b))}</a><br>"
