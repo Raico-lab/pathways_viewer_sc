@@ -198,13 +198,28 @@ def export_proteins(db: Database, path: str, ids: set[int] | None = None) -> Non
     _write(path, EXPORT_PROTEIN_COLUMNS, rows)
 
 
-def export_interactions(db: Database, path: str, ids: set[int] | None = None) -> None:
-    """ids を渡すと、その制御関係だけを書き出す（データベースで絞り込んだ行）。"""
+# YEASTRACT+ 以外の出典の印。どれもなく YEASTRACT+ だけが根拠の経路は、CSV に書き出さない
+# （YEASTRACT+ の利用条件: 内容の相当部分を、YEASTRACT+ と競合する形で再公開しない。https://www.yeastract-plus.org/termsusage.php ）
+OTHER_SOURCES = ("文献で確認", "SGD GO", "GO-CAM", "BioGRID", "PhosphoGRID", "UniProt", "PMID")
+
+
+def yeastract_only(evidence: str | None) -> bool:
+    """根拠が YEASTRACT+ だけの経路か。"""
+    ev = evidence or ""
+    return "YEASTRACT" in ev and not any(mark in ev for mark in OTHER_SOURCES)
+
+
+def export_interactions(db: Database, path: str, ids: set[int] | None = None) -> tuple[int, int]:
+    """ids を渡すと、その制御関係だけを書き出す（データベースで絞り込んだ行）。
+    YEASTRACT+ だけが根拠の経路は書き出さない。戻り値は（書き出した数, 外した数）。"""
+    chosen = [it for it in db.interactions() if ids is None or it.id in ids]
+    kept = [it for it in chosen if not yeastract_only(it.evidence)]
     rows = [[it.source.gene_name, it.target.gene_name, it.interaction_type,
              resolve_effect(it.interaction_type, it.effect), it.evidence, it.conditions]
             + [getattr(it, name) for name, _ in DETAILS]
-            for it in db.interactions() if ids is None or it.id in ids]
+            for it in kept]
     _write(path, EXPORT_INTERACTION_COLUMNS, rows)
+    return len(kept), len(chosen) - len(kept)
 
 
 def _write(path: str, columns: list[str], rows: list[list]) -> None:

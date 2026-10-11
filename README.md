@@ -9,7 +9,8 @@ It covers all genes (the bundled sample data center on the TOR pathway). The UI 
 - Browser version: https://raico-lab.github.io/pathways-viewer/
 - User guide: [docs/MANUAL.en.md](docs/MANUAL.en.md) (Japanese: [docs/MANUAL.md](docs/MANUAL.md))
 - License: source code under the GNU GPL v3 ([LICENSE](LICENSE)). Bundled data are not covered by the GPL; see
-  [DATA_LICENSES.md](DATA_LICENSES.md) for sources and terms of use.
+  [DATA_LICENSES.md](DATA_LICENSES.md) for sources and terms of use. Transcriptional regulation data from YEASTRACT+ are used
+  to view paths on the map, not to redistribute YEASTRACT+; for bulk use, obtain the data from YEASTRACT+ (https://yeastract-plus.org/).
 
 The rest of this README is in Japanese.
 
@@ -25,7 +26,8 @@ Copyright (C) 2026 Rai Katsukawa
 
 ソースコードは **GNU General Public License version 3**（[LICENSE](LICENSE)）です。再配布・改変は GPLv3 の条件に従ってください。
 無保証です。ほかの部品のライセンスは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、同梱のデータの出典と利用条件は
-[DATA_LICENSES.md](DATA_LICENSES.md)（データには GPL は及ばず、出典ごとの条件に従う）。
+[DATA_LICENSES.md](DATA_LICENSES.md)（データには GPL は及ばず、出典ごとの条件に従う）。YEASTRACT+ 由来の転写制御は地図で経路を見るために使っており、
+YEASTRACT+ のデータの配布元ではありません。まとめて使うときは YEASTRACT+（https://yeastract-plus.org/ ）から取得してください。
 
 研究で使った場合の引用の仕方は [CITATION.cff](CITATION.cff)（GitHub の「Cite this repository」）。デスクトップ版が同梱する Qt の LGPL-3.0 の全文は
 [licenses/LGPL-3.0.txt](licenses/LGPL-3.0.txt)。

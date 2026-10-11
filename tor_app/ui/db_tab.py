@@ -853,9 +853,16 @@ class DatabaseTab(QWidget):
         if not path:
             return
         try:
-            (csv_io.export_proteins if index == 0 else csv_io.export_interactions)(self.db, path, ids)
+            if index == 0:
+                csv_io.export_proteins(self.db, path, ids)
+                written, dropped = page.proxy.rowCount(), 0
+            else:
+                written, dropped = csv_io.export_interactions(self.db, path, ids)
         except OSError as e:
             QMessageBox.critical(self, i18n.tr("エラー"), i18n.tr("書き出せませんでした。\n{error}", error=e))
             return
-        QMessageBox.information(self, i18n.tr("エクスポート完了"),
-                                i18n.tr("{n} 件を {path} に保存しました。", n=page.proxy.rowCount(), path=path))
+        text = i18n.tr("{n} 件を {path} に保存しました。", n=written, path=path)
+        if dropped:   # YEASTRACT+ の利用条件のため
+            text += "\n" + i18n.tr("YEASTRACT+ だけが根拠の経路 {n} 本は書き出していません（YEASTRACT+ の利用条件のため。"
+                                    "根拠は各経路の説明欄から YEASTRACT+ で見られます）。", n=f"{dropped:,}")
+        QMessageBox.information(self, i18n.tr("エクスポート完了"), text)

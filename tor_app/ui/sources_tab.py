@@ -145,9 +145,10 @@ class SourcesTab(QWidget):
         def site_cells(s: dict, bg: str) -> str:
             hosts = "<br>".join(link(x["url"], re.sub(r"^https?://(www\.)?|/$", "", x["url"]))
                                for x in [s] + s.get("includes", []))
-            # データの利用条件（data/sources.json の license。詳しくは DATA_LICENSES.md）
-            lic = (f"<br><span style='color:#888;font-size:10px'>{html.escape(i18n.tr(s['license']))}</span>"
-                   if s.get("license") else "")
+            # データの利用条件（data/sources.json の license。license_url があれば条件のページへのリンク。詳しくは DATA_LICENSES.md）
+            lic_text = i18n.tr(s["license"]) if s.get("license") else ""
+            lic = (f"<br><span style='font-size:10px'>{link(s['license_url'], lic_text, '#888')}</span>" if s.get("license_url")
+                   else f"<br><span style='color:#888;font-size:10px'>{html.escape(lic_text)}</span>" if lic_text else "")
             # サイトが引用を求める論文（著者と年だけ。押すと論文を開く。papers.json に書誌がなければ PMID で）
             def short(p: dict) -> str:
                 return p["cite"][:p["cite"].find(p["year"]) + len(p["year"])] if p.get("year") in p["cite"] else p["cite"]

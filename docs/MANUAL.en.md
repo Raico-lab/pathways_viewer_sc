@@ -350,7 +350,7 @@ Switch the top-left selector of the **Conditions** tab to "**Genes**" and choose
 
 ![Database tab](manual/16_database.png)
 
-- **Database** tab: lists of genes, regulatory paths, and categories (complexes, paralogs). Filter by name, upstream/downstream, and condition (toggle conditions with "Clear all" / "Select all"), and export with "Export visible table to CSV…" (gene and path tables only; disabled on the Categories tab). Selecting a row shows its details on the right (same content as the Network details panel; empty at first, with help under Help at the top right of the table). View only.
+- **Database** tab: lists of genes, regulatory paths, and categories (complexes, paralogs). Filter by name, upstream/downstream, and condition (toggle conditions with "Clear all" / "Select all"), and export with "Export visible table to CSV…" (gene and path tables only; disabled on the Categories tab; paths supported only by YEASTRACT+ are not exported, per the YEASTRACT+ terms of use). Selecting a row shows its details on the right (same content as the Network details panel; empty at first, with help under Help at the top right of the table). View only.
 - **Sources** tab: data sources (SGD, BioGRID, YEASTRACT+, etc.), the papers used in the literature review (filter by title or author), and their terms of use.
 
 The server version of the data is authoritative; at every start, a newer version is installed automatically if available (you can also check with "File > Check for latest data").
