@@ -1811,7 +1811,7 @@ class NetworkTab(QWidget):
                 mark = {"→": "←", "⊣": "⊢", "─◇": "◇─"}[mark]
             return mark, its
 
-        heading = tr("経路") if len(rows) == 1 else tr("経路 {n} 本", n=len(rows))
+        heading = tr("経路（1 本）") if len(rows) == 1 else tr("経路 {n} 本", n=len(rows))
         parts = [f"<h3 style='margin:0 0 6px 0'>{heading}</h3>"]
         for row in rows[:self.PATHS_SHOWN]:
             steps = [step(row.nodes[i], row.nodes[i + 1], row.forward[i]) for i in range(len(row.nodes) - 1)]
@@ -2399,7 +2399,7 @@ class NetworkTab(QWidget):
         for i in range(self.trf_tree.topLevelItemCount()):
             gene = self.trf_tree.topLevelItem(i)
             key = gene.data(0, Qt.ItemDataRole.UserRole)
-            gene_hit = not words or words in gene.text(0).split("（")[0].lower()
+            gene_hit = not words or words in self._group_name(gene).lower()
             gene_any = gene_hit
             for j in range(gene.childCount()):
                 group = gene.child(j)
@@ -3071,7 +3071,9 @@ class NetworkTab(QWidget):
                       f"Complex Portal {html.escape(cat.ref)}</a></p>")
         if cat and cat.description:
             about += f"<h4 style='margin-bottom:2px'>{tr('説明')}</h4>{self._description_html(cat.description)}"
-        return (f"<h2>{tr('{name} 複合体', name=html.escape(name))}</h2>{about}"
+        # 名前がもともと「… complex」のときは、英語で「complex」を重ねない
+        title = html.escape(name) if name.lower().endswith("complex") else tr("{name} 複合体", name=html.escape(name))
+        return (f"<h2>{title}</h2>{about}"
                 f"<h4>{tr('構成する遺伝子 ({n})', n=len(members))}</h4><ul>{items}</ul>"
                 + self._complex_edges(name, members))
 

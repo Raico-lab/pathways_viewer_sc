@@ -7,7 +7,6 @@
  "関係: ": "Relations: ",
  "、": ", ",
  "・": ", ",
- "経路": "Path",
  "経路 {n} 本": "{n} paths",
  "確度 {level}": "confidence {level}",
  "ほか {n} 本": "{n} more",
@@ -90,5 +89,6 @@
  "出典:": "Source:",
  "説明": "Description",
  "{name} 複合体": "{name} complex",
- "構成する遺伝子 ({n})": "Member genes ({n})"
+ "構成する遺伝子 ({n})": "Member genes ({n})",
+ "経路（1 本）": "Path"
 }

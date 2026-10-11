@@ -263,7 +263,7 @@ class MainWindow(QMainWindow):
             db.proteins()  # 接続確認
         except Exception as e:  # noqa: BLE001 - 破損などを利用者に伝える
             QMessageBox.critical(self, i18n.tr("DB を開けません"),
-                                 i18n.tr("{error}\n\n「ファイル > 同梱データに戻す」で初期状態に戻せます。", error=e))
+                                 i18n.tr("{error}\n\n「ファイル > データの保存フォルダを開く」で tor_pathway.db を消してから起動し直すと、同梱のデータに戻ります。", error=e))
             return False
         self.db = db
         self.db_tab.set_database(db)

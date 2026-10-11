@@ -49,22 +49,22 @@ def _text_catalog() -> dict[str, str]:
 # 条件の名前（data/conditions.csv の label）の英語。conditions.csv に英語の列（label_en）があればそれを使い、
 # なければ画面の訳の辞書、それもなければ YEASTRACT+ の小群の名前・下の表を使う
 _COND_EXTRA = {
-    "通常の増殖": "normal growth", "G1 期": "G1 phase", "S 期": "S phase", "G2 期": "G2 phase",
-    "分裂期（M 期）": "M phase", "分裂期の終わり・細胞質分裂": "mitotic exit / cytokinesis",
-    "細胞周期の同調（時期は問わない）": "cell cycle synchronized (any phase)", "ラパマイシン": "rapamycin",
-    "小胞体ストレス": "ER stress", "分類なし": "not classified", "未分類": "unassigned",
+    "通常の増殖": "Normal growth", "G1 期": "G1 phase", "S 期": "S phase", "G2 期": "G2 phase",
+    "分裂期（M 期）": "M phase", "分裂期の終わり・細胞質分裂": "Mitotic exit / cytokinesis",
+    "細胞周期の同調（時期は問わない）": "Cell cycle synchronized (any phase)", "ラパマイシン": "Rapamycin",
+    "小胞体ストレス": "ER stress", "分類なし": "Not classified", "未分類": "Unassigned",
     "条件の記録なし": "No condition recorded",
     # 文献の CSV の条件の書き方（自由に書いたもの）でよく出る言葉
-    "分裂期": "M phase", "分裂期の終わり": "mitotic exit", "細胞質分裂": "cytokinesis", "M 期": "M phase",
-    "G1期": "G1 phase", "S期": "S phase", "G2期": "G2 phase", "M期": "M phase",
-    "アミノ酸飢餓": "amino acid starvation", "窒素飢餓": "nitrogen starvation", "グルコース飢餓": "glucose starvation",
-    "減数分裂": "meiosis", "窒素の飢餓": "nitrogen starvation", "アミノ酸の飢餓": "amino acid starvation",
-    "熱": "heat", "高浸透圧": "hyperosmotic stress", "低浸透圧": "hypo-osmotic stress",
-    "栄養の飢餓": "nutrient starvation", "薬剤": "drug", "フェロモン": "pheromone", "ガラクトース": "galactose",
-    "イノシトール": "inositol", "カルシウム": "calcium", "低酸素": "hypoxia", "アミノ酸の制限": "amino acid limitation",
-    "グルコース枯渇": "glucose depletion", "グルコース添加": "glucose addition", "鉄欠乏": "iron deficiency",
-    "カドミウム": "cadmium", "バイオフィルム": "biofilm", "亜鉛欠乏": "zinc deficiency", "低グルコース": "low glucose",
-    "低リン酸": "low phosphate", "化学物質": "chemicals", "無酸素": "anoxia", "偽菌糸": "pseudohyphae", "飢餓": "starvation", "通常時": "normal growth",
+    "分裂期": "Mitosis", "分裂期の終わり": "Mitotic exit", "細胞質分裂": "Cytokinesis", "M 期": "Mitosis",
+    "G1期": "G1 phase", "S期": "S phase", "G2期": "G2 phase", "M期": "Mitosis",
+    "アミノ酸飢餓": "Amino acid starvation", "窒素飢餓": "Nitrogen starvation", "グルコース飢餓": "Glucose starvation",
+    "減数分裂": "Meiosis", "窒素の飢餓": "Nitrogen starvation", "アミノ酸の飢餓": "Amino acid starvation",
+    "熱": "Heat", "高浸透圧": "Hyperosmotic stress", "低浸透圧": "Hypo-osmotic stress",
+    "栄養の飢餓": "Nutrient starvation", "薬剤": "Drug", "フェロモン": "Pheromone", "ガラクトース": "Galactose",
+    "イノシトール": "Inositol", "カルシウム": "Calcium", "低酸素": "Hypoxia", "アミノ酸の制限": "Amino acid limitation",
+    "グルコース枯渇": "Glucose depletion", "グルコース添加": "Glucose addition", "鉄欠乏": "Iron deficiency",
+    "カドミウム": "Cadmium", "バイオフィルム": "Biofilm", "亜鉛欠乏": "Zinc deficiency", "低グルコース": "Low glucose",
+    "低リン酸": "Low phosphate", "化学物質": "Chemicals", "無酸素": "Anoxia", "偽菌糸": "Pseudohyphae", "飢餓": "Starvation", "通常時": "Normal growth",
 }
 
 
@@ -143,6 +143,8 @@ def _punct(text: str) -> str:
     text = re.sub(r"\s*：\s*", ": ", text)
     text = text.replace("。", ". ").replace("〜", "–").replace("「", "“").replace("」", "”")
     text = re.sub(r"\(\s+", "(", text)
+    text = re.sub(r"\s+\)", ")", text)
+    text = re.sub(r"\s*→\s*", " → ", text)
     return re.sub(r"  +", " ", text).strip()
 
 
@@ -154,13 +156,13 @@ def _record(m: re.Match) -> str:
     """（記録の向きと一致）・（記録の促進を直した）・（記録の抑制のまま）"""
     s = m.group(1)
     if s == "記録の向きと一致":
-        return "(agrees with the recorded effect)"
+        return " (agrees with the recorded effect)"
     mm = re.fullmatch(r"記録の(促進|抑制|作用不明)を直した", s)
     if mm:
-        return f"(corrected from the recorded {_sign(mm.group(1))})"
+        return f" (corrected from the recorded {_sign(mm.group(1))})"
     mm = re.fullmatch(r"記録の(促進|抑制|作用不明)のまま", s)
     if mm:
-        return f"(recorded {_sign(mm.group(1))} kept)"
+        return f" (recorded {_sign(mm.group(1))} kept)"
     return m.group(0)
 
 
@@ -184,7 +186,10 @@ _RULES: list[tuple[re.Pattern, object]] = [(re.compile(p), r) for p, r in [
     (r"^⚠ 条件ごとの発現では逆向き: ", "⚠ Opposite in expression across conditions: "),
     (r"^⚠ IDEA では逆向き: ", "⚠ Opposite in IDEA: "),
     (r"^⚠ ", "⚠ "),
-    (r"^作用の向き: ", "Effect from: "),
+    (r"^作用の向き: ", "Effect direction: "),
+    (r"^間接の作用（", "Indirect effect ("),
+    (r"([^（）、。\s][^（）、。]*?) ?を介する", r"via \1"),
+    (r"(\S+) 依存", r"\1-dependent"),
     (r"^公開データ: ", "Public data: "),
     (r"^条件: ", "Condition: "),
     (r"^注記: ", "Note: "),
@@ -268,7 +273,7 @@ def segment_en(seg: str) -> str:
 
 # 自由に書いた文の前置き
 _HEADS = [("要旨・本文: ", "Summary and full text: "), ("本文: ", "Full text: "), ("注記: ", "Note: "),
-          ("条件: ", "Condition: "), ("間接の作用（", "Indirect effect ("), ("作用の向き: ", "Effect from: ")]
+          ("条件: ", "Condition: "), ("間接の作用（", "Indirect effect ("), ("作用の向き: ", "Effect direction: ")]
 
 
 def evidence_en(text: str) -> str:

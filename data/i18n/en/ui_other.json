@@ -38,7 +38,6 @@
  "サーバー: {url}": "Server: {url}",
  "未設定": "not configured",
  "DB を開けません": "Cannot open the database",
- "{error}\n\n「ファイル > 同梱データに戻す」で初期状態に戻せます。": "{error}\n\nUse \"File > Restore bundled data\" to return to the initial state.",
  "データ: {path}": "Data: {path}",
  "遺伝子名で検索 例: TOR1": "Search gene name, e.g. TOR1",
  "⧉ 新しい枠": "⧉ New panel",
@@ -226,5 +225,6 @@
  "ダウンロードしたデータに必要な表がありません": "The downloaded data is missing required tables",
  "デスクトップアプリ": "Desktop app",
  "利用条件あり": "Terms of use apply",
- "明示なし・引用を依頼": "Not stated; citation requested"
+ "明示なし・引用を依頼": "Not stated; citation requested",
+ "{error}\n\n「ファイル > データの保存フォルダを開く」で tor_pathway.db を消してから起動し直すと、同梱のデータに戻ります。": "{error}\n\nTo return to the bundled data, open \"File > Open data folder\", delete tor_pathway.db, and restart the app."
 }
