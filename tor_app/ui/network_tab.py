@@ -18,6 +18,7 @@ from .. import complex_groups, conditions, confidence, expression, relation_path
 from ..db import Database
 from ..db.vocab import DETAILS, EFFECTS, INTERACTION_TYPES, detail_text, resolve_effect, type_label
 from ..graph_data import PathwayModel
+from ..i18n import tr
 from ..paths import resource_path, user_data_dir
 from . import help_text
 from .gene_set_window import GeneSetPane, MapWindow

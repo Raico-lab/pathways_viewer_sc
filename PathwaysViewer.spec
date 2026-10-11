@@ -12,7 +12,7 @@ DATA_FILES = ["tor_pathway.db", "expression.db", "server.json", "conditions.csv"
 a = Analysis(
     ["main.py"],
     # LICENSE などは GPLv3 で配るために同梱する（アプリの「ヘルプ > このアプリについて」からも案内する）
-    datas=[("tor_app/web", "tor_app/web")] + [(f"data/{name}", "data") for name in DATA_FILES]
+    datas=[("tor_app/web", "tor_app/web"), ("data/i18n/en", "data/i18n/en")] + [(f"data/{name}", "data") for name in DATA_FILES]   # 英語の訳の辞書
           + [(name, ".") for name in ("LICENSE", "THIRD_PARTY_NOTICES.md", "DATA_LICENSES.md")]
           + [(f"licenses/{name}", "licenses") for name in ("LGPL-3.0.txt", "BioGRID-MIT.txt", "YeastPhosphoAtlasAnalysis-MIT.txt")],   # Qt（LGPL-3.0）・BioGRID と Leutert 2023 のリン酸化のデータ（MIT）
     hiddenimports=["sqlalchemy.dialects.sqlite"],

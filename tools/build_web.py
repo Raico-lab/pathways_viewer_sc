@@ -66,6 +66,9 @@ def build_app_zip(dest: Path) -> None:
                 zf.writestr("data/server.json", json.dumps({"base_url": ""}))
             elif path.suffix in SMALL_DATA_SUFFIXES:
                 zf.write(path, f"data/{path.name}")
+        # 英語の訳の辞書（tor_app/i18n.py が読む）
+        for path in sorted((ROOT / "data" / "i18n" / "en").glob("*.json")):
+            zf.write(path, f"data/i18n/en/{path.name}")
 
 
 def _bust(html: str, folder: Path, names) -> str:

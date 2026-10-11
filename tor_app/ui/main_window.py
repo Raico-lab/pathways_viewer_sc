@@ -8,7 +8,7 @@ from PyQt6.QtGui import QAction, QDesktopServices
 from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton, QTabWidget,
                              QVBoxLayout, QWidget)
 
-from .. import datastore, server
+from .. import datastore, i18n, server
 from ..db import Database
 from ..paths import TITLE, TITLE_HTML, user_data_dir
 from .db_tab import DatabaseTab
@@ -122,6 +122,21 @@ class MainWindow(QMainWindow):
         license_action = QAction("このアプリについて", self)
         license_action.triggered.connect(lambda: QMessageBox.about(self, "このアプリについて", ABOUT_TEXT))
         help_menu.addAction(license_action)
+        # 言語の切り替え（どちらの言語でも見つけられるよう、名前は両方で書く）。選ぶと保存して起動し直す
+        lang_menu = self.menuBar().addMenu("言語 / Language")
+        for lang, label in i18n.LANGUAGES.items():
+            action = QAction(label, self)
+            action.setCheckable(True)
+            action.setChecked(lang == i18n.language())
+            action.triggered.connect(lambda _=False, lang=lang: self._change_language(lang))
+            lang_menu.addAction(action)
+
+    def _change_language(self, lang: str) -> None:
+        """言語を変える: 保存して、アプリを起動し直す（ブラウザ版はページを読み直す）。画面の文字は読み込むときに決まるため。"""
+        if lang == i18n.language():
+            return
+        i18n.set_language(lang)
+        i18n.restart()
 
     # ---- DB を開く ----
     def start(self) -> bool:
