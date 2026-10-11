@@ -2828,7 +2828,8 @@ class NetworkTab(QWidget):
             return html.escape(text)
         # 1 行目は、なるべく区切り（・や空白）の後ろで折る
         cut = max(first.rfind("・"), first.rfind(" "), first.rfind("（"))
-        if cut > len(first) // 2:
+        # 英語は単語の途中で折らない（空白があれば、短くなってもそこで折る）
+        if cut > (0 if text.isascii() else len(first) // 2):
             first, rest = first[:cut + 1], text[cut + 1:]
         second = metrics.elidedText(rest.strip(), Qt.TextElideMode.ElideRight, width)
         # 2 行目は ▸ の分だけ下げて、1 行目の名前の頭にそろえる
