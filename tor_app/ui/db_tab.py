@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComple
                              QTabWidget, QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout,
                              QWidget, QWidgetAction)
 
-from .. import conditions
+from .. import conditions, i18n
 from ..db import Database
 from ..db import csv_io
 from ..db.vocab import EFFECTS, PARALOG_SOURCE, resolve_effect, type_label
@@ -172,7 +172,7 @@ class GenePicker(QLineEdit):
         self.chosen = ""
         self.names: dict[str, str] = {}   # 大文字の名前 → 表示の名前
         self.setClearButtonEnabled(True)
-        self.setPlaceholderText("名前で絞り込む")
+        self.setPlaceholderText(i18n.tr("名前で絞り込む"))
         self.setFixedWidth(140)
         completer = QCompleter([])
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
@@ -226,7 +226,7 @@ class ConditionPicker(QPushButton):
 
     def __init__(self):
         super().__init__()
-        self.setText("条件")
+        self.setText(i18n.tr("条件"))
         self.setMinimumWidth(220)   # 「条件: 浸透圧ストレス ほか 12」などが切れないように
         self.tree = QTreeWidget()
         self.tree.setHeaderHidden(True)
@@ -298,8 +298,9 @@ class ConditionPicker(QPushButton):
                     selected.add(key)
         names = conditions.labels()
         first = sorted(names.get(k, k) for k in selected)[:1]
-        self.setText("条件: すべて" if selected == keys else "条件: なし" if not selected else
-                     f"条件: {first[0]}" + (f" ほか {len(selected) - 1}" if len(selected) > 1 else ""))
+        self.setText(i18n.tr("条件: すべて") if selected == keys else i18n.tr("条件: なし") if not selected else
+                     i18n.tr("条件: {name}", name=first[0])
+                     + (i18n.tr(" ほか {n}", n=len(selected) - 1) if len(selected) > 1 else ""))
         off = keys - selected
         if (off, selected) != (self.off, self.selected):
             self.keys, self.off, self.selected = keys, off, selected
@@ -374,7 +375,7 @@ class TablePage(QWidget):
         self.proxy.layoutChanged.connect(self._update_count)
 
     def _update_count(self, *_):
-        self.count.setText(f"{self.proxy.rowCount()} / {self.model.rowCount()} 件")
+        self.count.setText(i18n.tr("{shown} / {total} 件", shown=self.proxy.rowCount(), total=self.model.rowCount()))
 
     def shown_ids(self) -> set[int]:
         """絞り込みで残っている行の id。"""
@@ -397,21 +398,22 @@ class DatabaseTab(QWidget):
         super().__init__(parent)
         self.db: Database | None = None
         self.proteins_page = TablePage(
-            ["遺伝子名", "Systematic 名", "ORF の確度（SGD）", "機能説明"])
+            [i18n.tr(h) for h in ("遺伝子名", "Systematic 名", "ORF の確度（SGD）", "機能説明")])
         self.interactions_page = TablePage(
-            ["上流", "下流", "種類", "作用の向き", "条件", "根拠・文献"])
-        self.categories_page = TablePage(["名前", "複合体", "色", "所属遺伝子数", "所属遺伝子", "出典"])
+            [i18n.tr(h) for h in ("上流", "下流", "種類", "作用の向き", "条件", "根拠・文献")])
+        self.categories_page = TablePage(
+            [i18n.tr(h) for h in ("名前", "複合体", "色", "所属遺伝子数", "所属遺伝子", "出典")])
 
         self._build_filters()
         self._proteins, self._interactions, self._categories = [], [], []
         self._cat_members: dict[int, list[str]] = {}   # カテゴリ → 所属する遺伝子名（手作業の区分と Complex Portal・パラログ）
 
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.proteins_page, "遺伝子")
-        self.tabs.addTab(self.interactions_page, "制御関係")
-        self.tabs.addTab(self.categories_page, "カテゴリ")
+        self.tabs.addTab(self.proteins_page, i18n.tr("遺伝子"))
+        self.tabs.addTab(self.interactions_page, i18n.tr("制御関係"))
+        self.tabs.addTab(self.categories_page, i18n.tr("カテゴリ"))
 
-        self.export_button = QPushButton("表示中の表を CSV エクスポート…")
+        self.export_button = QPushButton(i18n.tr("表示中の表を CSV エクスポート…"))
         bottom = QHBoxLayout()
         bottom.addStretch(1)
         bottom.addWidget(self.export_button)
@@ -438,8 +440,8 @@ class DatabaseTab(QWidget):
         nav = QHBoxLayout()
         nav.setContentsMargins(0, 0, 0, 0)
         self.detail_back, self.detail_forward = QPushButton("◀"), QPushButton("▶")
-        for button, step, tip in ((self.detail_back, -1, "前に表示した説明に戻る"),
-                                  (self.detail_forward, 1, "次に表示した説明に進む")):
+        for button, step, tip in ((self.detail_back, -1, i18n.tr("前に表示した説明に戻る")),
+                                  (self.detail_forward, 1, i18n.tr("次に表示した説明に進む"))):
             button.setFixedWidth(34)
             button.setToolTip(tip)
             button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -453,7 +455,7 @@ class DatabaseTab(QWidget):
         right_layout.addWidget(self.help_view, 1)
         # 一番下の Help（地図の説明欄と同じ）: 出している説明の見方を、説明欄の新しいページとして出す（◀ で戻れる）
         detail_help = QPushButton("Help")
-        detail_help.setToolTip("この説明欄の見方を表示します（◀ で戻れます）")
+        detail_help.setToolTip(i18n.tr("この説明欄の見方を表示します（◀ で戻れます）"))
         detail_help.clicked.connect(self.show_detail_help)
         right_layout.addWidget(detail_help)
         self._update_nav()
@@ -486,10 +488,10 @@ class DatabaseTab(QWidget):
 
         self.gene_name, self.gene_up, self.gene_down = GenePicker(), steps(), steps()
         row = self.proteins_page.filter_row
-        for label, w in (("遺伝子", self.gene_name), ("上流", self.gene_up), ("下流", self.gene_down)):
+        for label, w in ((i18n.tr("遺伝子"), self.gene_name), (i18n.tr("上流"), self.gene_up), (i18n.tr("下流"), self.gene_down)):
             row.addWidget(QLabel(label))
             row.addWidget(w)
-        self.gene_exact = QCheckBox("一致")   # チェック中は選んだ遺伝子だけ（上流・下流の段数は使わない）
+        self.gene_exact = QCheckBox(i18n.tr("一致"))   # チェック中は選んだ遺伝子だけ（上流・下流の段数は使わない）
         row.addWidget(self.gene_exact)
         self.gene_name.chosenChanged.connect(self._filter_proteins)
         self.gene_up.valueChanged.connect(self._filter_proteins)
@@ -499,13 +501,14 @@ class DatabaseTab(QWidget):
         self.rel_source, self.rel_target = GenePicker(), GenePicker()
         self.rel_conditions = ConditionPicker()
         row = self.interactions_page.filter_row
-        for label, w in (("上流", self.rel_source), ("下流", self.rel_target)):
+        for label, w in ((i18n.tr("上流"), self.rel_source), (i18n.tr("下流"), self.rel_target)):
             row.addWidget(QLabel(label))
             row.addWidget(w)
         row.addWidget(self.rel_conditions)
-        for text, on in (("すべて解除", False), ("すべて選択", True)):
+        for text, tip, on in ((i18n.tr("すべて解除"), i18n.tr("条件をすべて解除"), False),
+                              (i18n.tr("すべて選択"), i18n.tr("条件をすべて選択"), True)):
             button = QPushButton(text)
-            button.setToolTip(f"条件を{text}")
+            button.setToolTip(tip)
             button.clicked.connect(lambda _=False, on=on: self.rel_conditions.set_all(on))
             row.addWidget(button)
         self.rel_source.chosenChanged.connect(self._filter_interactions)
@@ -514,13 +517,13 @@ class DatabaseTab(QWidget):
 
         # カテゴリ自体の名前（複合体・パラログの組の名前）でも絞り込む。打つたびに、名前にその文字を含むものだけを残す
         self.cat_name = QLineEdit()
-        self.cat_name.setPlaceholderText("名前で絞り込む")
+        self.cat_name.setPlaceholderText(i18n.tr("名前で絞り込む"))
         self.cat_name.setClearButtonEnabled(True)
         self.cat_name.setFixedWidth(180)
         self.cat_gene = GenePicker()
         row = self.categories_page.filter_row
         row.addWidget(self.cat_name)
-        row.addWidget(QLabel("遺伝子"))
+        row.addWidget(QLabel(i18n.tr("遺伝子")))
         row.addWidget(self.cat_gene)
         self.cat_name.textChanged.connect(self._filter_categories)
         self.cat_gene.chosenChanged.connect(self._filter_categories)
@@ -746,13 +749,15 @@ class DatabaseTab(QWidget):
             link = (f"<a href='https://www.ebi.ac.uk/complexportal/complex/{html.escape(c.ref)}'>"
                     f"{html.escape(c.source)} {html.escape(c.ref)}</a>")
             return (f"<h2 style='margin-bottom:2px'>{html.escape(c.name)}</h2><p>{link}</p>"
-                    f"<h4>所属する遺伝子 ({len(members)})</h4>"
-                    + (f"<ul style='margin-top:0'>{items}</ul>" if items else "<span style='color:#888'>なし</span>")
-                    + (f"<h4 style='margin-bottom:2px'>説明</h4>{self._desc_html(c.description)}" if c.description else ""))
+                    f"<h4>{i18n.tr('所属する遺伝子')} ({len(members)})</h4>"
+                    + (f"<ul style='margin-top:0'>{items}</ul>" if items else f"<span style='color:#888'>{i18n.tr('なし')}</span>")
+                    + (f"<h4 style='margin-bottom:2px'>{i18n.tr('説明')}</h4>{self._desc_html(c.description)}"
+                       if c.description else ""))
         swatch = f"<span style='background:{html.escape(c.color or '')}'>&nbsp;&nbsp;&nbsp;&nbsp;</span> {html.escape(c.color or '')}"
-        return (f"<h2 style='margin-bottom:2px'>{html.escape(c.name)}{' 複合体' if c.is_complex and not c.name.endswith('複合体') else ''}</h2>"
-                f"<p>色: {swatch}</p><h4>所属する遺伝子 ({len(members)})</h4>"
-                + (f"<ul style='margin-top:0'>{items}</ul>" if items else "<span style='color:#888'>なし</span>")
+        suffix = i18n.tr(" 複合体") if c.is_complex and not c.name.endswith(("複合体", "complex")) else ""
+        return (f"<h2 style='margin-bottom:2px'>{html.escape(c.name)}{suffix}</h2>"
+                f"<p>{i18n.tr('色: {swatch}', swatch=swatch)}</p><h4>{i18n.tr('所属する遺伝子')} ({len(members)})</h4>"
+                + (f"<ul style='margin-top:0'>{items}</ul>" if items else f"<span style='color:#888'>{i18n.tr('なし')}</span>")
                 + (self._complex_about(c.name, {p.gene_name.upper() for p in members}) if c.is_complex else ""))
 
     def _complex_about(self, name: str, genes: set[str]) -> str:
@@ -774,7 +779,7 @@ class DatabaseTab(QWidget):
             parts.append(f"<p style='margin-bottom:2px'><a href='https://www.ebi.ac.uk/complexportal/complex/{ac}'>"
                          f"{html.escape(title)}</a> <span style='color:#888'>({'・'.join(sorted(members))})</span></p>"
                          + self._desc_html(desc))
-        return ("<h4 style='margin-bottom:2px'>複合体の説明（Complex Portal）</h4>" + "".join(parts)) if parts else ""
+        return (f"<h4 style='margin-bottom:2px'>{i18n.tr('複合体の説明（Complex Portal）')}</h4>" + "".join(parts)) if parts else ""
 
     # ---- 表示 ----
     def set_database(self, db: Database) -> None:
@@ -811,8 +816,8 @@ class DatabaseTab(QWidget):
         self.interactions_page.set_rows(
             [it.id for it in interactions],
             [[it.source.gene_name, it.target.gene_name, type_label(it.interaction_type),
-              EFFECTS[resolve_effect(it.interaction_type, it.effect)] + ("" if it.effect else "・自動"),
-              "・".join(cond_labels.get(k, k) for k in conditions.split(it.conditions)),
+              EFFECTS[resolve_effect(it.interaction_type, it.effect)] + ("" if it.effect else i18n.tr("・自動")),
+              i18n.tr("・").join(cond_labels.get(k, k) for k in conditions.split(it.conditions)),
               it.evidence] for it in interactions])
         # 所属: 手作業の区分（Upstream など）は遺伝子の complex_category、Complex Portal・パラログは CategoryMember（複数に入れる）
         by_frame: dict[str, list[str]] = {}
@@ -829,7 +834,7 @@ class DatabaseTab(QWidget):
         self.categories_page.set_rows(
             [c.id for c in categories],
             [[c.name, "✔" if c.is_complex else "", c.color, len(self._cat_members[c.id]),
-              "・".join(self._cat_members[c.id]), c.source or "手作業"] for c in categories],
+              i18n.tr("・").join(self._cat_members[c.id]), c.source or i18n.tr("手作業")] for c in categories],
             {(r, 2): c.color for r, c in enumerate(categories)})
         self._filter_proteins()
         self._filter_interactions()
@@ -843,12 +848,13 @@ class DatabaseTab(QWidget):
         page = self.proteins_page if index == 0 else self.interactions_page
         ids = page.shown_ids() if page.proxy.rowCount() < page.model.rowCount() else None
         name = "proteins.csv" if index == 0 else "interactions.csv"
-        path, _ = QFileDialog.getSaveFileName(self, "CSV にエクスポート", name, "CSV (*.csv)")
+        path, _ = QFileDialog.getSaveFileName(self, i18n.tr("CSV にエクスポート"), name, "CSV (*.csv)")
         if not path:
             return
         try:
             (csv_io.export_proteins if index == 0 else csv_io.export_interactions)(self.db, path, ids)
         except OSError as e:
-            QMessageBox.critical(self, "エラー", f"書き出せませんでした。\n{e}")
+            QMessageBox.critical(self, i18n.tr("エラー"), i18n.tr("書き出せませんでした。\n{error}", error=e))
             return
-        QMessageBox.information(self, "エクスポート完了", f"{page.proxy.rowCount()} 件を {path} に保存しました。")
+        QMessageBox.information(self, i18n.tr("エクスポート完了"),
+                                i18n.tr("{n} 件を {path} に保存しました。", n=page.proxy.rowCount(), path=path))
