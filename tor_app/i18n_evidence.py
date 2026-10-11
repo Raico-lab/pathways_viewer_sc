@@ -62,7 +62,9 @@ _COND_EXTRA = {
     "熱": "heat", "高浸透圧": "hyperosmotic stress", "低浸透圧": "hypo-osmotic stress",
     "栄養の飢餓": "nutrient starvation", "薬剤": "drug", "フェロモン": "pheromone", "ガラクトース": "galactose",
     "イノシトール": "inositol", "カルシウム": "calcium", "低酸素": "hypoxia", "アミノ酸の制限": "amino acid limitation",
-    "グルコース枯渇": "glucose depletion", "グルコース添加": "glucose addition", "鉄欠乏": "iron deficiency", "飢餓": "starvation", "通常時": "normal growth",
+    "グルコース枯渇": "glucose depletion", "グルコース添加": "glucose addition", "鉄欠乏": "iron deficiency",
+    "カドミウム": "cadmium", "バイオフィルム": "biofilm", "亜鉛欠乏": "zinc deficiency", "低グルコース": "low glucose",
+    "低リン酸": "low phosphate", "化学物質": "chemicals", "無酸素": "anoxia", "偽菌糸": "pseudohyphae", "飢餓": "starvation", "通常時": "normal growth",
 }
 
 
@@ -220,6 +222,7 @@ _RULES: list[tuple[re.Pattern, object]] = [(re.compile(p), r) for p, r in [
     (r"（PMID ([\d, ]+?)(?: ほか (\d+) 報)?）",
      lambda m: f" (PMID {m.group(1)}" + (f" and {m.group(2)} more" if m.group(2) else "") + ")"),
     (r"(PMID: [\d, ]+) ほか (\d+) 報", r"\1 and \2 more"),
+    (r" ほか (\d+) 件$", r" and \1 more"),
     (r"^Public data: (BioGRID|YEASTRACT\+)(.*?) (\S+)・(作用不明|促進|抑制)$",
      lambda m: f"Public data: {m.group(1)}{m.group(2)} {_words(m.group(3))}, {_sign(m.group(4))}"),
 ]]

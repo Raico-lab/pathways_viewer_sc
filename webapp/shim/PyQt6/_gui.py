@@ -292,6 +292,19 @@ class QAction(QObject):
     def text(self):
         return self._text
 
+    # チェックの付く項目（言語のメニューなど）。メニューでは、チェックした項目の名前の前に ✓ を付ける
+    def setCheckable(self, on: bool):
+        self._checkable = bool(on)
+
+    def isCheckable(self) -> bool:
+        return getattr(self, "_checkable", False)
+
+    def setChecked(self, on: bool):
+        self._checked = bool(on)
+
+    def isChecked(self) -> bool:
+        return getattr(self, "_checked", False)
+
     def setText(self, text):
         self._text = text
         if self._menu_item is not None:

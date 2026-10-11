@@ -87,7 +87,8 @@ class QMenu(QWidget):
                 holder.appendChild(widget._el)
                 self._el.appendChild(holder)
                 continue
-            item = _dom.el("div", "qmenu-item" + ("" if action.isEnabled() else " disabled"), action.text())
+            label = (("✓ " if action.isChecked() else "\u2003") + action.text()) if action.isCheckable() else action.text()
+            item = _dom.el("div", "qmenu-item" + ("" if action.isEnabled() else " disabled"), label)
             action._menu_item = item
             _dom.listen(self, item, "click", lambda ev, a=action: self._activate(a))
             self._el.appendChild(item)

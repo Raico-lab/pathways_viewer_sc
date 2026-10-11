@@ -816,7 +816,7 @@ class NetworkTab(QWidget):
             self.del_summary.setText(tr("{name} の mRNA が変化した破壊株はありません", name=html.escape(name)) if mrna else
                                      tr("{name} のリン酸化が変化した破壊株はありません", name=html.escape(name)))
             return
-        sources = "・".join(sorted({x.source for x in pts}))
+        sources = tr("・").join(sorted({x.source for x in pts}))
         up = sum(1 for x in pts if x.value > 0)
         head = (tr("<b>{name} の mRNA を変化させた破壊株</b>", name=html.escape(name)) if mrna else
                 tr("<b>{name} のリン酸化を変化させた破壊株</b>", name=html.escape(name)))
@@ -3041,7 +3041,7 @@ class NetworkTab(QWidget):
         """パラログの組の説明: 組の遺伝子、候補の出典、働きが重なる根拠（遺伝的相互作用・PMID・GO の重なり）。"""
         cat = self.model.categories.get(name) if self.model else None
         genes = self.model.paralogs.get(name, []) if self.model else []
-        links = "・".join(f"<a href='node:{g}'>{html.escape(self.model.names[g])}</a>" for g in genes)
+        links = tr("・").join(f"<a href='node:{g}'>{html.escape(self.model.names[g])}</a>" for g in genes)
         lines = []
         for line in (cat.description if cat else "").split("\n"):
             text = html.escape(line)
