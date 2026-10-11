@@ -1,4 +1,8 @@
-"""制御の種類・カテゴリの既定値（表示名・色・作用の向き）。"""
+"""制御の種類・カテゴリの既定値（表示名・色・作用の向き）。
+
+画面に出す名前は日本語で書き、英語の画面では tr で data/i18n/en/vocab.json の訳にする（キーはそのまま）。
+"""
+from ..i18n import is_en, tr
 
 # interaction_type -> (日本語名, 既定の作用, 線の色, 線上の記号)
 INTERACTION_TYPES = {
@@ -29,9 +33,9 @@ INTERACTION_TYPES = {
 }
 
 EFFECTS = {
-    "activate": "活性化方向（→）",
-    "inhibit": "抑制方向（⊣）",
-    "none": "作用不明",
+    "activate": tr("活性化方向（→）"),
+    "inhibit": tr("抑制方向（⊣）"),
+    "none": tr("作用不明"),
 }
 
 # CSV の effect 列で受け付ける表記
@@ -55,7 +59,7 @@ CATEGORY_PALETTE = [
 
 def type_label(interaction_type: str) -> str:
     info = INTERACTION_TYPES.get(interaction_type)
-    return info[0] if info else interaction_type
+    return tr(info[0]) if info else interaction_type
 
 
 def default_effect(interaction_type: str) -> str:
@@ -91,8 +95,9 @@ FEEDBACK = "フィードバック（下流から上流への作用）"
 
 
 # 文献から拾った関係の性質（DB の interactions の列名と、画面に出す名前）。docs/curation/literature_fields.md
-DETAILS = [("partner", "組む相手"), ("site", "修飾の部位"), ("evidence_kind", "根拠の実験"), ("necessity", "必要・十分"),
-           ("redundant_with", "同じ働きの上流"), ("strength", "効く強さ"), ("layer", "変えるもの"), ("timing", "時間")]
+DETAILS = [(name, tr(label)) for name, label in (
+    ("partner", "組む相手"), ("site", "修飾の部位"), ("evidence_kind", "根拠の実験"), ("necessity", "必要・十分"),
+    ("redundant_with", "同じ働きの上流"), ("strength", "効く強さ"), ("layer", "変えるもの"), ("timing", "時間"))]
 # 1 つの値であるべき列（文献どうしで食い違えば両方を残して ⚠）
 SINGLE_DETAILS = ("necessity", "strength")
 # 決まった言葉の訳（それ以外の値はそのまま出す）
@@ -109,4 +114,4 @@ DETAIL_WORDS = {
 def detail_text(value: str) -> str:
     """性質の値を画面に出す形にする（";"・「・」で区切った決まった言葉を訳して「・」でつなぐ。例: "transient・5 分以内"）。"""
     words = [w.strip() for part in (value or "").split(";") for w in part.split("・")]
-    return "・".join(DETAIL_WORDS.get(w, w) for w in words if w)
+    return (", " if is_en() else "・").join(tr(DETAIL_WORDS[w]) if w in DETAIL_WORDS else w for w in words if w)

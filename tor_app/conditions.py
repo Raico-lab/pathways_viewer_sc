@@ -13,25 +13,44 @@ data/conditions.csv の列（行の順が画面の並び）:
 - description: Help に出す説明
 - match: 文献の CSV の condition 列（日本語の自由な書き方）を、この条件に当てはめるための言葉（";" 区切り。
   英数字は語として当てる）。label も当てはめに使う（match が空なら使わない）
+- group_en・label_en・description_en: 英語の画面に出す群・名前・説明（空なら日本語のまま）。
+  Condition の group・label・description は画面の言語のものを返す（日本語は group_ja などで引ける。当てはめは日本語の label）
 """
 import csv
 import re
 from dataclasses import dataclass
 
+from . import i18n
 from .paths import resource_path
 
 NONE_KEY = "_none"   # 条件の記録がない関係（左の「条件」タブの選択肢）
-NONE_LABEL = "条件の記録なし"
+NONE_LABEL = i18n.pick("条件の記録なし", "No condition recorded")
 
 
 @dataclass(frozen=True)
 class Condition:
     key: str
-    group: str
-    label: str
+    group_ja: str
+    label_ja: str
     yeastract: str
     match: tuple[str, ...]
-    description: str = ""
+    description_ja: str = ""
+    group_en: str = ""
+    label_en: str = ""
+    description_en: str = ""
+
+    # 画面に出す群・名前・説明（英語の画面なら英語。訳がなければ日本語）
+    @property
+    def group(self) -> str:
+        return (i18n.is_en() and self.group_en) or self.group_ja
+
+    @property
+    def label(self) -> str:
+        return (i18n.is_en() and self.label_en) or self.label_ja
+
+    @property
+    def description(self) -> str:
+        return (i18n.is_en() and self.description_en) or self.description_ja
 
 
 _CACHE: list[Condition] | None = None
@@ -42,7 +61,8 @@ def load() -> list[Condition]:
     if _CACHE is None:
         with open(resource_path("data", "conditions.csv"), encoding="utf-8") as f:
             _CACHE = [Condition(r["key"].strip(), r["group"].strip(), r["label"].strip(), (r.get("yeastract") or "").strip(),
-                                _match(r), (r.get("description") or "").strip())
+                                _match(r), (r.get("description") or "").strip(), (r.get("group_en") or "").strip(),
+                                (r.get("label_en") or "").strip(), (r.get("description_en") or "").strip())
                       for r in csv.DictReader(f) if r.get("key", "").strip()]
     return _CACHE
 

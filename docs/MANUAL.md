@@ -1,3 +1,5 @@
+English: [MANUAL.en.md](MANUAL.en.md)
+
 # 操作ガイド — Pathways viewer for *Saccharomyces cerevisiae*
 
 出芽酵母の遺伝子どうしの制御関係（リン酸化・転写制御・結合など）を地図にして、

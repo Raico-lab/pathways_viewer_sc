@@ -5,6 +5,8 @@
 """
 import re
 
+from .i18n import tr
+
 # (キー, 表示名, 色, 判定パターン)
 ROLES = [
     ("unknown", "機能不明", "#cfd8dc",
@@ -28,7 +30,8 @@ ROLES = [
     ("complex", "複合体の構成要素・足場", "#90a4ae", r"subunit|component|scaffold|adaptor|adapter"),
     ("other", "その他", "#e0e0e0", r""),
 ]
-ROLE_INFO = {key: (label, color) for key, label, color, _ in ROLES}
+# 画面に出す名前（英語の画面では data/i18n/en/vocab.json の訳）
+ROLE_INFO = {key: (tr(label), color) for key, label, color, _ in ROLES}
 # 最初の一文では分からなくても、説明全体にこう書かれていれば転写制御因子とみなす
 _TF_ANYWHERE = re.compile(r"transcription(al)? (factor|activator|repressor)|myb-like hth transcrip|"
                           r"binds (\w+ ){1,4}motifs?", re.IGNORECASE)
@@ -70,7 +73,7 @@ def level_color(level: int, max_level: int) -> str:
 
 def level_label(level: int, max_level: int) -> str:
     if level == 0:
-        return "第 1 階層・起点"
+        return tr("第 1 階層・起点")
     if level == max_level:
-        return f"第 {level + 1} 階層・最下流"
-    return f"第 {level + 1} 階層"
+        return tr("第 {n} 階層・最下流", n=level + 1)
+    return tr("第 {n} 階層", n=level + 1)

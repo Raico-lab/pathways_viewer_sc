@@ -44,6 +44,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
 
+from tor_app import i18n  # noqa: E402
+i18n._language = "ja"   # DB の根拠欄などに書く名前（種類・条件など）は、画面の言語によらず日本語にする
+
 import condition_expression  # noqa: E402
 import deleteome  # noqa: E402
 import idea  # noqa: E402

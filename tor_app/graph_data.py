@@ -7,6 +7,7 @@ from . import complex_groups, conditions, confidence
 from .db import Category, Interaction, Protein
 from .db.vocab import (FEEDBACK, INTERACTION_TYPES, NOT_SIGNAL_FLOW, PARALOG_COLOR, PARALOG_SOURCE, resolve_effect,
                        type_label)
+from .i18n import tr
 from .roles import ROLE_INFO, classify
 from .subgraph import Adjacency, Subgraph
 
@@ -257,7 +258,8 @@ class PathwayModel:
                 bid = f"b:{hub}:{t}"
                 info = INTERACTION_TYPES.get(t)
                 elements.append({"data": {"id": bid, "isComplex": True, "isBundle": True, "hub": f"p{hub}",
-                                          "label": f"{self.names[hub]} の下流 {_short_type(t)} {len(gs)}",
+                                          "label": tr("{gene} の下流 {type} {n}", gene=self.names[hub],
+                                                      type=_short_type(t), n=len(gs)),
                                           "color": info[2] if info else "#9e9e9e"}})
                 for g in gs:
                     bundle_of[g] = bid
@@ -497,14 +499,14 @@ _MECHANISM_UNKNOWN = ("activation", "inhibition")
 def _short_type(interaction_type: str) -> str:
     """まとめの枠の名札に使う種類の名前（長い補足の括弧は外す: 酵素活性（修飾なし・作用は不明） → 酵素活性）。"""
     label = type_label(interaction_type)
-    return re.sub(r"（.*?）", "", label) if len(label) > 10 else label
+    return re.sub(r"\s*[（(].*?[）)]", "", label) if len(label) > (24 if label.isascii() else 10) else label
 
 
 def _type_legend(all_types: list[str], shown: set[str]) -> list[dict]:
     rows = []
     unknown = [t for t in all_types if t in _MECHANISM_UNKNOWN]
     if unknown:
-        rows.append({"key": "|".join(unknown), "label": "機構不明", "symbol": "—",
+        rows.append({"key": "|".join(unknown), "label": tr("機構不明"), "symbol": "—",
                      "color": INTERACTION_TYPES["activation"][2], "shown": bool(shown & set(unknown))})
     for t in all_types:
         if t not in _MECHANISM_UNKNOWN:

@@ -659,6 +659,13 @@ class QUrl:
     def isValid(self) -> bool:
         return bool(self._text)
 
+    def setQuery(self, query: str) -> None:
+        """? の後ろ（問い合わせ）を入れ替える。"""
+        self._text = self._text.split("?", 1)[0] + (f"?{query}" if query else "")
+
+    def query(self) -> str:
+        return self._text.split("?", 1)[1] if "?" in self._text else ""
+
     @staticmethod
     def fromLocalFile(path) -> "QUrl":
         return QUrl("file://" + str(path))

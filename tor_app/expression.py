@@ -10,10 +10,11 @@ import sqlite3
 from dataclasses import dataclass
 
 from . import conditions
+from .i18n import pick, tr
 from .paths import resource_path
 
-KINDS = {"mrna": "発現（mRNA）", "phospho": "リン酸化"}
-SHORT = {"mrna": "mRNA", "phospho": "リン酸化"}   # 説明欄の表の見出し（折り返さない短い名前）
+KINDS = {"mrna": tr("発現（mRNA）"), "phospho": tr("リン酸化")}
+SHORT = {"mrna": "mRNA", "phospho": pick("リン酸化", "Phospho")}   # 説明欄の表の見出し（折り返さない短い名前）
 
 _con: sqlite3.Connection | None = None
 _missing = False
@@ -128,7 +129,7 @@ def gene_summary(orf: str) -> dict[str, dict[str, tuple[float, str]]]:
 
 
 # ---- 破壊株での実測（tools/build_deletions.py。表 strains・deletion・deletion_measured） ----
-DELETION_KINDS = {"del_mrna": "破壊株の mRNA", "del_phospho": "破壊株のリン酸化"}
+DELETION_KINDS = {"del_mrna": tr("破壊株の mRNA"), "del_phospho": tr("破壊株のリン酸化")}
 _DEL_BASE = {"del_mrna": "mrna", "del_phospho": "phospho"}
 
 

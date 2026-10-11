@@ -264,7 +264,7 @@ EDGE_DETAIL = """
 <b>必要・十分</b>（上流を壊すと失われるか、上流だけで起こるか）・<b>同じ働きの上流</b>（片方を壊しても残る、重なって働く上流）・
 <b>効く強さ</b>・<b>変えるもの</b>（発現・活性・分解・局在）・<b>時間</b>（一過性・持続・適応すると戻る）。</li>
 <li><b>根拠・文献</b>: 出典ごとに 1 行。色付きの [ ] が出典（文献・BioGRID・YEASTRACT+・SGD の GO 注釈など）、PMID を押すと PubMed を開きます。
-「文献で確認」の行には、論文の要旨の一文がそのまま入っています。</li>
+「文献で確認」の行には、要旨から読み取れたことを、私たちの言葉で書いています（論文の文は引用せず、出典は PMID で示します）。</li>
 <li>一番下のリンクで、SGD の相互作用・制御の一覧と照らし合わせられます。</li>
 </ul>
 """
@@ -329,3 +329,14 @@ Deleteome は富栄養の培地で育てた株の測定なので、ストレス�
 TOPICS = {"genes": GENES, "trf": TFS, "relation": RELATION, "conditions": CONDITIONS, "saved": SAVED, "map": MAP, "legend": LEGEND,
           "data": DATA, "deletion": DELETION}
 ALL = MAP + DETAILS_ALL + LEGEND + GENES + TFS + RELATION + CONDITIONS + DELETION + DATA + SAVED + DATABASE
+
+# 英語の画面では、英語版（help_text_en.py。名前と形は同じ）の値に置き換える（_STYLE も他のモジュールが使うので入れる）
+from .. import i18n  # noqa: E402
+
+if i18n.is_en():
+    from . import help_text_en as _en
+    for _name in ("_STYLE", "_condition_list", "MAP", "LEGEND", "GENES", "TFS", "RELATION", "SAVED", "CONDITIONS", "DATA",
+                  "DATABASE", "NODE_DETAIL", "EDGE_DETAIL", "COMPLEX_DETAIL", "PARALOG_DETAIL", "DETAIL_HELP", "detail_help",
+                  "DETAILS_ALL", "DELETION", "TOPICS", "ALL"):
+        globals()[_name] = getattr(_en, _name)
+    del _name, _en

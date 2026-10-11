@@ -3,8 +3,6 @@
 英語の画面のとき、help_text.py の末尾でここの値に置き換える。用語は data/i18n/GLOSSARY.md にそろえる。
 help_text.py を直したら、ここも同じように直す。
 """
-from .. import i18n
-
 _STYLE = "<style>h3{margin:0 0 4px 0} h4{margin:10px 0 2px 0} ul{margin-top:2px; padding-left:16px} li{margin-bottom:3px}</style>"
 
 MAP = _STYLE + """
@@ -177,16 +175,15 @@ relations to targets whose expression peaks in the same phase as the factor's ac
 
 
 def _condition_list() -> str:
-    """条件ごとの説明（data/conditions.csv の description 列）を群ごとに並べる（訳の辞書にあれば英語）。"""
+    """条件ごとの説明（data/conditions.csv の description 列）を群ごとに並べる（Condition が画面の言語の群・名前・説明を返す）。"""
     from .. import conditions
-    tr = i18n.tr
     groups: dict[str, list] = {}
     for c in conditions.load():
         groups.setdefault(c.group, []).append(c)
     parts = ["<h4>Condition descriptions</h4>"]
     for group, items in groups.items():
-        lines = "".join(f"<li><b>{tr(c.label)}</b> — {tr(c.description)}</li>" for c in items)
-        parts.append(f"<p style='margin:6px 0 0 0'><b>{tr(group)}</b></p><ul>{lines}</ul>")
+        lines = "".join(f"<li><b>{c.label}</b> — {c.description}</li>" for c in items)
+        parts.append(f"<p style='margin:6px 0 0 0'><b>{group}</b></p><ul>{lines}</ul>")
     return "".join(parts)
 
 
@@ -266,7 +263,7 @@ EDGE_DETAIL = """
 <b>Necessary / sufficient</b> (whether it is lost when the upstream gene is deleted, or caused by the upstream gene alone), <b>Redundant upstream</b> (upstream regulators acting in parallel, so the effect remains when one is deleted),
 <b>Strength</b>, <b>What changes</b> (expression, activity, degradation, localization), and <b>Timing</b> (transient, sustained, returns on adaptation).</li>
 <li><b>Evidence and references</b>: one line per source. The colored [ ] is the source (literature, BioGRID, YEASTRACT+, SGD GO annotation, etc.); click a PMID to open PubMed.
-"Literature-verified" lines contain a sentence from the paper's abstract as is.</li>
+"Literature-verified" lines give what we read from the abstract, in our own words (no sentences are quoted from the paper; the source is shown by PMID).</li>
 <li>Links at the bottom let you compare with SGD's interaction and regulation lists.</li>
 </ul>
 """

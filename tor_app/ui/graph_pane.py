@@ -15,7 +15,7 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import (QListWidget, QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit, QMessageBox,
                              QPushButton, QSizePolicy, QSpinBox, QVBoxLayout)
 
-from .. import relation_paths
+from .. import i18n, relation_paths
 from ..paths import resource_path
 from ..subgraph import Subgraph, ViewSpec, build_subgraph, grow_targets, link_path, regrow
 
@@ -217,7 +217,10 @@ class GraphPane(QFrame):
         self.bridge.filterToggled.connect(self.filterToggled)
         self.bridge.filterReset.connect(self.filterReset)
         self.bridge.displayOptionChanged.connect(self.displayOptionChanged)
-        self.view.setUrl(QUrl.fromLocalFile(str(resource_path("tor_app", "web", "network.html"))))
+        # 画面の言語を地図のページに渡す（network.html の側で ?lang= を読む）
+        url = QUrl.fromLocalFile(str(resource_path("tor_app", "web", "network.html")))
+        url.setQuery(f"lang={i18n.language()}")
+        self.view.setUrl(url)
 
     def _build_bar(self):
         self.title = QLabel()
@@ -225,7 +228,7 @@ class GraphPane(QFrame):
         self.back_button = self._small_button("◀", self.go_back)
         self.forward_button = self._small_button("▶", self.go_forward)
         self.search = QLineEdit()
-        self.search.setPlaceholderText("遺伝子名で検索 例: TOR1")
+        self.search.setPlaceholderText(i18n.tr("遺伝子名で検索 例: TOR1"))
         self.search.setClearButtonEnabled(True)
         self.search.setMinimumWidth(120)
         # キー入力の処理が終わってから出す（Enter のキーを離したときに吹き出しが閉じないように）
@@ -233,13 +236,13 @@ class GraphPane(QFrame):
         self._build_search_menu()
         self._build_candidates()
         self.new_pane_button = self._small_button(
-            "⧉ 新しい枠", self.open_marked_in_new_pane,
-            "新しい表示枠を開いて、緑で選択中の遺伝子に注目します。複数なら最後に選んだものです。\n"
-            "緑がなければ最後に紫にしたもの、それもなければ注目中のものに注目します")
-        self.close_button = self._small_button("✕", lambda: self.closeRequested.emit(self), "この表示枠を閉じる")
+            i18n.tr("⧉ 新しい枠"), self.open_marked_in_new_pane,
+            i18n.tr("新しい表示枠を開いて、緑で選択中の遺伝子に注目します。複数なら最後に選んだものです。\n"
+                    "緑がなければ最後に紫にしたもの、それもなければ注目中のものに注目します"))
+        self.close_button = self._small_button("✕", lambda: self.closeRequested.emit(self), i18n.tr("この表示枠を閉じる"))
         self.detach_button = self._small_button(
-            "別ウィンドウで開く", lambda: self.detachRequested.emit(self),
-            "この表示枠を別ウィンドウで開きます。枠が 1 つなら今の内容を写して開き、2 つ以上ならこの枠を別ウィンドウに移します")
+            i18n.tr("別ウィンドウで開く"), lambda: self.detachRequested.emit(self),
+            i18n.tr("この表示枠を別ウィンドウで開きます。枠が 1 つなら今の内容を写して開き、2 つ以上ならこの枠を別ウィンドウに移します"))
         self.bar = QHBoxLayout()
         for w in (self.title, self.back_button, self.forward_button, self.search, self.detach_button,
                   self.new_pane_button, self.close_button):
@@ -263,17 +266,17 @@ class GraphPane(QFrame):
             self.view_bar.addSpacing(4)
         # 設定をクリア: 線の色の右隣（共通の設定の行に置く）
         self.clear_settings_button = self._small_button(
-            "設定をクリア", lambda: self.tab.reset_settings(self),
-            "TF・経路・条件・配置・色・線・凡例の設定を最初の状態に戻します（注目・拡張・段数はそのまま）")
+            i18n.tr("設定をクリア"), lambda: self.tab.reset_settings(self),
+            i18n.tr("TF・経路・条件・配置・色・線・凡例の設定を最初の状態に戻します（注目・拡張・段数はそのまま）"))
         self.view_bar.addWidget(self.clear_settings_button)
         self.view_bar.addStretch(1)
         # この表示枠の図全体を画像で保存する（画面に見えていない部分も含む）
-        for w in (self._small_button("PNG", self.export_png, "この表示枠の図全体を、3 倍の解像度の PNG 画像で保存します"),
-                  self._small_button("SVG", self.export_svg, "この表示枠の図全体を SVG 画像で保存します。拡大しても荒くなりません")):
+        for w in (self._small_button("PNG", self.export_png, i18n.tr("この表示枠の図全体を、3 倍の解像度の PNG 画像で保存します")),
+                  self._small_button("SVG", self.export_svg, i18n.tr("この表示枠の図全体を SVG 画像で保存します。拡大しても荒くなりません"))):
             self.view_bar.addWidget(w)
 
-        self.up_spin = self._step_spin(self.up_steps, "上流を何段までたどるか")
-        self.down_spin = self._step_spin(self.down_steps, "下流を何段までたどるか")
+        self.up_spin = self._step_spin(self.up_steps, i18n.tr("上流を何段までたどるか"))
+        self.down_spin = self._step_spin(self.down_steps, i18n.tr("下流を何段までたどるか"))
         # 段数を続けて変えたときは、少し待ってから最後の値だけ計算する（途中の値の重い計算をしない）
         self._steps_timer = QTimer(self)
         self._steps_timer.setSingleShot(True)
@@ -286,15 +289,16 @@ class GraphPane(QFrame):
         self.lod_label = ShrinkLabel()
         self.lod_label.setStyleSheet("color:#777;")
         self.info_bar = QHBoxLayout()
-        for w in (QLabel("上流"), self.up_spin, QLabel("段 下流"), self.down_spin, QLabel("段"), self.focus_label):
+        for w in (QLabel(i18n.tr("上流")), self.up_spin, QLabel(i18n.tr("段 下流")), self.down_spin, QLabel(i18n.tr("段")),
+                  self.focus_label):
             self.info_bar.addWidget(w)
         self.info_bar.addStretch(1)
         self.info_bar.addWidget(self.lod_label)
         # この表示枠だけに効くボタン（行の右端）
-        relayout = self._small_button("再配置", self.relayout,
-                                      "注目・拡張・上流/下流の段数・凡例のチェックから表示する遺伝子を決め直し、\n"
-                                      "選んだ方式で自動配置し直します。範囲外の遺伝子は消えます。同じ設定なら常に同じ図になります")
-        fit = self._small_button("画面に合わせる", self.fit_view, "この表示枠の図全体が収まるように表示します")
+        relayout = self._small_button(i18n.tr("再配置"), self.relayout,
+                                      i18n.tr("注目・拡張・上流/下流の段数・凡例のチェックから表示する遺伝子を決め直し、\n"
+                                              "選んだ方式で自動配置し直します。範囲外の遺伝子は消えます。同じ設定なら常に同じ図になります"))
+        fit = self._small_button(i18n.tr("画面に合わせる"), self.fit_view, i18n.tr("この表示枠の図全体が収まるように表示します"))
         for w in (relayout, fit):
             self.info_bar.addWidget(w)
         self._update_nav_buttons()
@@ -321,9 +325,12 @@ class GraphPane(QFrame):
         self._record_history()
         self.refresh_view()
         removed, new = len(before - self.sub.nodes), len(self.sub.nodes - before)
-        detail = "、".join(t for t in (f"範囲外の {removed} 個を消しました" if removed else "",
-                                       f"{new} 個を加えました" if new else "") if t)
-        self.statusMessage.emit("再配置しました" + (f"。{detail}" if detail else ""))
+        parts = [i18n.tr("再配置しました")]
+        if removed:
+            parts.append(i18n.tr("範囲外の {n} 個を消しました", n=removed))
+        if new:
+            parts.append(i18n.tr("{n} 個を加えました", n=new))
+        self.statusMessage.emit(i18n.tr("。").join(parts))
 
     def _adjacency(self, with_tx: bool = False):
         """上流・下流をたどる関係（「作用が分かっている関係のみ」と、凡例のチェックで隠したものを反映）。
@@ -366,7 +373,7 @@ class GraphPane(QFrame):
         return spin
 
     def set_title(self, index: int, closable: bool) -> None:
-        self.title.setText(f"枠{index}")
+        self.title.setText(i18n.tr("枠{index}", index=index))
         self.close_button.setVisible(closable)
 
     def set_active(self, active: bool) -> None:
@@ -564,13 +571,13 @@ class GraphPane(QFrame):
         h = QHBoxLayout(self.search_menu)
         h.setContentsMargins(6, 6, 6, 6)
         self.search_menu_label = QLabel()
-        grow = QPushButton("拡張")
+        grow = QPushButton(i18n.tr("拡張"))
         grow.setObjectName("grow")
-        grow.setToolTip("地図にある遺伝子なら、上流・下流を 1 階層追加します。\n"
-                        "地図にない遺伝子なら、その遺伝子と、今の地図と 3 段以内でつながる経路上の遺伝子だけを加えます")
-        focus = QPushButton("注目")
+        grow.setToolTip(i18n.tr("地図にある遺伝子なら、上流・下流を 1 階層追加します。\n"
+                                "地図にない遺伝子なら、その遺伝子と、今の地図と 3 段以内でつながる経路上の遺伝子だけを加えます"))
+        focus = QPushButton(i18n.tr("注目"))
         focus.setObjectName("focus")
-        focus.setToolTip("この遺伝子を中心に表示し直します")
+        focus.setToolTip(i18n.tr("この遺伝子を中心に表示し直します"))
         for b in (grow, focus):
             b.setFocusPolicy(Qt.FocusPolicy.NoFocus)   # 押しても検索欄のフォーカスを奪わない
         grow.clicked.connect(lambda: self._search_action("grow"))
@@ -582,7 +589,8 @@ class GraphPane(QFrame):
         text = self.search.text().strip()
         pid = self.model.by_name.get(text.upper()) if (text and self.model) else None
         if pid is None:
-            self.statusMessage.emit(f"「{text}」は登録されていません" if text else "遺伝子名を入力してください")
+            self.statusMessage.emit(i18n.tr("「{text}」は登録されていません", text=text) if text
+                                    else i18n.tr("遺伝子名を入力してください"))
             return
         self.search_menu_label.setText(self.model.proteins[pid].gene_name)
         self.search_menu.adjustSize()
@@ -642,17 +650,17 @@ class GraphPane(QFrame):
 
     # 経路の表示経路（左の「経路」タブで選ぶ）: キー → (表示名, 説明, 基準の遺伝子が必須か)
     RELATION_MODES = {
-        "off": ("なし", "経路を表示しない。普段の地図です", False),
-        "all": ("すべての経路", "チェックした遺伝子どうしを、指定の段数で結ぶすべての経路。各段の矢印の向きは問わず、"
-                "A → X ← B のように共通の標的を経由する経路も含む", False),
-        "direct": ("矢印の向きにたどれる経路", "チェックした遺伝子から、別のチェックした遺伝子へ矢印の向きにたどれる経路。"
-                   "途中はどの遺伝子でもよく、1 段なら直接の関係", False),
-        "regulators": ("すべてを制御している遺伝子", "チェックした遺伝子すべてに、指定の段数で届く上流の遺伝子と、そこからの経路。"
-                       "共通の制御因子を階層の上から順に並べる", False),
-        "targets": ("すべてから制御を受けている遺伝子", "チェックした遺伝子すべてから、指定の段数で届く下流の遺伝子と、そこへの経路。"
-                    "共通の標的を階層の上から順に並べる", False),
-        "toward": ("基準の遺伝子へ作用している経路", "ほかのチェックした遺伝子から基準の遺伝子へ、矢印の向きにたどれる経路", True),
-        "from": ("基準の遺伝子から作用している経路", "基準の遺伝子から、ほかのチェックした遺伝子へ矢印の向きにたどれる経路", True),
+        "off": (i18n.tr("なし"), i18n.tr("経路を表示しない。普段の地図です"), False),
+        "all": (i18n.tr("すべての経路"), i18n.tr("チェックした遺伝子どうしを、指定の段数で結ぶすべての経路。各段の矢印の向きは問わず、"
+                                              "A → X ← B のように共通の標的を経由する経路も含む"), False),
+        "direct": (i18n.tr("矢印の向きにたどれる経路"), i18n.tr("チェックした遺伝子から、別のチェックした遺伝子へ矢印の向きにたどれる経路。"
+                                                         "途中はどの遺伝子でもよく、1 段なら直接の関係"), False),
+        "regulators": (i18n.tr("すべてを制御している遺伝子"), i18n.tr("チェックした遺伝子すべてに、指定の段数で届く上流の遺伝子と、そこからの経路。"
+                                                               "共通の制御因子を階層の上から順に並べる"), False),
+        "targets": (i18n.tr("すべてから制御を受けている遺伝子"), i18n.tr("チェックした遺伝子すべてから、指定の段数で届く下流の遺伝子と、そこへの経路。"
+                                                                "共通の標的を階層の上から順に並べる"), False),
+        "toward": (i18n.tr("基準の遺伝子へ作用している経路"), i18n.tr("ほかのチェックした遺伝子から基準の遺伝子へ、矢印の向きにたどれる経路"), True),
+        "from": (i18n.tr("基準の遺伝子から作用している経路"), i18n.tr("基準の遺伝子から、ほかのチェックした遺伝子へ矢印の向きにたどれる経路"), True),
     }
 
     def _on_picked_changed(self, pids: list[int]) -> None:
@@ -677,7 +685,7 @@ class GraphPane(QFrame):
         names = self.model.names
         if mode in ("toward", "from") and anchor not in pids:
             self.clear_relation()
-            return "基準の遺伝子を選んでください"
+            return i18n.tr("基準の遺伝子を選んでください")
         if len(pids) < (1 if mode in ("regulators", "targets") else 2):
             self.clear_relation()
             return ""   # チェックが足りないときは何も出さない
@@ -707,17 +715,20 @@ class GraphPane(QFrame):
         # 経路の本数は「経路」タブの一覧の各段に出す。ここでは共通の遺伝子・打ち切りなどだけ（使い方は Help に）
         lines = []
         if result.truncated:
-            lines.append(f"経路が {relation_paths.TOTAL_CAP} 本を超えたので、そこで一覧を打ち切りました")
+            lines.append(i18n.tr("経路が {cap} 本を超えたので、そこで一覧を打ち切りました", cap=relation_paths.TOTAL_CAP))
         if result.capped:
-            lines.append(f"{relation_paths.ENUM_CAP} 本に達して数えるのをやめた組が {result.capped} 組あります")
+            lines.append(i18n.tr("{cap} 本に達して数えるのをやめた組が {n} 組あります", cap=relation_paths.ENUM_CAP, n=result.capped))
         if mode in ("regulators", "targets"):
-            kind = "共通の制御因子" if mode == "regulators" else "共通の標的"
             listed = [graph.label(u) for u in list(result.common)[:self.RELATION_COMMON_SHOWN]]   # 多いときは初めの分だけ
             rest = len(result.common) - len(listed)
-            lines.append(f"{kind} {len(result.common)} 個: "
-                         + ("、".join(listed) + (f" ほか {rest} 個" if rest > 0 else "") if result.common else "なし"))
+            names_text = (i18n.tr("、").join(listed) + (i18n.tr(" ほか {n} 個", n=rest) if rest > 0 else "")
+                          if result.common else i18n.tr("なし"))
+            lines.append(i18n.tr("共通の制御因子 {n} 個: {names}", n=len(result.common), names=names_text)
+                         if mode == "regulators" else
+                         i18n.tr("共通の標的 {n} 個: {names}", n=len(result.common), names=names_text))
         if result.missing:
-            lines.append(f"{'・'.join(graph.label(u) for u in result.missing)} は {steps} 段の経路でつながっていません")
+            lines.append(i18n.tr("{names} は {steps} 段の経路でつながっていません",
+                                 names=i18n.tr("・").join(graph.label(u) for u in result.missing), steps=steps))
         return "\n".join(lines)
 
     RELATION_COMMON_SHOWN = 30   # 経路タブの結果に名前を並べる共通の制御因子・標的の数（すべては一覧の上流に並ぶ）
@@ -818,11 +829,15 @@ class GraphPane(QFrame):
         self._record_history()
         self.refresh_view(keep_positions=True, keep_view=True, center_on=pid)
         if not hits:
-            self.statusMessage.emit(f"{name} は今の地図と {self.LINK_DEPTH} 段以内でつながっていないので、{name} だけを加えました")
+            self.statusMessage.emit(i18n.tr("{name} は今の地図と {depth} 段以内でつながっていないので、{name} だけを加えました",
+                                            name=name, depth=self.LINK_DEPTH))
         else:
-            more = f"。経路の途中の遺伝子はほかに {len(middle) - len(chosen)} 個あります" if len(middle) > len(chosen) else ""
-            self.statusMessage.emit(f"{name} を加えました。今の地図の {len(hits)} 個と直接つながっています" if not chosen else
-                                    f"{name} と、今の地図につながる経路上の {len(chosen)} 個を加えました{more}")
+            more = (i18n.tr("。経路の途中の遺伝子はほかに {n} 個あります", n=len(middle) - len(chosen))
+                    if len(middle) > len(chosen) else "")
+            self.statusMessage.emit(i18n.tr("{name} を加えました。今の地図の {n} 個と直接つながっています", name=name, n=len(hits))
+                                    if not chosen else
+                                    i18n.tr("{name} と、今の地図につながる経路上の {n} 個を加えました", name=name, n=len(chosen))
+                                    + more)
 
     def set_focus(self, pid: int, center: bool = False) -> None:
         """pid に注目する（注目する遺伝子は常に 1 つ。前の注目と、拡張などで加えたものは外す）。"""
@@ -855,7 +870,7 @@ class GraphPane(QFrame):
         if role is None:
             self.set_focus(pid, center=center)
             self.nodeClicked.emit(self, pid)
-            self.statusMessage.emit(f"{name} に注目しました")
+            self.statusMessage.emit(i18n.tr("{name} に注目しました", name=name))
             return
         snap = self._snapshot()
         picked = [p for p in self.picked if p != pid]
@@ -877,8 +892,9 @@ class GraphPane(QFrame):
         self.refresh_view(center_on=pid if center else None)
         self.nodeClicked.emit(self, pid)
         old_name = self.model.names[previous]
-        self.statusMessage.emit(f"{name} に注目しました。{old_name} は"
-                                + ("拡張" if role == "grown" else "緑の選択") + "に入れ替えました")
+        self.statusMessage.emit(i18n.tr("{name} に注目しました。{old} は拡張に入れ替えました", name=name, old=old_name)
+                                if role == "grown" else
+                                i18n.tr("{name} に注目しました。{old} は緑の選択に入れ替えました", name=name, old=old_name))
 
     def grow_node(self, pid: int) -> None:
         """2 回目のクリック: 選んだ遺伝子の直接の上流・下流のうち、表示されていないものを追加する。
@@ -899,7 +915,7 @@ class GraphPane(QFrame):
                 self._note_grown(pid)
                 self._record_history()
                 self.refresh_view(keep_positions=True, keep_view=True, center_on=pid)
-            self.statusMessage.emit(f"{name} の上流・下流はすべて表示されています")
+            self.statusMessage.emit(i18n.tr("{name} の上流・下流はすべて表示されています", name=name))
             return
         levels = self.model.levels(known_only)
         before = {levels[n] for n in self.sub.nodes if levels.get(n) is not None}
@@ -928,9 +944,9 @@ class GraphPane(QFrame):
             return
         self._record_history()
         self.refresh_view(keep_positions=True, keep_view=True, center_on=pid)
-        message = f"{name} の上流・下流を {len(new)} 個追加しました"
+        message = i18n.tr("{name} の上流・下流を {n} 個追加しました", name=name, n=len(new))
         if hidden_rows:
-            message += "。使われていない第 " + "・".join(map(str, hidden_rows)) + " 階層の段を隠しました"
+            message += i18n.tr("。使われていない第 {rows} 階層の段を隠しました", rows=i18n.tr("・").join(map(str, hidden_rows)))
         self.statusMessage.emit(message)
 
     def _note_grown(self, pid: int) -> None:
@@ -944,7 +960,7 @@ class GraphPane(QFrame):
             grown = [n for n in self.grown_order if n in self.grown] or sorted(self.grown)
             candidates = picked or grown or self.focus_ids()
             if not candidates:
-                self.statusMessage.emit("新しい枠で表示する遺伝子がありません")
+                self.statusMessage.emit(i18n.tr("新しい枠で表示する遺伝子がありません"))
                 return
             self.tab.add_pane(candidates[-1])
         self.js("app.pickedNodes()", done)
@@ -1001,8 +1017,8 @@ class GraphPane(QFrame):
         self._record_history()
         self.refresh_view(keep_positions=True)
         name = self.model.proteins[pid].gene_name
-        self.statusMessage.emit(f"{name} の紫の印を外し、追加していた {removed} 個を隠しました" if removed
-                                else f"{name} の紫の印を外しました")
+        self.statusMessage.emit(i18n.tr("{name} の紫の印を外し、追加していた {n} 個を隠しました", name=name, n=removed) if removed
+                                else i18n.tr("{name} の紫の印を外しました", name=name))
 
     def expand_node(self, pid: int) -> None:
         """この遺伝子の上流・下流をすべて表示に加える。"""
@@ -1014,7 +1030,7 @@ class GraphPane(QFrame):
             return
         self._record_history()
         self.refresh_view(keep_positions=True)
-        self.statusMessage.emit(f"{self.model.proteins[pid].gene_name} の周辺を展開しました")
+        self.statusMessage.emit(i18n.tr("{name} の周辺を展開しました", name=self.model.proteins[pid].gene_name))
 
     def _apply_steps(self) -> None:
         self.activate()
@@ -1041,9 +1057,9 @@ class GraphPane(QFrame):
 
     @staticmethod
     def describe(state: dict) -> str:
-        focus = ", ".join(state["focus"]) or "表示なし"
-        extra = f"＋展開 {len(state['extra'])}" if state["extra"] else ""
-        return f"{focus} 上流 {state['up']}・下流 {state['down']} 段{extra}"
+        focus = ", ".join(state["focus"]) or i18n.tr("表示なし")
+        extra = i18n.tr("＋展開 {n}", n=len(state['extra'])) if state["extra"] else ""
+        return i18n.tr("{focus} 上流 {up}・下流 {down} 段", focus=focus, up=state['up'], down=state['down']) + extra
 
     def _history_state(self) -> dict:
         """戻る・進むで覚える内容: この表示枠の表示（遺伝子・段数・TFs など）と、全表示枠に共通の凡例・条件タブのチェック。"""
@@ -1067,9 +1083,9 @@ class GraphPane(QFrame):
         self.forward_button.setEnabled(can_forward)
         back_key = QKeySequence(QKeySequence.StandardKey.Back).toString(QKeySequence.SequenceFormat.NativeText)
         forward_key = QKeySequence(QKeySequence.StandardKey.Forward).toString(QKeySequence.SequenceFormat.NativeText)
-        self.back_button.setToolTip(f"前の表示に戻る {back_key}"
+        self.back_button.setToolTip(i18n.tr("前の表示に戻る {key}", key=back_key)
                                     + (f"\n{self.describe(self.history[self.history_pos - 1])}" if can_back else ""))
-        self.forward_button.setToolTip(f"次の表示に進む {forward_key}"
+        self.forward_button.setToolTip(i18n.tr("次の表示に進む {key}", key=forward_key)
                                        + (f"\n{self.describe(self.history[self.history_pos + 1])}"
                                           if can_forward else ""))
 
@@ -1094,7 +1110,7 @@ class GraphPane(QFrame):
             self.nodeClicked.emit(self, focus[0])
         else:
             self.backgroundClicked.emit(self)
-        self.statusMessage.emit(f"表示: {self.describe(state)}")
+        self.statusMessage.emit(i18n.tr("表示: {view}", view=self.describe(state)))
 
     def load_state(self, state: dict) -> None:
         """登録した表示（state() の形。遺伝子は名前）を当てはめて描き直す（左の「登録」タブから呼び出したとき）。"""
@@ -1130,7 +1146,7 @@ class GraphPane(QFrame):
             self.refresh_view()
 
     def _on_lod_changed(self, shown: int, total: int) -> None:
-        self.lod_label.setText(f"縮小中: 下流 {shown}/{total} 段目まで" if shown < total else "")
+        self.lod_label.setText(i18n.tr("縮小中: 下流 {shown}/{total} 段目まで", shown=shown, total=total) if shown < total else "")
 
     def refresh_view(self, keep_positions: bool = False, keep_view: bool = False, center_on: int | None = None) -> None:
         """注目範囲を計算し直して描画する。"""
@@ -1141,7 +1157,7 @@ class GraphPane(QFrame):
         # まとめの遺伝子（線を隠して枠に並べるもの）は軽いので数えない
         laid = len(self.sub.nodes) - sum(len(g) for g in self.sub.bundles.values())
         if laid > WARN_NODES:
-            self.statusMessage.emit(f"表示が {laid} 個と多いため重くなることがあります。段数を減らしてください")
+            self.statusMessage.emit(i18n.tr("表示が {n} 個と多いため重くなることがあります。段数を減らしてください", n=laid))
         self.viewChanged.emit(self)
         if self.page_ready:
             self._push_elements(keep_positions, keep_view, center_on)
@@ -1185,19 +1201,20 @@ class GraphPane(QFrame):
         if edges <= WARN_EDGES or edges <= self.model.count_edges(self.sub, self.tab.known_only(),
                                                                      self.tab.hidden_filters()):
             return True
-        box = QMessageBox(QMessageBox.Icon.Warning, "線が多くなります",
-                          f"表示すると線が {edges} 本、遺伝子が {len(sub.nodes)} 個になり、"
-                          "線の計算と描画に時間がかかることがあります。\n表示しますか？", parent=self)
-        box.setInformativeText("段数を減らすか、凡例のチェックで転写制御などの種類を隠すと、線を減らせます。")
-        show = box.addButton("表示する", QMessageBox.ButtonRole.AcceptRole)
-        box.addButton("キャンセル", QMessageBox.ButtonRole.RejectRole)
+        box = QMessageBox(QMessageBox.Icon.Warning, i18n.tr("線が多くなります"),
+                          i18n.tr("表示すると線が {edges} 本、遺伝子が {nodes} 個になり、"
+                                  "線の計算と描画に時間がかかることがあります。\n表示しますか？",
+                                  edges=edges, nodes=len(sub.nodes)), parent=self)
+        box.setInformativeText(i18n.tr("段数を減らすか、凡例のチェックで転写制御などの種類を隠すと、線を減らせます。"))
+        show = box.addButton(i18n.tr("表示する"), QMessageBox.ButtonRole.AcceptRole)
+        box.addButton(i18n.tr("キャンセル"), QMessageBox.ButtonRole.RejectRole)
         box.setDefaultButton(show)   # Enter で表示する（ブラウザ版の確認と同じ）
         box.exec()
         if box.clickedButton() is show:
             return True
         self._restore_snapshot(snap)
         self.js("app.resetPick()")
-        self.statusMessage.emit("表示をキャンセルしました")
+        self.statusMessage.emit(i18n.tr("表示をキャンセルしました"))
         return False
 
     def js(self, code: str, callback=None) -> None:
@@ -1255,14 +1272,15 @@ class GraphPane(QFrame):
         if not self.model:
             return
         edges = self.model.count_edges(self.sub, self.tab.known_only(), self.tab.hidden_filters())
-        self.focus_label.setText(f" 遺伝子 {len(self.sub.nodes)} 個　線 {edges} 本")
+        self.focus_label.setText(i18n.tr(" 遺伝子 {nodes} 個　線 {edges} 本", nodes=len(self.sub.nodes), edges=edges))
 
     # ================= 保存・書き出し =================
     def _default_file_name(self, ext: str) -> str:
         return ("_".join(self.focus_names) or "network") + f".{ext}"
 
     def export_png(self):
-        path, _ = QFileDialog.getSaveFileName(self, "PNG として保存", self._default_file_name("png"), "PNG 画像 (*.png)")
+        path, _ = QFileDialog.getSaveFileName(self, i18n.tr("PNG として保存"), self._default_file_name("png"),
+                                              i18n.tr("PNG 画像 (*.png)"))
         if not path:
             return
 
@@ -1271,14 +1289,15 @@ class GraphPane(QFrame):
                 with open(path, "wb") as f:
                     f.write(base64.b64decode(data_uri.split(",", 1)[1]))
             except (OSError, AttributeError, IndexError) as e:
-                QMessageBox.critical(self, "エラー", f"保存できませんでした。\n{e}")
+                QMessageBox.critical(self, i18n.tr("エラー"), i18n.tr("保存できませんでした。\n{error}", error=e))
                 return
-            self.statusMessage.emit(f"{path} に保存しました")
+            self.statusMessage.emit(i18n.tr("{path} に保存しました", path=path))
 
         self.js("app.exportPng()", done)
 
     def export_svg(self):
-        path, _ = QFileDialog.getSaveFileName(self, "SVG として保存", self._default_file_name("svg"), "SVG 画像 (*.svg)")
+        path, _ = QFileDialog.getSaveFileName(self, i18n.tr("SVG として保存"), self._default_file_name("svg"),
+                                              i18n.tr("SVG 画像 (*.svg)"))
         if not path:
             return
 
@@ -1287,8 +1306,8 @@ class GraphPane(QFrame):
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(svg)
             except (OSError, TypeError) as e:
-                QMessageBox.critical(self, "エラー", f"保存できませんでした。\n{e}")
+                QMessageBox.critical(self, i18n.tr("エラー"), i18n.tr("保存できませんでした。\n{error}", error=e))
                 return
-            self.statusMessage.emit(f"{path} に保存しました")
+            self.statusMessage.emit(i18n.tr("{path} に保存しました", path=path))
 
         self.js("app.exportSvg()", done)

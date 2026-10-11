@@ -120,7 +120,7 @@ class QWebEngineView(QWidget):
             v = str(version.version) if not _dom.absent(version) else ""
         except Exception:  # noqa: BLE001
             v = ""
-        self._iframe.src = text + (f"?v={v}" if v else "")
+        self._iframe.src = text + ((("&" if "?" in text else "?") + f"v={v}") if v else "")
 
     load = setUrl
 

@@ -11,6 +11,7 @@ from PyQt6.QtCore import QEvent, Qt
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
                              QMessageBox, QPushButton, QVBoxLayout, QWidget)
 
+from .. import i18n
 from ..db.vocab import type_label
 from ..paths import user_data_dir
 from ..roles import ROLE_INFO
@@ -20,16 +21,16 @@ SAVE_FILE = user_data_dir() / "saved_views.json"
 
 # 登録できる項目: キー → (表示名, 説明)
 PARTS = {
-    "focus": ("注目", "注目している遺伝子・上流/下流の段数"),
-    "grown": ("拡張", "拡張と、それで加えた遺伝子・隠した段"),
-    "picked": ("選択", "地図で緑に選んでいる遺伝子"),
-    "trf": ("TF", "左の TF 一覧でチェックした、マップの一番上の段に表示する転写因子"),
-    "relation": ("経路", "「経路」タブのチェックした遺伝子・表示経路・経路の段数・基準の遺伝子"),
-    "conditions": ("条件", "左の「条件」タブで外した条件と、最も上流の経路のチェック"),
-    "legend": ("凡例", "凡例の役割・制御の種類・作用のチェックと「表示」欄"),
+    "focus": (i18n.tr("注目"), i18n.tr("注目している遺伝子・上流/下流の段数")),
+    "grown": (i18n.tr("拡張"), i18n.tr("拡張と、それで加えた遺伝子・隠した段")),
+    "picked": (i18n.tr("選択"), i18n.tr("地図で緑に選んでいる遺伝子")),
+    "trf": ("TF", i18n.tr("左の TF 一覧でチェックした、マップの一番上の段に表示する転写因子")),
+    "relation": (i18n.tr("経路"), i18n.tr("「経路」タブのチェックした遺伝子・表示経路・経路の段数・基準の遺伝子")),
+    "conditions": (i18n.tr("条件"), i18n.tr("左の「条件」タブで外した条件と、最も上流の経路のチェック")),
+    "legend": (i18n.tr("凡例"), i18n.tr("凡例の役割・制御の種類・作用のチェックと「表示」欄")),
 }
 EXPANSION_KEYS = ("extra", "uncapped", "excluded", "grown", "grown_info", "grown_order")
-EFFECT_NAMES = {"activate": "促進", "inhibit": "抑制", "none": "作用不明"}
+EFFECT_NAMES = {"activate": i18n.tr("促進"), "inhibit": i18n.tr("抑制"), "none": i18n.tr("作用不明")}
 
 
 def _load() -> list[dict]:
@@ -53,7 +54,7 @@ class SavedViewsPanel(QWidget):
         self._press_on_current = False          # 選んでいる登録をもう一度押したか（押したら選択を外す）
         self._filtering = False                 # アプリ全体のイベントフィルタを入れているか（選んでいる間だけ）
         layout = QVBoxLayout(self)
-        layout.addWidget(self._heading("登録する項目"))
+        layout.addWidget(self._heading(i18n.tr("登録する項目")))
         self.part_checks: dict[str, QCheckBox] = {}
         for key, (label, desc) in PARTS.items():
             cb = QCheckBox(label)
@@ -62,33 +63,33 @@ class SavedViewsPanel(QWidget):
             self.part_checks[key] = cb
             layout.addWidget(cb)
         all_row = QHBoxLayout()
-        for text, on in (("すべて選択", True), ("すべて解除", False)):
+        for text, on in ((i18n.tr("すべて選択"), True), (i18n.tr("すべて解除"), False)):
             button = QPushButton(text)
             button.clicked.connect(lambda _c=False, on=on: self._check_all_parts(on))
             all_row.addWidget(button)
         layout.addLayout(all_row)
         name_row = QHBoxLayout()
         self.name_edit = QLineEdit()
-        self.name_edit.setPlaceholderText("名前")
+        self.name_edit.setPlaceholderText(i18n.tr("名前"))
         self.name_edit.returnPressed.connect(self.save_current)
-        save_button = QPushButton("登録")
+        save_button = QPushButton(i18n.pick("登録", "Save"))
         save_button.clicked.connect(self.save_current)
         name_row.addWidget(self.name_edit, 1)
         name_row.addWidget(save_button)
         layout.addLayout(name_row)
 
         layout.addSpacing(8)
-        layout.addWidget(self._heading("登録した表示"))
+        layout.addWidget(self._heading(i18n.tr("登録した表示")))
         self.list = QListWidget()
         self.list.setMinimumHeight(160)
         self.list.currentItemChanged.connect(lambda *_: self._show_summary())
         self.list.itemClicked.connect(self._on_item_clicked)
         self.list.itemDoubleClicked.connect(self._on_item_double_clicked)
         buttons = QHBoxLayout()
-        self.load_button = QPushButton("呼び出す")
-        self.load_button.setToolTip("選んだ表示を、操作中の表示枠に当てはめます。ダブルクリックでも呼び出せます")
+        self.load_button = QPushButton(i18n.tr("呼び出す"))
+        self.load_button.setToolTip(i18n.tr("選んだ表示を、操作中の表示枠に当てはめます。ダブルクリックでも呼び出せます"))
         self.load_button.clicked.connect(self.load_selected)
-        self.delete_button = QPushButton("削除")
+        self.delete_button = QPushButton(i18n.tr("削除"))
         self.delete_button.clicked.connect(self.delete_selected)
         buttons.addWidget(self.load_button)
         buttons.addWidget(self.delete_button)
@@ -188,13 +189,14 @@ class SavedViewsPanel(QWidget):
         name = self.name_edit.text().strip()
         parts = [k for k, cb in self.part_checks.items() if cb.isChecked()]
         if not name:
-            QMessageBox.information(self, "登録", "名前を入力してください。")
+            QMessageBox.information(self, i18n.pick("登録", "Save view"), i18n.tr("名前を入力してください。"))
             return
         if not parts:
-            QMessageBox.information(self, "登録", "登録する項目を 1 つ以上チェックしてください。")
+            QMessageBox.information(self, i18n.pick("登録", "Save view"), i18n.tr("登録する項目を 1 つ以上チェックしてください。"))
             return
         same = [i for i, v in enumerate(self.views) if v["name"] == name]
-        if same and QMessageBox.question(self, "上書きの確認", f"「{name}」はすでに登録されています。上書きしますか？") \
+        if same and QMessageBox.question(self, i18n.tr("上書きの確認"),
+                                     i18n.tr("「{name}」はすでに登録されています。上書きしますか？", name=name)) \
                 != QMessageBox.StandardButton.Yes:
             return
         view = {"name": name, "saved_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "parts": self._capture(parts)}
@@ -205,11 +207,12 @@ class SavedViewsPanel(QWidget):
         try:
             _store(self.views)
         except OSError as e:
-            QMessageBox.critical(self, "エラー", f"ファイルに書き込めませんでした。\n{e}")
+            QMessageBox.critical(self, i18n.tr("エラー"), i18n.tr("ファイルに書き込めませんでした。\n{error}", error=e))
             return
         self.name_edit.clear()
         self._refresh_list(select=name)
-        tab.statusMessage.emit(f"「{name}」を登録しました: {'・'.join(PARTS[k][0] for k in parts)}")
+        tab.statusMessage.emit(i18n.tr("「{name}」を登録しました: {parts}", name=name,
+                                       parts=i18n.tr("・").join(PARTS[k][0] for k in parts)))
 
     # ================= 呼び出し =================
     def load_selected(self) -> None:
@@ -264,19 +267,19 @@ class SavedViewsPanel(QWidget):
         else:
             tab.apply_relation()   # 今の経路の設定のまま、描き直した地図に出し直す
         tab._save_view()
-        tab.statusMessage.emit(f"「{view['name']}」を呼び出しました")
+        tab.statusMessage.emit(i18n.tr("「{name}」を呼び出しました", name=view['name']))
 
     def delete_selected(self) -> None:
         view = self._selected()
         if view is None:
             return
-        if QMessageBox.question(self, "削除の確認", f"「{view['name']}」を削除しますか？") != QMessageBox.StandardButton.Yes:
+        if QMessageBox.question(self, i18n.tr("削除の確認"), i18n.tr("「{name}」を削除しますか？", name=view['name'])) != QMessageBox.StandardButton.Yes:
             return
         self.views = [v for v in self.views if v is not view]
         try:
             _store(self.views)
         except OSError as e:
-            QMessageBox.critical(self, "エラー", f"ファイルに書き込めませんでした。\n{e}")
+            QMessageBox.critical(self, i18n.tr("エラー"), i18n.tr("ファイルに書き込めませんでした。\n{error}", error=e))
         self._refresh_list()
 
     # ================= 一覧 =================
@@ -322,37 +325,41 @@ class SavedViewsPanel(QWidget):
     @staticmethod
     def _describe(view: dict) -> str:
         parts = view["parts"]
-        lines = [f"登録日: {view.get('saved_at', '') or '不明'}"]
+        sep, none = i18n.tr("、"), i18n.tr("なし")
+        lines = [i18n.tr("登録日: {date}", date=view.get('saved_at', '') or i18n.tr("不明"))]
         if "focus" in parts:
             f = parts["focus"]
-            lines.append(f"注目: {'、'.join(f.get('focus', [])) or 'なし'}、上流 {f.get('up')}・下流 {f.get('down')} 段")
+            lines.append(i18n.tr("注目: {genes}、上流 {up}・下流 {down} 段", genes=sep.join(f.get('focus', [])) or none,
+                                 up=f.get('up'), down=f.get('down')))
         if "grown" in parts:
             g = parts["grown"]
-            lines.append(f"拡張: {'、'.join(g.get('grown', [])) or 'なし'}"
-                         + (f"、加えた遺伝子 {len(g.get('extra', []))} 個" if g.get("extra") else ""))
+            lines.append(i18n.tr("拡張: {genes}", genes=sep.join(g.get('grown', [])) or none)
+                         + (i18n.tr("、加えた遺伝子 {n} 個", n=len(g.get('extra', []))) if g.get("extra") else ""))
         trf = parts["trf"] if "trf" in parts else parts.get("focus", {}).get("trf")
         if trf is not None:
-            lines.append(f"TF: {'、'.join(trf) or 'なし'}")
+            lines.append(f"TF: {sep.join(trf) or none}")
         if "picked" in parts:
-            lines.append(f"緑の選択: {'、'.join(parts['picked']) or 'なし'}")
+            lines.append(i18n.tr("緑の選択: {genes}", genes=sep.join(parts['picked']) or none))
         if "relation" in parts:
             from .graph_pane import GraphPane
             r = parts["relation"]
             mode = GraphPane.RELATION_MODES.get(r.get("mode"), ("?",))[0]
             steps = r.get("steps", r.get("lo"))   # 以前の形式（lo〜hi）で登録したものは最小の段数
-            span = "" if r.get("mode") == "off" or steps is None else f" {steps} 段"
-            anchor = f"、基準 {r['anchor']}" if r.get("anchor") else ""
-            lines.append(f"経路: {mode}{span}: {'、'.join(r.get('genes', [])) or '遺伝子なし'}{anchor}")
+            span = "" if r.get("mode") == "off" or steps is None else i18n.tr(" {n} 段", n=steps)
+            anchor = i18n.tr("、基準 {gene}", gene=r['anchor']) if r.get("anchor") else ""
+            lines.append(i18n.tr("経路: {mode}{span}: {genes}", mode=mode, span=span,
+                                 genes=sep.join(r.get('genes', [])) or i18n.tr("遺伝子なし")) + anchor)
         if "legend" in parts:
             h = parts["legend"].get("hidden", {})
             hidden = ([ROLE_INFO[k][0] for k in h.get("roles", []) if k in ROLE_INFO]
                       + [type_label(k) for k in h.get("types", [])]
                       + [EFFECT_NAMES.get(k, k) for k in h.get("effects", [])])
-            lines.append("凡例: " + ("隠す項目 " + "、".join(hidden) if hidden else "すべて表示"))
+            lines.append(i18n.tr("凡例: 隠す項目 {items}", items=sep.join(hidden)) if hidden else i18n.tr("凡例: すべて表示"))
         if "conditions" in parts:
             from .. import conditions
             names = conditions.labels()
             off = parts["conditions"].get("off", [])
-            lines.append("条件: " + ("外す条件 " + "、".join(names.get(k, k) for k in off) if off else "すべて選択")
-                         + ("、最も上流の経路" if parts["conditions"].get("top") else ""))
+            lines.append((i18n.tr("条件: 外す条件 {items}", items=sep.join(names.get(k, k) for k in off)) if off
+                          else i18n.tr("条件: すべて選択"))
+                         + (i18n.tr("、最も上流の経路") if parts["conditions"].get("top") else ""))
         return "\n".join(lines)

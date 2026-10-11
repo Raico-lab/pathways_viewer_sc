@@ -30,6 +30,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+from tor_app import i18n  # noqa: E402
+i18n._language = "ja"   # 一覧（docs/curation）は画面の言語によらず日本語で書く
 from tor_app import confidence  # noqa: E402
 
 DB = ROOT / "data" / "tor_pathway.db"

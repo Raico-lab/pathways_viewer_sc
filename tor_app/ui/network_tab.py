@@ -448,13 +448,13 @@ class NetworkTab(QWidget):
         panel = QWidget()
         layout = QVBoxLayout(panel)
         self.gene_search = QLineEdit()
-        self.gene_search.setPlaceholderText("名前で絞り込む")
+        self.gene_search.setPlaceholderText(tr("名前で絞り込む"))
         self.gene_search.setClearButtonEnabled(True)
         self.gene_search.textChanged.connect(lambda _t: self._refill_gene_list())
         layout.addWidget(self.gene_search)
         self.gene_lists: dict[str, tuple[QLabel, QListWidget]] = {}
         for title, color in self.GENE_GROUPS:
-            head = QLabel(title)
+            head = QLabel(tr(title))   # title は一覧の鍵。画面には訳を出す
             head.setStyleSheet(f"color: {color}; font-weight: bold; margin-top: 4px;")
             lst = QListWidget()
             lst.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
@@ -496,7 +496,7 @@ class NetworkTab(QWidget):
                 item.setData(Qt.ItemDataRole.UserRole, pid)
                 lst.addItem(item)
             lst.blockSignals(False)
-            head.setText(f"{title}（{len(genes)}）")
+            head.setText(tr("{title}（{n}）", title=tr(title), n=len(genes)))
             head.setVisible(bool(genes))
             lst.setVisible(bool(genes))
             if title != "そのほか" and genes:   # 注目・拡張は中身の高さに合わせる（多ければスクロール）
@@ -558,14 +558,14 @@ class NetworkTab(QWidget):
         # 探し方: 壊した遺伝子（株）を選ぶ／変化した遺伝子を選び、その遺伝子を変化させた破壊株を探す
         search_row = QHBoxLayout()
         self.del_search_mode = QComboBox()
-        for text, key in (("変化した遺伝子", "changed"), ("壊した遺伝子", "strain")):   # 最初は変化した遺伝子
+        for text, key in ((tr("変化した遺伝子"), "changed"), (tr("壊した遺伝子"), "strain")):   # 最初は変化した遺伝子
             self.del_search_mode.addItem(text, key)
-        self.del_search_mode.setToolTip("壊した遺伝子: 株を、壊した遺伝子の名前で絞り込みます\n"
-                                        "変化した遺伝子: 今の地図の遺伝子を選ぶと、その遺伝子の発現（リン酸化）を変化させた"
-                                        "破壊株を、名前の順に並べます。どれかの破壊株で変化した遺伝子は黒、変化しなかった遺伝子は灰色")
+        self.del_search_mode.setToolTip(tr("壊した遺伝子: 株を、壊した遺伝子の名前で絞り込みます\n"
+                                           "変化した遺伝子: 今の地図の遺伝子を選ぶと、その遺伝子の発現（リン酸化）を変化させた"
+                                           "破壊株を、名前の順に並べます。どれかの破壊株で変化した遺伝子は黒、変化しなかった遺伝子は灰色"))
         search_row.addWidget(self.del_search_mode)
         self.del_search = QLineEdit()
-        self.del_search.setPlaceholderText("名前で絞り込む")
+        self.del_search.setPlaceholderText(tr("名前で絞り込む"))
         self.del_search.setClearButtonEnabled(True)
         search_row.addWidget(self.del_search, 1)
         self.del_gene: str | None = None   # 「変化した遺伝子」で選んだ遺伝子の ORF
@@ -581,10 +581,10 @@ class NetworkTab(QWidget):
         self.del_search_mode.currentIndexChanged.connect(lambda _i: self._on_deletion_search_mode())
         self.del_search.textChanged.connect(lambda _t: self._refill_deletion_list())
         kinds = QHBoxLayout()
-        kinds.addWidget(QLabel("データ"))
+        kinds.addWidget(QLabel(tr("データ")))
         self.del_kind_group = QButtonGroup(self)
         self.del_kind_buttons = {}
-        for key, text in (("del_mrna", "mRNA"), ("del_phospho", "リン酸化")):
+        for key, text in (("del_mrna", "mRNA"), ("del_phospho", tr("リン酸化"))):
             b = QRadioButton(text)
             self.del_kind_group.addButton(b)
             self.del_kind_buttons[key] = b
@@ -602,7 +602,7 @@ class NetworkTab(QWidget):
         outer.addWidget(self.del_summary)
         self.del_changes = QListWidget()
         self.del_changes.setMinimumHeight(160)
-        self.del_changes.setToolTip("選んだ破壊株で変わった、今の地図の遺伝子（名前の順）。押すと右側に説明を出します")
+        self.del_changes.setToolTip(tr("選んだ破壊株で変わった、今の地図の遺伝子（名前の順）。押すと右側に説明を出します"))
         self.del_changes.itemClicked.connect(self._on_deletion_change_clicked)
         self.del_changes.itemSelectionChanged.connect(lambda: QTimer.singleShot(0, self._check_deletion_selection))
         outer.addWidget(self.del_changes, 1)
@@ -647,7 +647,7 @@ class NetworkTab(QWidget):
             for orf, name, kinds in expression.deletion_strains():
                 if words and words not in name.upper() and words not in orf.upper():
                     continue
-                tag = "（mRNA・リン酸化）" if len(kinds) > 1 else "（リン酸化）" if kinds == {"phospho"} else ""
+                tag = tr("（mRNA・リン酸化）") if len(kinds) > 1 else tr("（リン酸化）") if kinds == {"phospho"} else ""
                 entries.append((orf, name + tag))
             current = self.deletion_strain()
         else:
@@ -713,12 +713,12 @@ class NetworkTab(QWidget):
             orf = item.data(Qt.ItemDataRole.UserRole)
             if changed:
                 item.setForeground(black if orf in moved else gray)
-                item.setToolTip("どれかの破壊株で変化しました" if orf in moved else "どの破壊株でも変化していません")
+                item.setToolTip(tr("どれかの破壊株で変化しました") if orf in moved else tr("どの破壊株でも変化していません"))
                 continue
             hits = [g for g in targets.get(orf, {}) if g in shown]
             item.setForeground(black if hits else gray)
-            item.setToolTip(f"今の地図の遺伝子のうち {len(hits)} 個がこの株で変わりました" if hits else
-                            "今の地図の遺伝子は、この株で変わっていません")
+            item.setToolTip(tr("今の地図の遺伝子のうち {n} 個がこの株で変わりました", n=len(hits)) if hits else
+                            tr("今の地図の遺伝子は、この株で変わっていません"))
 
     def _choose_strain(self, orf: str) -> None:
         """一覧で株を選んだ: 選んだ株を覚える選択肢（画面には出さない）をそろえ、地図をその株の実測（選んでいるデータ）で色分けする。
@@ -783,17 +783,18 @@ class NetworkTab(QWidget):
             self.del_summary.setText("")
             return
         if base not in info:
-            self.del_summary.setText(f"{name} の破壊株の{'mRNA' if base == 'mrna' else 'リン酸化'}の測定はありません"
-                                     if orf else "")
+            self.del_summary.setText((tr("{name} の破壊株の mRNA の測定はありません", name=name) if base == "mrna" else
+                                      tr("{name} の破壊株のリン酸化の測定はありません", name=name)) if orf else "")
             return
         pts = [x for x in expression.strain_changes(orf) if x.kind == base]
         up = sum(1 for x in pts if x.value > 0)
         strong = sum(1 for x in pts if abs(x.value) >= self.STRONG_LOG2)
-        unit = "部位" if base == "phospho" else "遺伝子"
         shown = [x for x in pts if x.gene in self._map_orfs()]   # 一覧に出すのは今の地図の遺伝子だけ
-        self.del_summary.setText(f"<b>{html.escape(name)} 破壊株</b>（{html.escape(info[base]['source'])}）<br>"
-                                 f"上がった{unit} {up}・下がった{unit} {len(pts) - up}<br>うち 1.7 倍以上 {strong}"
-                                 f"・今の地図 {len(shown)}")
+        counts = (tr("上がった部位 {up}・下がった部位 {down}", up=up, down=len(pts) - up) if base == "phospho" else
+                  tr("上がった遺伝子 {up}・下がった遺伝子 {down}", up=up, down=len(pts) - up))
+        self.del_summary.setText(tr("<b>{name} 破壊株</b>（{source}）", name=html.escape(name),
+                                    source=html.escape(info[base]['source'])) + "<br>" + counts + "<br>"
+                                 + tr("うち 1.7 倍以上 {strong}・今の地図 {shown}", strong=strong, shown=len(shown)))
         for x in sorted(shown, key=lambda x: (x.gene_name.upper(), x.site or "")):   # 名前の順
             text = f"{x.gene_name}{(' ' + x.site) if x.site else ''}   {x.value:+.2f}"
             item = QListWidgetItem(text)
@@ -810,14 +811,17 @@ class NetworkTab(QWidget):
             return
         name = expression.gene_names().get(gene, gene)
         pts = sorted((x for x in expression.changed_in(gene) if x.kind == base), key=lambda x: (x.strain_name.upper(), x.site or ""))
-        kind = "mRNA" if base == "mrna" else "リン酸化"
+        mrna = base == "mrna"
         if not pts:
-            self.del_summary.setText(f"{html.escape(name)} の{kind}が変化した破壊株はありません")
+            self.del_summary.setText(tr("{name} の mRNA が変化した破壊株はありません", name=html.escape(name)) if mrna else
+                                     tr("{name} のリン酸化が変化した破壊株はありません", name=html.escape(name)))
             return
         sources = "・".join(sorted({x.source for x in pts}))
         up = sum(1 for x in pts if x.value > 0)
-        self.del_summary.setText(f"<b>{html.escape(name)} の{kind}を変化させた破壊株</b><br>"
-                                 f"上げた株 {up}・下げた株 {len(pts) - up}（{html.escape(sources)}）")
+        head = (tr("<b>{name} の mRNA を変化させた破壊株</b>", name=html.escape(name)) if mrna else
+                tr("<b>{name} のリン酸化を変化させた破壊株</b>", name=html.escape(name)))
+        self.del_summary.setText(head + "<br>" + tr("上げた株 {up}・下げた株 {down}（{sources}）", up=up,
+                                                     down=len(pts) - up, sources=html.escape(sources)))
         current = self.deletion_strain() if self.deletion_kind() else None
         for x in pts:
             item = QListWidgetItem(f"{x.strain_name}{(' ' + x.site) if x.site else ''}   {x.value:+.2f}")
@@ -873,14 +877,14 @@ class NetworkTab(QWidget):
         layout = QVBoxLayout(page)
         top_row = QHBoxLayout()
         self.cond_mode = QComboBox()
-        self.cond_mode.addItem("経路", "edges")
+        self.cond_mode.addItem(tr("経路"), "edges")
         if expression.available():
-            self.cond_mode.addItem("遺伝子", "genes")
-        self.cond_mode.setToolTip("経路: チェックした条件で報告された関係（線）を目立たせます\n"
-                                  "遺伝子: チェックした条件で発現・リン酸化が 2 倍以上変化した遺伝子を目立たせます")
+            self.cond_mode.addItem(tr("遺伝子"), "genes")
+        self.cond_mode.setToolTip(tr("経路: チェックした条件で報告された関係（線）を目立たせます\n"
+                                     "遺伝子: チェックした条件で発現・リン酸化が 2 倍以上変化した遺伝子を目立たせます"))
         top_row.addWidget(self.cond_mode)
         self.cond_search = QLineEdit()
-        self.cond_search.setPlaceholderText("名前で絞り込む")
+        self.cond_search.setPlaceholderText(tr("名前で絞り込む"))
         self.cond_search.setClearButtonEnabled(True)
         self.cond_search.textChanged.connect(lambda _t: self._apply_condition_search())
         top_row.addWidget(self.cond_search, 1)
@@ -894,13 +898,13 @@ class NetworkTab(QWidget):
         self.cond_tree.itemChanged.connect(self._on_condition_item_changed)
         edges.addWidget(self.cond_tree)
         buttons = QHBoxLayout()
-        for text, on in (("すべて選択", True), ("すべて解除", False)):
+        for text, on in ((tr("すべて選択"), True), (tr("すべて解除"), False)):
             b = QPushButton(text)
             b.clicked.connect(lambda _=False, on=on: self.set_conditions_off(set() if on else set(self._all_condition_keys())))
             buttons.addWidget(b)
         edges.addLayout(buttons)
         # 最も上流の経路: 条件に合う線のうち、経路の起点になるもの（上流に同じく条件に合う線がない線）だけを目立たせる
-        self.cond_top = QCheckBox("最も上流の経路を表示")
+        self.cond_top = QCheckBox(tr("最も上流の経路を表示"))
         self.cond_top.setChecked(top)
         self.cond_top.toggled.connect(lambda _on: (self._all_js(self.condition_js()), self._save_view(),
                                                    self._record_filters()))
@@ -911,7 +915,7 @@ class NetworkTab(QWidget):
         edges.addWidget(self.cond_edges_summary)
         self.cond_edges_list = QListWidget()
         self.cond_edges_list.setMinimumHeight(160)
-        self.cond_edges_list.setToolTip("チェックした条件に合う、今の地図の線（名前の順）。押すと右側に線の説明を出します")
+        self.cond_edges_list.setToolTip(tr("チェックした条件に合う、今の地図の線（名前の順）。押すと右側に線の説明を出します"))
         self.cond_edges_list.itemClicked.connect(self._on_condition_edge_clicked)
         edges.addWidget(self.cond_edges_list, 1)
         edges.addWidget(self.help_button("conditions"))
@@ -926,18 +930,18 @@ class NetworkTab(QWidget):
         self.cond_gene_tree.itemChanged.connect(self._on_condition_gene_checked)
         genes.addWidget(self.cond_gene_tree)
         buttons = QHBoxLayout()
-        for text, on in (("すべて選択", True), ("すべて解除", False)):
+        for text, on in ((tr("すべて選択"), True), (tr("すべて解除"), False)):
             b = QPushButton(text)
             b.clicked.connect(lambda _=False, on=on: self.set_gene_conditions_off(
                 set() if on else set(expression.condition_keys())))
             buttons.addWidget(b)
         genes.addLayout(buttons)
         kinds = QHBoxLayout()
-        kinds.addWidget(QLabel("データ"))
+        kinds.addWidget(QLabel(tr("データ")))
         self.cond_kind_group = QButtonGroup(self)
         self.cond_kind_buttons: dict[str, QRadioButton] = {}
         for key, text in expression.SHORT.items():
-            b = QRadioButton(text)
+            b = QRadioButton(tr(text))
             self.cond_kind_group.addButton(b)
             self.cond_kind_buttons[key] = b
             kinds.addWidget(b)
@@ -955,8 +959,8 @@ class NetworkTab(QWidget):
         genes.addWidget(self.cond_summary)
         self.cond_values = QListWidget()
         self.cond_values.setMinimumHeight(160)
-        self.cond_values.setToolTip("チェックした条件で大きく変化した、今の地図の遺伝子（名前の順）。値は変化の最も大きい条件のもの。"
-                                    "押すと右側に説明を出します")
+        self.cond_values.setToolTip(tr("チェックした条件で大きく変化した、今の地図の遺伝子（名前の順）。値は変化の最も大きい条件のもの。"
+                                       "押すと右側に説明を出します"))
         self.cond_values.itemClicked.connect(self._on_condition_value_clicked)
         genes.addWidget(self.cond_values, 1)
         genes.addWidget(self.help_button("conditions"))
@@ -998,7 +1002,7 @@ class NetworkTab(QWidget):
         def remember(item, opened: bool, tree=tree) -> None:
             if self._cond_applying or not item.childCount():
                 return
-            name = item.text(0).split("（")[0]
+            name = self._group_name(item)
             (tree.toggled.add if opened != tree.start_open else tree.toggled.discard)(name)
 
         tree.itemExpanded.connect(lambda it: remember(it, True))
@@ -1007,7 +1011,8 @@ class NetworkTab(QWidget):
 
     @staticmethod
     def _group_item(tree: QTreeWidget, group: str, n: int, checkable: bool) -> QTreeWidgetItem:
-        item = QTreeWidgetItem([f"{group}（{n}）" if n > 1 else group])
+        item = QTreeWidgetItem([tr("{group}（{n}）", group=group, n=n) if n > 1 else group])
+        item.setData(0, Qt.ItemDataRole.UserRole + 1, group)   # 群の名前（数を添えない。開閉を覚える鍵）
         font = item.font(0)
         font.setBold(True)
         item.setFont(0, font)
@@ -1018,13 +1023,18 @@ class NetworkTab(QWidget):
         tree.addTopLevelItem(item)
         return item
 
+    @staticmethod
+    def _group_name(item: QTreeWidgetItem) -> str:
+        """群の項目の名前（_group_item で覚えた、数を添えない名前）。"""
+        return item.data(0, Qt.ItemDataRole.UserRole + 1) or item.text(0).split("（")[0]
+
     def _apply_condition_search(self) -> None:
         """両方の一覧を、名前に検索欄の文字を含む条件に絞る（群の名前に含むなら群ごと残す）。絞っている間は群を開く。"""
         words = self.cond_search.text().strip().lower()
         for tree in (self.cond_tree, self.cond_gene_tree):
             for i in range(tree.topLevelItemCount()):
                 group = tree.topLevelItem(i)
-                name = group.text(0).split("（")[0]
+                name = self._group_name(group)
                 any_shown = False
                 for j in range(group.childCount()):
                     child = group.child(j)
@@ -1084,8 +1094,8 @@ class NetworkTab(QWidget):
                 ok = kind in have.get(c.key, set())
                 ok_any |= ok
                 self._set_gray(item, not ok)
-                item.setToolTip(0, "、".join(expression.SHORT[k] for k in expression.SHORT if k in have.get(c.key, set()))
-                                + " の測定があります")
+                item.setToolTip(0, tr("{kinds} の測定があります", kinds=tr("、").join(
+                    tr(expression.SHORT[k]) for k in expression.SHORT if k in have.get(c.key, set()))))
                 head.addChild(item)
             self._set_gray(head, not ok_any)
         self._cond_syncing = False
@@ -1172,7 +1182,7 @@ class NetworkTab(QWidget):
         names = expression.gene_names()
         labels = conditions.labels()
         rows = sorted(((names.get(orf, orf), orf, v, d, c) for orf, (v, d, c) in changed.items()), key=lambda r: r[0].upper())
-        self.cond_summary.setText(f"2 倍以上変化した遺伝子 {len(rows)} 個" + ("（すべての条件）" if everything else ""))
+        self.cond_summary.setText(tr("2 倍以上変化した遺伝子 {n} 個", n=len(rows)) + (tr("（すべての条件）") if everything else ""))
         for name, orf, v, d, cond in rows:
             item = QListWidgetItem(f"{name}{(' ' + d) if d else ''}   {v:+.2f}（{labels.get(cond, cond)}）")
             item.setData(Qt.ItemDataRole.UserRole, orf)
@@ -1198,7 +1208,7 @@ class NetworkTab(QWidget):
         for c in conditions.load():
             if counts.get(c.key):
                 groups.setdefault(c.group, []).append((c.key, c.label))
-        groups["記録なし"] = [(conditions.NONE_KEY, conditions.NONE_LABEL)]
+        groups[tr("記録なし")] = [(conditions.NONE_KEY, conditions.NONE_LABEL)]
         self._cond_syncing = True
         self.cond_tree.clear()
         self._cond_items = {}
@@ -1272,7 +1282,7 @@ class NetworkTab(QWidget):
                 continue
             rows.append((names.get(it.source_id, "?"), names.get(it.target_id, "?"), it.id, it.effect))
         rows.sort(key=lambda r: (r[0].upper(), r[1].upper()))
-        self.cond_edges_summary.setText(f"今の地図の線 {len(rows)} 本" + ("" if self.conditions_off else "（すべての条件）"))
+        self.cond_edges_summary.setText(tr("今の地図の線 {n} 本", n=len(rows)) + ("" if self.conditions_off else tr("（すべての条件）")))
         for src, tgt, iid, effect in rows:
             item = QListWidgetItem(f"{src} → {tgt}")
             item.setData(Qt.ItemDataRole.UserRole, iid)
@@ -1331,38 +1341,38 @@ class NetworkTab(QWidget):
         self._narrow_combo(self.rel_mode, 8)
         top_row.addWidget(self.rel_mode, 3)
         self.rel_search = QLineEdit()
-        self.rel_search.setPlaceholderText("名前で絞り込む")
+        self.rel_search.setPlaceholderText(tr("名前で絞り込む"))
         self.rel_search.setClearButtonEnabled(True)
-        self.rel_search.setToolTip("遺伝子の一覧と、経路の一覧（その名前を通る経路）を絞り込みます")
+        self.rel_search.setToolTip(tr("遺伝子の一覧と、経路の一覧（その名前を通る経路）を絞り込みます"))
         top_row.addWidget(self.rel_search, 2)
         layout.addLayout(top_row)
 
         settings = QHBoxLayout()   # 基準の遺伝子と段数は 1 行に
-        settings.addWidget(QLabel("基準"))
+        settings.addWidget(QLabel(tr("基準")))
         self.rel_anchor = QComboBox()
         self._narrow_combo(self.rel_anchor, 6)
-        self.rel_anchor.setToolTip("チェックした遺伝子から選びます。選ぶと、基準の遺伝子が端にある経路だけを一覧にします。\n"
-                                   "「基準の遺伝子へ・から作用している経路」では必ず選びます")
+        self.rel_anchor.setToolTip(tr("チェックした遺伝子から選びます。選ぶと、基準の遺伝子が端にある経路だけを一覧にします。\n"
+                                      "「基準の遺伝子へ・から作用している経路」では必ず選びます"))
         settings.addWidget(self.rel_anchor, 1)
         settings.addSpacing(8)
-        settings.addWidget(QLabel("段数"))
+        settings.addWidget(QLabel(tr("段数")))
         self.rel_steps = QSpinBox()
         self.rel_steps.setRange(1, 3)
         self.rel_steps.setValue(1)
-        self.rel_steps.setToolTip("段数がちょうどこの数の経路だけを一覧にします。1 なら直接の関係です。複合体は 1 つとして数えます")
+        self.rel_steps.setToolTip(tr("段数がちょうどこの数の経路だけを一覧にします。1 なら直接の関係です。複合体は 1 つとして数えます"))
         settings.addWidget(self.rel_steps)
         layout.addLayout(settings)
 
         # 対象の遺伝子: 注目・拡張の群に分け、名前の順（群のチェックで中の遺伝子をまとめて切り替える）
-        layout.addWidget(self._relation_title("遺伝子"))
+        layout.addWidget(self._relation_title(tr("遺伝子")))
         self.rel_list = self._condition_tree(start_open=True)
-        self.rel_list.setToolTip("経路を調べる遺伝子をチェックします（操作中の表示枠で注目・拡張している遺伝子）")
+        self.rel_list.setToolTip(tr("経路を調べる遺伝子をチェックします（操作中の表示枠で注目・拡張している遺伝子）"))
         self.rel_list.itemChanged.connect(self._on_relation_item_changed)
         layout.addWidget(self.rel_list)
-        check_all = QPushButton("すべて選択")
-        check_all.setToolTip("一覧の遺伝子（絞り込み中は見えているもの）をすべてチェックします")
+        check_all = QPushButton(tr("すべて選択"))
+        check_all.setToolTip(tr("一覧の遺伝子（絞り込み中は見えているもの）をすべてチェックします"))
         check_all.clicked.connect(self._check_all_relation_genes)
-        clear = QPushButton("すべて解除")
+        clear = QPushButton(tr("すべて解除"))
         clear.clicked.connect(self._clear_relation_checks)
         buttons = QHBoxLayout()
         buttons.addWidget(check_all)
@@ -1375,7 +1385,7 @@ class NetworkTab(QWidget):
         self.rel_paths_box = QWidget()
         paths_layout = QVBoxLayout(self.rel_paths_box)
         paths_layout.setContentsMargins(0, 0, 0, 0)
-        paths_layout.addWidget(self._relation_title("経路"))
+        paths_layout.addWidget(self._relation_title(tr("経路")))
         self.rel_result = QLabel()   # 共通の遺伝子・打ち切りなどの結果
         self.rel_result.setWordWrap(True)
         self.rel_result.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
@@ -1393,8 +1403,8 @@ class NetworkTab(QWidget):
         self.rel_tree.setTextElideMode(Qt.TextElideMode.ElideRight)
         self.rel_tree.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.rel_tree.header().setStretchLastSection(True)
-        self.rel_tree.setToolTip("経路を選ぶと地図で強調します。上流や「上流 … 行き先」の組を選ぶと、その中の経路をすべて強調します。\n"
-                                 "記号: → 促進、⊣ 抑制、◇ 作用不明。← ⊢ は右から左への矢印。P・Tx などは関係の種類")
+        self.rel_tree.setToolTip(tr("経路を選ぶと地図で強調します。上流や「上流 … 行き先」の組を選ぶと、その中の経路をすべて強調します。\n"
+                                    "記号: → 促進、⊣ 抑制、◇ 作用不明。← ⊢ は右から左への矢印。P・Tx などは関係の種類"))
         self.rel_tree.itemSelectionChanged.connect(self._on_relation_path_selected)
         self.rel_tree.itemExpanded.connect(self._fill_group)
         self.rel_tree.itemClicked.connect(self._on_relation_tree_clicked)
@@ -1407,9 +1417,9 @@ class NetworkTab(QWidget):
         self._rel_click_serial = -1
         self._rel_detail_shown = False   # 右側の説明欄に、選んだ経路の説明を出しているか
 
-        self.rel_window_button = QPushButton("新しい枠で開く")
-        self.rel_window_button.setToolTip("いま経路タブで強調している遺伝子だけを新しい表示枠に描きます。一覧で経路を選んでいなければ、チェックした遺伝子を描きます。\n"
-                                          "その枠の「再配置」は、開いたときの遺伝子の組に戻して配置し直します")
+        self.rel_window_button = QPushButton(tr("新しい枠で開く"))
+        self.rel_window_button.setToolTip(tr("いま経路タブで強調している遺伝子だけを新しい表示枠に描きます。一覧で経路を選んでいなければ、チェックした遺伝子を描きます。\n"
+                                             "その枠の「再配置」は、開いたときの遺伝子の組に戻して配置し直します"))
         self.rel_window_button.setEnabled(False)
         self.rel_window_button.clicked.connect(lambda: self.open_relation_pane())
         layout.addWidget(self.rel_window_button)
@@ -1497,7 +1507,7 @@ class NetworkTab(QWidget):
         if nodes:
             focus = set(pane.focus_ids())
             names = self.model.names
-            for group, pids in (("注目", [n for n in nodes if n in focus]), ("拡張", [n for n in nodes if n not in focus])):
+            for group, pids in ((tr("注目"), [n for n in nodes if n in focus]), (tr("拡張"), [n for n in nodes if n not in focus])):
                 if not pids:
                     continue
                 head = self._group_item(tree, group, len(pids), checkable=True)
@@ -1527,7 +1537,7 @@ class NetworkTab(QWidget):
                 child.setHidden(not shown)
                 any_shown |= shown
             group.setHidden(not any_shown)
-            name = group.text(0).split("（")[0]
+            name = self._group_name(group)
             self._cond_applying = True   # 絞り込みで開いた群は、開閉した群として覚えない
             group.setExpanded(bool(words and any_shown) or name not in tree.toggled)
             self._cond_applying = False
@@ -1541,7 +1551,7 @@ class NetworkTab(QWidget):
         anchor = self.rel_anchor.currentData()
         self.rel_anchor.blockSignals(True)
         self.rel_anchor.clear()
-        self.rel_anchor.addItem("なし", None)
+        self.rel_anchor.addItem(tr("なし"), None)
         for p in self._rel_checked:
             self.rel_anchor.addItem(self.model.names[p], p)
         if anchor is not None and self.rel_anchor.findData(anchor) >= 0:
@@ -2641,7 +2651,7 @@ class NetworkTab(QWidget):
         known_only = self.known_only()
         level = self.model.levels(known_only).get(pid)
         place = (f"No. {self.model.layout_order(known_only)[pid]}"
-                 f"・{tr('階層なし') if level is None else tr('第{n}階層', n=level + 1)}")
+                 f"{tr('・')}{tr('階層なし') if level is None else tr('第{n}階層', n=level + 1)}")
         rows = [(tr("Systematic 名"), p.standard_name), (tr("配置の番号"), place),
                 (tr("ORF の確度（SGD）"), p.protein_properties)]
         table = "".join(f"<tr><td nowrap style='color:#777;padding-right:8px;white-space:nowrap'>{k}</td><td>{html.escape(v or '')}</td></tr>"
@@ -2728,7 +2738,7 @@ class NetworkTab(QWidget):
             counts = (tr("上がった部位 {up}・下がった部位 {down}", up=up, down=len(pts) - up) if kind == "phospho"
                       else tr("上がった遺伝子 {up}・下がった遺伝子 {down}", up=up, down=len(pts) - up))
             parts.append(f"<p style='margin:4px 0 2px 0'><b>{tr('この遺伝子を壊した株の{kind}', kind=title)}</b>"
-                         f"（{ref(meta['source'], meta['pmid'])}）: {counts} "
+                         f"{tr('（{src}）: {counts}', src=ref(meta['source'], meta['pmid']), counts=counts)} "
                          f"<a href='kocolor:{orf}:{color_kind}' style='text-decoration:none;white-space:nowrap'>"
                          f"{tr('地図で色分け')}</a></p>")
             if pts:
@@ -2739,8 +2749,8 @@ class NetworkTab(QWidget):
             if not pts:
                 continue
             sources = sorted({(x.source, x.pmid) for x in pts})
-            parts.append(f"<p style='margin:6px 0 2px 0'><b>この遺伝子の{title}が変わった破壊株</b>"
-                         f"（{'・'.join(ref(*s) for s in sources)}）: {len({x.strain for x in pts})} 株</p>")
+            parts.append(f"<p style='margin:6px 0 2px 0'><b>{tr('この遺伝子の{kind}が変わった破壊株', kind=title)}</b>"
+                         f"{tr('（{src}）: {counts}', src=tr('・').join(ref(*s) for s in sources), counts=tr('{n} 株', n=len({x.strain for x in pts})))}</p>")
             parts.append(rows(pts, True, f"ko-in-{kind}"))
         if len(parts) == 1:
             return ""
@@ -2800,7 +2810,7 @@ class NetworkTab(QWidget):
                               f"{self._measures_html(mine)}</td></tr></table>")
         if rows:
             blocks.append(table("".join(rows)))
-        return "<h4 style='margin-bottom:2px'>条件ごとの log2 比</h4>" + "".join(blocks)
+        return f"<h4 style='margin-bottom:2px'>{tr('条件ごとの log2 比')}</h4>" + "".join(blocks)
 
     def _two_lines(self, text: str, width: int, bold: bool = False) -> str:
         """条件名を width px の幅で 2 行までに折り返す（HTML、改行は <br>）。2 行に収まらない分は「…」で省く。
@@ -2866,13 +2876,14 @@ class NetworkTab(QWidget):
                                 f"{html.escape(x.site)}・{html.escape(x.label)}・p = {x.pval:.2g} {ref}</td></tr>")
                     continue
                 site = f"<b>{html.escape(x.site)}</b> " if x.site else ""
-                sig = (f" <span style='color:#777;font-size:11px'>p = {x.pval:.2g}・補正後 {x.padj:.2g}</span>"
+                sig = (f" <span style='color:#777;font-size:11px'>"
+                       f"{tr('p = {p}・補正後 {padj}', p=f'{x.pval:.2g}', padj=f'{x.padj:.2g}')}</span>"
                        if x.padj is not None else "")
                 rows.append(f"<tr><td align='right' style='white-space:nowrap;padding:3px 8px 0 0'>{self._value_html(x.value)}</td>"
                             f"<td style='padding-top:3px'>{site}{ref}</td></tr>"
                             f"<tr><td></td><td style='color:#999'>{html.escape(x.label)}{sig}</td></tr>")
             if rows:
-                more = f"<div style='color:#777'>ほか {len(rows) - 30} 件</div>" if len(rows) > 30 else ""
+                more = f"<div style='color:#777'>{tr('ほか {n} 件', n=len(rows) - 30)}</div>" if len(rows) > 30 else ""
                 parts.append(f"<div style='margin-top:4px'><b>{title}</b></div>"
                              f"<table cellspacing='0' cellpadding='0'>{''.join(rows[:30])}</table>{more}")
         return "".join(parts)
@@ -2912,16 +2923,17 @@ class NetworkTab(QWidget):
         out = ""
         if items:
             links = "".join(f"<li><a href='cpx:{html.escape(ac)}'>{html.escape(name)}</a></li>" for ac, name in items)
-            out = f"<h4 style='margin-bottom:2px'>所属する複合体（Complex Portal）</h4><ul style='margin-top:0'>{links}</ul>"
+            out = (f"<h4 style='margin-bottom:2px'>{tr('所属する複合体（Complex Portal）')}</h4>"
+                   f"<ul style='margin-top:0'>{links}</ul>")
         # パラログ（役割が重なりうる相手）。組の名前を押すと根拠を出す
         pid = self.model.by_name.get(gene.upper()) if self.model else None
         pairs = [n for n, genes in self.model.paralogs.items() if pid in genes] if pid is not None else []
         if pairs:
             gene_link = lambda g: f"<a href='node:{g}'>{html.escape(self.model.names[g])}</a>"   # noqa: E731
             mates = "".join(f"<li>{'・'.join(gene_link(g) for g in self.model.paralogs[n] if g != pid)} "
-                            f"<a href='paralog:{html.escape(n)}' style='color:#888;white-space:nowrap'>根拠</a></li>"
+                            f"<a href='paralog:{html.escape(n)}' style='color:#888;white-space:nowrap'>{tr('根拠')}</a></li>"
                             for n in pairs)
-            out += f"<h4 style='margin-bottom:2px'>パラログ</h4><ul style='margin-top:0'>{mates}</ul>"
+            out += f"<h4 style='margin-bottom:2px'>{tr('パラログ')}</h4><ul style='margin-top:0'>{mates}</ul>"
         return out
 
     def _tf_pair_note(self, pid: int, relations: list, sub) -> str:
@@ -2932,8 +2944,9 @@ class NetworkTab(QWidget):
         if not omitted:
             return ""
         names = sorted({model.names[it.source_id if it.source_id != pid else it.target_id] for it in omitted})
-        shown = "、".join(names[:6]) + (f" ほか {len(names) - 6} 個" if len(names) > 6 else "")
-        return f"<p style='color:{self._tone('#b26a00', '#f0a040')}'>省いた転写因子どうしの線 {len(omitted)} 本: {html.escape(shown)}</p>"
+        shown = tr("、").join(names[:6]) + (tr(" ほか {n} 個", n=len(names) - 6) if len(names) > 6 else "")
+        return (f"<p style='color:{self._tone('#b26a00', '#f0a040')}'>"
+                f"{tr('省いた転写因子どうしの線 {n} 本: {names}', n=len(omitted), names=html.escape(shown))}</p>")
 
     def _description_html(self, text: str) -> str:
         """説明欄: 英語の説明（原文のまま）。"""
@@ -2945,25 +2958,26 @@ class NetworkTab(QWidget):
         items = self._edge_items(edges, shown)
         head = f"<h4>{title} ({len(items)})</h4>" if title else ""
         if not items:
-            return head + "<span style='color:#999'>なし</span>"
+            return head + f"<span style='color:#999'>{tr('なし')}</span>"
         opened = key in self._st.open_lists
         lines = [h for _, h in (items if opened else items[:MAX_LIST])]
         if len(items) > MAX_LIST:
             muted = self._tone("#555", "#aaa")
-            lines.append(f"<a href='list:{key}' style='color:{muted}'>▴ 閉じる</a>" if opened else
-                         f"<a href='list:{key}' style='color:{muted}'>▸ ほか {len(items) - MAX_LIST} 件を表示</a>")
+            lines.append(f"<a href='list:{key}' style='color:{muted}'>{tr('▴ 閉じる')}</a>" if opened else
+                         f"<a href='list:{key}' style='color:{muted}'>"
+                         f"{tr('▸ ほか {n} 件を表示', n=len(items) - MAX_LIST)}</a>")
         return head + "<br>".join(lines)
 
     def _edge_html(self, iid: int) -> str:
         it = self.model.interactions[iid]
         effect = resolve_effect(it.interaction_type, it.effect)
         level = self.model.confidence.get(iid, "U")
-        rows = [("種類", html.escape(type_label(it.interaction_type))),
-                ("作用の向き", html.escape(EFFECTS[effect])
-                 + (" <span style='color:#e65100'>⚠ 出典で食い違いあり</span>" if "⚠" in (it.evidence or "") else "")),
-                ("向きの根拠", html.escape(self._effect_basis(it, effect))),
-                ("確度", html.escape(confidence.label(level))),
-                ("条件", html.escape("・".join(conditions.labels().get(k, k) for k in conditions.split(it.conditions))
+        rows = [(tr("種類"), html.escape(type_label(it.interaction_type))),
+                (tr("作用の向き"), html.escape(EFFECTS[effect])
+                 + (f" <span style='color:#e65100'>{tr('⚠ 出典で食い違いあり')}</span>" if "⚠" in (it.evidence or "") else "")),
+                (tr("向きの根拠"), html.escape(self._effect_basis(it, effect))),
+                (tr("確度"), html.escape(confidence.label(level))),
+                (tr("条件"), html.escape(tr("・").join(conditions.labels().get(k, k) for k in conditions.split(it.conditions))
                                      or conditions.NONE_LABEL))]
         # 文献から拾った性質（組む相手・部位など）は、値のあるものだけ
         rows += [(label, html.escape(detail_text(getattr(it, name, "") or ""))) for name, label in DETAILS
@@ -2972,32 +2986,32 @@ class NetworkTab(QWidget):
                         f"<td>{v}</td></tr>" for k, v in rows)
         a, b = it.source.gene_name, it.target.gene_name
         # 参照データのリンクは、リンクの途中で折り返さないよう 1 つずつ改行して並べる
-        sgd = (f"<p style='font-size:11px;color:#888'>参照データで確かめる:<br>"
-               f"<a href='https://www.yeastgenome.org/locus/{a}/interaction'>SGD {html.escape(a)} の相互作用</a><br>"
-               f"<a href='https://www.yeastgenome.org/locus/{a}/regulation'>{html.escape(a)} の制御</a><br>"
-               f"<a href='https://www.yeastgenome.org/locus/{b}/interaction'>SGD {html.escape(b)} の相互作用</a><br>"
-               f"<a href='https://www.yeastgenome.org/locus/{b}/regulation'>{html.escape(b)} の制御</a></p>")
+        sgd = (f"<p style='font-size:11px;color:#888'>{tr('参照データで確かめる:')}<br>"
+               f"<a href='https://www.yeastgenome.org/locus/{a}/interaction'>{tr('SGD {gene} の相互作用', gene=html.escape(a))}</a><br>"
+               f"<a href='https://www.yeastgenome.org/locus/{a}/regulation'>{tr('{gene} の制御', gene=html.escape(a))}</a><br>"
+               f"<a href='https://www.yeastgenome.org/locus/{b}/interaction'>{tr('SGD {gene} の相互作用', gene=html.escape(b))}</a><br>"
+               f"<a href='https://www.yeastgenome.org/locus/{b}/regulation'>{tr('{gene} の制御', gene=html.escape(b))}</a></p>")
         return (f"<h2 style='margin-bottom:2px'><a href='node:{it.source_id}'>{html.escape(a)}</a>"
                 f" → <a href='node:{it.target_id}'>{html.escape(b)}</a></h2>"
                 f"<table>{table}</table>"
-                f"<h4 style='margin-bottom:2px'>根拠・文献</h4>{self._evidence_html(it.evidence or '')}{sgd}")
+                f"<h4 style='margin-bottom:2px'>{tr('根拠・文献')}</h4>{self._evidence_html(it.evidence or '')}{sgd}")
 
     @staticmethod
     def _effect_basis(it, effect: str) -> str:
         """作用の向きを何から決めたか（根拠欄から読み取る）。分からなければ空。"""
         ev = it.evidence or ""
         if not it.effect:
-            return f"記録がなく、{type_label(it.interaction_type)}の既定値"
+            return tr("記録がなく、{type}の既定値", type=type_label(it.interaction_type))
         if effect == "none":
             return confidence.UNKNOWN_REASONS[confidence.unknown_reason(ev)]
-        return ("文献で確認" if ev.startswith("文献で確認") else
-                "転写因子の誘導実験 IDEA" if "作用の向き: IDEA" in ev else
-                "SGD の GO 注釈" if "作用の向き: SGD GO" in ev or ev.startswith("SGD GO") else
+        return (tr("文献で確認") if ev.startswith("文献で確認") else
+                tr("転写因子の誘導実験 IDEA") if "作用の向き: IDEA" in ev else
+                tr("SGD の GO 注釈") if "作用の向き: SGD GO" in ev or ev.startswith("SGD GO") else
                 "GO-CAM" if "作用の向き: GO-CAM" in ev or ev.startswith("GO-CAM") else
-                "破壊株データからの推定" if "作用の向き: 破壊株データ" in ev else
-                "条件ごとの発現からの推定（間接の作用を含む）" if "作用の向き: 条件ごとの発現" in ev else
-                "YEASTRACT+ の発現の報告" if "TF acting as" in ev else
-                "構造確認用のサンプル" if "サンプル" in ev else "")
+                tr("破壊株データからの推定") if "作用の向き: 破壊株データ" in ev else
+                tr("条件ごとの発現からの推定（間接の作用を含む）") if "作用の向き: 条件ごとの発現" in ev else
+                tr("YEASTRACT+ の発現の報告") if "TF acting as" in ev else
+                tr("構造確認用のサンプル") if "サンプル" in ev else "")
 
     @staticmethod
     def _evidence_html(evidence: str) -> str:
@@ -3034,7 +3048,7 @@ class NetworkTab(QWidget):
             text = re.sub(r"(\d{6,9})", lambda m: f"<a href='https://pubmed.ncbi.nlm.nih.gov/{m.group(1)}/'>{m.group(1)}</a>", text) \
                 if line.startswith("両方を壊すと") else text
             lines.append(f"<li>{text}</li>")
-        title = f"<h2 style='margin-bottom:2px'>{html.escape(name)} パラログ</h2>" if heading else \
+        title = f"<h2 style='margin-bottom:2px'>{tr('{name} パラログ', name=html.escape(name))}</h2>" if heading else \
             f"<h4 style='margin-bottom:2px'>{html.escape(name)}</h4>"
         return f"{title}<p>{links}</p><ul style='margin-top:0'>{''.join(lines)}</ul>"
 
@@ -3045,7 +3059,7 @@ class NetworkTab(QWidget):
         if all(p in self.model.paralogs for p in pairs):
             if len(pairs) == 1:
                 return self.paralog_html(pairs[0])
-            return ("<h2 style='margin-bottom:2px'>パラログ</h2>"
+            return (f"<h2 style='margin-bottom:2px'>{tr('パラログ')}</h2>"
                     + "".join(self.paralog_html(p, heading=False) for p in pairs))
         members = self.model.all_complexes().get(name, [])
         items = "".join(f"<li><a href='node:{m}'>{html.escape(self.model.proteins[m].gene_name)}</a></li>"
@@ -3053,11 +3067,12 @@ class NetworkTab(QWidget):
         cat = self.model.categories.get(name)
         about = ""
         if cat and cat.ref:
-            about += (f"<p>出典: <a href='https://www.ebi.ac.uk/complexportal/complex/{html.escape(cat.ref)}'>"
+            about += (f"<p>{tr('出典:')} <a href='https://www.ebi.ac.uk/complexportal/complex/{html.escape(cat.ref)}'>"
                       f"Complex Portal {html.escape(cat.ref)}</a></p>")
         if cat and cat.description:
-            about += f"<h4 style='margin-bottom:2px'>説明</h4>{self._description_html(cat.description)}"
-        return (f"<h2>{html.escape(name)} 複合体</h2>{about}<h4>構成する遺伝子 ({len(members)})</h4><ul>{items}</ul>"
+            about += f"<h4 style='margin-bottom:2px'>{tr('説明')}</h4>{self._description_html(cat.description)}"
+        return (f"<h2>{tr('{name} 複合体', name=html.escape(name))}</h2>{about}"
+                f"<h4>{tr('構成する遺伝子 ({n})', n=len(members))}</h4><ul>{items}</ul>"
                 + self._complex_edges(name, members))
 
     def _complex_edges(self, name: str, members: list[int]) -> str:
@@ -3078,7 +3093,7 @@ class NetworkTab(QWidget):
                 downs.append(it)
         sub = self._pane(self.detail_pane).sub if self._render_pane else None
         shown = sub.nodes if sub else set()
-        return (self._edge_list(ups, shown, "cup", "上流") + self._edge_list(downs, shown, "cdown", "下流"))
+        return (self._edge_list(ups, shown, "cup", tr("上流")) + self._edge_list(downs, shown, "cdown", tr("下流")))
 
     def _open_link(self, target: str):
         if target.startswith(("http://", "https://")):

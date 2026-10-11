@@ -1,5 +1,20 @@
 # Pathways viewer for *Saccharomyces cerevisiae*
 
+## Pathways viewer for *Saccharomyces cerevisiae* — English summary
+
+A desktop and browser app that maps regulatory relations between budding yeast genes (phosphorylation, transcriptional
+regulation, binding, etc.) and lets you explore what lies upstream and downstream of a gene and which paths connect genes.
+It covers all genes (the bundled sample data center on the TOR pathway). The UI is available in Japanese and English.
+
+- Browser version: https://raico-lab.github.io/pathways-viewer/
+- User guide: [docs/MANUAL.en.md](docs/MANUAL.en.md) (Japanese: [docs/MANUAL.md](docs/MANUAL.md))
+- License: source code under the GNU GPL v3 ([LICENSE](LICENSE)). Bundled data are not covered by the GPL; see
+  [DATA_LICENSES.md](DATA_LICENSES.md) for sources and terms of use.
+
+The rest of this README is in Japanese.
+
+---
+
 出芽酵母の遺伝子間の制御関係を可視化し、遺伝子どうしのつながり（経路）を探すデスクトップアプリです。
 対象は TOR 経路に限らず全遺伝子です（同梱のサンプルデータは TOR 経路）。
 （データベース・ネットワーク。シミュレーション・制御遺伝子探索・上流経路の予測は配布版に入れない。試作は `archive/`）
