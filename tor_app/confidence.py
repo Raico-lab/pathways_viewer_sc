@@ -10,7 +10,7 @@
 複数の出典がある関係は、いちばん確かなものを取る。マップの表示と順位には使わず、関係の説明に使う。
 画面に出す名前（LEVELS・CHOICES・UNKNOWN_REASONS）は、英語の画面では data/i18n/en/vocab.json の訳。
 """
-from .i18n import tr
+from .i18n import pick, tr
 
 LEVELS = {
     "A": tr("文献で確認"),
@@ -23,8 +23,8 @@ ORDER = "ABCDU"
 
 # 計算に使う関係の選び方（画面の選択肢）: 値 → (表示名, 使う確度)
 CHOICES = {
-    "all": (tr("すべての関係"), set(ORDER)),
-    "no_d": (tr("推定だけの関係を除く（A〜C）"), set("ABC")),
+    "all": (pick("すべての経路", "All relations"), set(ORDER)),   # 経路タブの「すべての経路」（All paths）とは別
+    "no_d": (tr("推定だけの経路を除く（A〜C）"), set("ABC")),
     "ab": (tr("個別実験・文献で確認のみ（A・B）"), set("AB")),
     "a": (tr("文献で確認のみ（A）"), {"A"}),
 }

@@ -12,7 +12,7 @@ from PyQt6.QtCore import QObject, Qt, QTimer, QUrl, pyqtSignal
 from PyQt6.QtGui import QColor, QDesktopServices, QFont, QFontMetrics, QKeySequence, QShortcut
 from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QSizePolicy, QButtonGroup, QCheckBox, QComboBox, QHBoxLayout, QLabel, QLineEdit,
                              QListWidget, QListWidgetItem, QPushButton, QRadioButton, QScrollArea, QSpinBox, QSplitter, QStyle,
-                             QStyledItemDelegate, QTabWidget, QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+                             QStyledItemDelegate, QTabWidget, QTextBrowser, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from .. import complex_groups, conditions, confidence, expression, relation_paths
 from ..db import Database
@@ -205,7 +205,7 @@ class NetworkTab(QWidget):
         self.edge_color_combo = QComboBox()
         self.edge_color_combo.addItem(tr("修飾・制御"), "type")
         self.edge_color_combo.addItem(tr("作用"), "effect")
-        self.edge_color_combo.setToolTip(tr("線の色\n修飾・制御: 修飾・制御の種類で色分け。リン酸化＝橙、転写制御＝青など\n"
+        self.edge_color_combo.setToolTip(tr("経路の色\n修飾・制御: 修飾・制御の種類で色分け。リン酸化＝橙、転写制御＝青など\n"
                                             "作用: 促進＝赤、抑制＝青、作用不明＝灰、結合＝薄い灰"))
         self.edge_color_combo.currentIndexChanged.connect(lambda: self._save_view())
         self.edge_color_combo.currentIndexChanged.connect(
@@ -218,7 +218,7 @@ class NetworkTab(QWidget):
         """表示枠の検索窓の下に出す、全表示枠に共通の選択肢: (見出し, 値を持つ選択肢)。"""
         # 見出しは短くする（表示枠を 2 列に並べても枠が広がりすぎないように。説明は選択肢のツールチップ）
         # 遺伝子の色は左の「条件」（遺伝子）・「破壊株」タブで選ぶ（選択をやめると役割に戻る）ので、ここには出さない
-        return [(tr("配置"), self.layout_combo), (tr("線"), self.edge_color_combo)]
+        return [(tr("配置"), self.layout_combo), (tr("経路の色"), self.edge_color_combo)]
 
     def data_kind(self) -> str | None:
         """発現・リン酸化で色分けしているなら、その種類（mrna / phospho）。今は選べないので、いつも None。"""
@@ -465,6 +465,28 @@ class NetworkTab(QWidget):
         layout.addWidget(self.help_button("genes"))
         return panel
 
+    def _ungrow_button(self, pid: int) -> QWidget:
+        """「拡張」の一覧の行の右端の ×: 押すとその遺伝子を拡張から外す（凡例の × と同じ）。"""
+        holder = QWidget()
+        row = QHBoxLayout(holder)
+        row.setContentsMargins(0, 0, 2, 0)
+        row.addStretch(1)
+        button = QToolButton()
+        button.setText("×")
+        button.setAutoRaise(True)
+        button.setToolTip(tr("拡張から外す"))
+        button.setStyleSheet("QToolButton { padding: 0 4px; color: #6a1b9a; font-weight: bold; }")
+        # 一覧を作り直すとこのボタンも消えるので、押した後で外す
+        button.clicked.connect(lambda _c=False, p=pid: QTimer.singleShot(0, lambda: self._ungrow(p)))
+        row.addWidget(button)
+        return holder
+
+    def _ungrow(self, pid: int) -> None:
+        pane = self.active_pane
+        if pane is not None:
+            pane.remove_grown(pid)
+        self._refill_gene_list()
+
     def _gene_items(self):
         """「遺伝子」タブの 3 つの一覧の項目すべて。"""
         for _head, lst in self.gene_lists.values():
@@ -495,6 +517,8 @@ class NetworkTab(QWidget):
                 item = QListWidgetItem(name)
                 item.setData(Qt.ItemDataRole.UserRole, pid)
                 lst.addItem(item)
+                if title == "拡張":
+                    lst.setItemWidget(item, self._ungrow_button(pid))
             lst.blockSignals(False)
             head.setText(tr("{title}（{n}）", title=tr(title), n=len(genes)))
             head.setVisible(bool(genes))
@@ -880,7 +904,7 @@ class NetworkTab(QWidget):
         self.cond_mode.addItem(tr("経路"), "edges")
         if expression.available():
             self.cond_mode.addItem(tr("遺伝子"), "genes")
-        self.cond_mode.setToolTip(tr("経路: チェックした条件で報告された関係（線）を目立たせます\n"
+        self.cond_mode.setToolTip(tr("経路: チェックした条件で報告された経路を目立たせます\n"
                                      "遺伝子: チェックした条件で発現・リン酸化が 2 倍以上変化した遺伝子を目立たせます"))
         top_row.addWidget(self.cond_mode)
         self.cond_search = QLineEdit()
@@ -915,7 +939,7 @@ class NetworkTab(QWidget):
         edges.addWidget(self.cond_edges_summary)
         self.cond_edges_list = QListWidget()
         self.cond_edges_list.setMinimumHeight(160)
-        self.cond_edges_list.setToolTip(tr("チェックした条件に合う、今の地図の線（名前の順）。押すと右側に線の説明を出します"))
+        self.cond_edges_list.setToolTip(tr("チェックした条件に合う、今の地図の経路（名前の順）。押すと右側に経路の説明を出します"))
         self.cond_edges_list.itemClicked.connect(self._on_condition_edge_clicked)
         edges.addWidget(self.cond_edges_list, 1)
         edges.addWidget(self.help_button("conditions"))
@@ -1282,7 +1306,7 @@ class NetworkTab(QWidget):
                 continue
             rows.append((names.get(it.source_id, "?"), names.get(it.target_id, "?"), it.id, it.effect))
         rows.sort(key=lambda r: (r[0].upper(), r[1].upper()))
-        self.cond_edges_summary.setText(tr("今の地図の線 {n} 本", n=len(rows)) + ("" if self.conditions_off else tr("（すべての条件）")))
+        self.cond_edges_summary.setText(tr("今の地図の経路 {n} 本", n=len(rows)) + ("" if self.conditions_off else tr("（すべての条件）")))
         for src, tgt, iid, effect in rows:
             item = QListWidgetItem(f"{src} → {tgt}")
             item.setData(Qt.ItemDataRole.UserRole, iid)
@@ -1359,7 +1383,7 @@ class NetworkTab(QWidget):
         self.rel_steps = QSpinBox()
         self.rel_steps.setRange(1, 3)
         self.rel_steps.setValue(1)
-        self.rel_steps.setToolTip(tr("段数がちょうどこの数の経路だけを一覧にします。1 なら直接の関係です。複合体は 1 つとして数えます"))
+        self.rel_steps.setToolTip(tr("段数がちょうどこの数の経路だけを一覧にします。1 なら直接の経路です。複合体は 1 つとして数えます"))
         settings.addWidget(self.rel_steps)
         layout.addLayout(settings)
 
@@ -1404,7 +1428,7 @@ class NetworkTab(QWidget):
         self.rel_tree.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.rel_tree.header().setStretchLastSection(True)
         self.rel_tree.setToolTip(tr("経路を選ぶと地図で強調します。上流や「上流 … 行き先」の組を選ぶと、その中の経路をすべて強調します。\n"
-                                    "記号: → 促進、⊣ 抑制、◇ 作用不明。← ⊢ は右から左への矢印。P・Tx などは関係の種類"))
+                                    "記号: → 促進、⊣ 抑制、◇ 作用不明。← ⊢ は右から左への矢印。P・Tx などは経路の種類"))
         self.rel_tree.itemSelectionChanged.connect(self._on_relation_path_selected)
         self.rel_tree.itemExpanded.connect(self._fill_group)
         self.rel_tree.itemClicked.connect(self._on_relation_tree_clicked)
@@ -1759,7 +1783,7 @@ class NetworkTab(QWidget):
             child = QTreeWidgetItem([text])
             child.setData(0, self.SHOWN_ROWS, [row])
             edges = sorted(GraphPane.row_edges(graph, row), key=lambda e: (names[e[0]], names[e[1]]))
-            child.setToolTip(0, text + "\n" + tr("関係: ") + tr("、").join(f"{names[x]} → {names[y]}" for x, y in edges))
+            child.setToolTip(0, text + "\n" + tr("経路: ") + tr("、").join(f"{names[x]} → {names[y]}" for x, y in edges))
             children.append(child)
         item.addChildren(children)
         item.setData(0, self.FILLED, True)
@@ -2378,7 +2402,7 @@ class NetworkTab(QWidget):
                     item.setData(0, Qt.ItemDataRole.UserRole, n)
                     item.setToolTip(0, self.model.proteins[n].description
                                     + ("\n" + tr("⇄ 複数の遺伝子の TF。チェックは連動します") if shared else "")
-                                    + ("\n" + tr("ほかの関係ですでに地図にあります") if gray else ""))
+                                    + ("\n" + tr("ほかの経路ですでに地図にあります") if gray else ""))
                     flags = Qt.ItemFlag.ItemIsEnabled
                     if not gray:
                         flags |= Qt.ItemFlag.ItemIsUserCheckable
@@ -2947,7 +2971,7 @@ class NetworkTab(QWidget):
         names = sorted({model.names[it.source_id if it.source_id != pid else it.target_id] for it in omitted})
         shown = tr("、").join(names[:6]) + (tr(" ほか {n} 個", n=len(names) - 6) if len(names) > 6 else "")
         return (f"<p style='color:{self._tone('#b26a00', '#f0a040')}'>"
-                f"{tr('省いた転写因子どうしの線 {n} 本: {names}', n=len(omitted), names=html.escape(shown))}</p>")
+                f"{tr('省いた転写因子どうしの経路 {n} 本: {names}', n=len(omitted), names=html.escape(shown))}</p>")
 
     def _description_html(self, text: str) -> str:
         """説明欄: 英語の説明（原文のまま）。"""

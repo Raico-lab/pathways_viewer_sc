@@ -267,7 +267,7 @@ class GraphPane(QFrame):
         # 設定をクリア: 線の色の右隣（共通の設定の行に置く）
         self.clear_settings_button = self._small_button(
             i18n.tr("設定をクリア"), lambda: self.tab.reset_settings(self),
-            i18n.tr("TF・経路・条件・配置・色・線・凡例の設定を最初の状態に戻します（注目・拡張・段数はそのまま）"))
+            i18n.tr("TF・経路・条件・配置・色・経路の色・凡例の設定を最初の状態に戻します（注目・拡張・段数はそのまま）"))
         self.view_bar.addWidget(self.clear_settings_button)
         self.view_bar.addStretch(1)
         # この表示枠の図全体を画像で保存する（画面に見えていない部分も含む）
@@ -659,7 +659,7 @@ class GraphPane(QFrame):
         "all": (i18n.tr("すべての経路"), i18n.tr("チェックした遺伝子どうしを、指定の段数で結ぶすべての経路。各段の矢印の向きは問わず、"
                                               "A → X ← B のように共通の標的を経由する経路も含む"), False),
         "direct": (i18n.tr("矢印の向きにたどれる経路"), i18n.tr("チェックした遺伝子から、別のチェックした遺伝子へ矢印の向きにたどれる経路。"
-                                                         "途中はどの遺伝子でもよく、1 段なら直接の関係"), False),
+                                                         "途中はどの遺伝子でもよく、1 段なら直接の経路"), False),
         "regulators": (i18n.tr("すべてを制御している遺伝子"), i18n.tr("チェックした遺伝子すべてに、指定の段数で届く上流の遺伝子と、そこからの経路。"
                                                                "共通の制御因子を階層の上から順に並べる"), False),
         "targets": (i18n.tr("すべてから制御を受けている遺伝子"), i18n.tr("チェックした遺伝子すべてから、指定の段数で届く下流の遺伝子と、そこへの経路。"
@@ -1206,11 +1206,11 @@ class GraphPane(QFrame):
         if edges <= WARN_EDGES or edges <= self.model.count_edges(self.sub, self.tab.known_only(),
                                                                      self.tab.hidden_filters()):
             return True
-        box = QMessageBox(QMessageBox.Icon.Warning, i18n.tr("線が多くなります"),
-                          i18n.tr("表示すると線が {edges} 本、遺伝子が {nodes} 個になり、"
-                                  "線の計算と描画に時間がかかることがあります。\n表示しますか？",
+        box = QMessageBox(QMessageBox.Icon.Warning, i18n.tr("経路が多くなります"),
+                          i18n.tr("表示すると経路が {edges} 本、遺伝子が {nodes} 個になり、"
+                                  "経路の計算と描画に時間がかかることがあります。\n表示しますか？",
                                   edges=edges, nodes=len(sub.nodes)), parent=self)
-        box.setInformativeText(i18n.tr("段数を減らすか、凡例のチェックで転写制御などの種類を隠すと、線を減らせます。"))
+        box.setInformativeText(i18n.tr("段数を減らすか、凡例のチェックで転写制御などの種類を隠すと、経路を減らせます。"))
         show = box.addButton(i18n.tr("表示する"), QMessageBox.ButtonRole.AcceptRole)
         box.addButton(i18n.tr("キャンセル"), QMessageBox.ButtonRole.RejectRole)
         box.setDefaultButton(show)   # Enter で表示する（ブラウザ版の確認と同じ）
@@ -1277,7 +1277,7 @@ class GraphPane(QFrame):
         if not self.model:
             return
         edges = self.model.count_edges(self.sub, self.tab.known_only(), self.tab.hidden_filters())
-        self.focus_label.setText(i18n.tr(" 遺伝子 {nodes} 個　線 {edges} 本", nodes=len(self.sub.nodes), edges=edges))
+        self.focus_label.setText(i18n.tr(" 遺伝子 {nodes} 個　経路 {edges} 本", nodes=len(self.sub.nodes), edges=edges))
 
     # ================= 保存・書き出し =================
     def _default_file_name(self, ext: str) -> str:

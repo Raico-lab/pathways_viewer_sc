@@ -294,6 +294,18 @@ class QListWidget(QAbstractItemView):
             e = e.parentElement
 
     # ---- 項目 ----
+    def setItemWidget(self, item, widget):
+        item._widget = widget
+        # 親を一覧にしてから見せる（親がないまま show すると別の窓になる）。置き場所は _render_item が決める
+        QObject.setParent(widget, self)
+        widget._hidden = False
+        widget._sync_display()
+        if item._el is not None:
+            self._render_item(item)
+
+    def itemWidget(self, item):
+        return getattr(item, "_widget", None)
+
     def addItem(self, item):
         self.insertItem(len(self._items), item)
 
@@ -330,6 +342,14 @@ class QListWidget(QAbstractItemView):
             box.className = "q-item-check"
             e.appendChild(box)
         e.appendChild(_dom.el("span", "q-item-text", item._text))
+        widget = getattr(item, "_widget", None)
+        if widget is not None:   # setItemWidget の部品は行の右端に置く（押しても行は選ばない。Qt と同じ）
+            holder = _dom.el("span", "q-item-widget")
+            holder.style.cssText = "margin-left:auto;display:inline-flex;align-items:center"
+            holder.appendChild(widget._el)
+            for kind in ("mousedown", "click", "dblclick"):
+                _dom.listen(self, holder, kind, lambda ev: ev.stopPropagation())
+            e.appendChild(holder)
         e.classList.toggle("disabled", not enabled)
         e.classList.toggle("selected", item in self._selected)
         e.classList.toggle("current", item is self._current)

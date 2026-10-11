@@ -105,7 +105,7 @@ class GeneSetPane(GraphPane):
         if not self.model:
             return
         edges = self.model.count_edges(self.sub, self.tab.known_only(), self.tab.hidden_filters())
-        self.focus_label.setText(i18n.tr(" 遺伝子 {nodes} 個　線 {edges} 本", nodes=len(self.sub.nodes), edges=edges))
+        self.focus_label.setText(i18n.tr(" 遺伝子 {nodes} 個　経路 {edges} 本", nodes=len(self.sub.nodes), edges=edges))
 
 
 class MapWindow(QWidget):

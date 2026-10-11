@@ -98,7 +98,7 @@
       const shownTotal = (r.edgeIds || []).filter(visible).length;
       const shownOverlap = (r.overlapped || []).filter(visible).length;
       if (r.dense && shownOverlap && shownTotal > NOTICE_EDGES) {
-        showMessage(T(`線が多いため、${shownTotal} 本のうち ${shownOverlap} 本は重なりを避けきれていません。` +
+        showMessage(T(`経路が多いため、${shownTotal} 本のうち ${shownOverlap} 本は重なりを避けきれていません。` +
                       "段数を減らすか、凡例のチェックで種類を絞ると見やすくなります",
                       `There are many edges: ${shownOverlap} of ${shownTotal} could not avoid overlapping. ` +
                       "Reduce the steps or narrow the types with the legend checkboxes to make the map easier to read."));

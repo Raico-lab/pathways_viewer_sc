@@ -219,7 +219,7 @@ All left tabs act on the **active map panel** (blue frame).
 
 ![Genes tab. ① genes on the current map, split into "Focus", "Expand", and "Others"](manual/18_genes.png)
 
-Genes on the current map are listed under the headings "**Focus**" (orange), "**Expand**" (purple), and "**Others**", each sorted by name (counts in parentheses). Type a name in the box at the top to filter.
+Genes on the current map are listed under the headings "**Focus**" (orange), "**Expand**" (purple), and "**Others**", each sorted by name (counts in parentheses). Type a name in the box at the top to filter. Click **×** at the right of a gene in the Expand list to remove it from Expand.
 
 - Click a gene to select it in green on the map and show its details on the right. Genes selected in green on the map are also selected in the list.
 - **Click a gene selected in green again** to move to and zoom in on that gene on the map (same as clicking its name in the Legend).

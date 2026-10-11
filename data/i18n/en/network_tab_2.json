@@ -4,7 +4,6 @@
  "{shown} 本 / {count}": "{shown} / {count}",
  "{left} … {right}（{count}）": "{left} … {right} ({count})",
  "{name} から（{count}）": "From {name} ({count})",
- "関係: ": "Relations: ",
  "、": ", ",
  "・": ", ",
  "経路 {n} 本": "{n} paths",
@@ -27,7 +26,6 @@
  "作用不明": "Unknown effect",
  "{mark} {label}（{n}）": "{mark} {label} ({n})",
  "⇄ 複数の遺伝子の TF。チェックは連動します": "⇄ TF of several genes; checks are linked",
- "ほかの関係ですでに地図にあります": "Already on the map via other relations",
  "今の地図の TF（{n}）": "TFs on current map ({n})",
  "今の地図の TF": "TFs on current map",
  "このタブの使い方を右側に表示します": "Show how to use this tab on the right",
@@ -63,7 +61,6 @@
  "根拠": "Evidence",
  "パラログ": "Paralogs",
  " ほか {n} 個": " and {n} more",
- "省いた転写因子どうしの線 {n} 本: {names}": "{n} omitted TF–TF edges: {names}",
  "なし": "None",
  "▴ 閉じる": "▴ Close",
  "▸ ほか {n} 件を表示": "▸ Show {n} more",
@@ -90,5 +87,9 @@
  "説明": "Description",
  "{name} 複合体": "{name} complex",
  "構成する遺伝子 ({n})": "Member genes ({n})",
- "経路（1 本）": "Path"
+ "経路（1 本）": "Path",
+ "省いた転写因子どうしの経路 {n} 本: {names}": "{n} omitted TF–TF edges: {names}",
+ "経路: ": "Relations: ",
+ "ほかの経路ですでに地図にあります": "Already on the map via other relations",
+ "拡張から外す": "Remove from Expand"
 }

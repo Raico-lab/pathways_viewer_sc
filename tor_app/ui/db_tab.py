@@ -410,7 +410,7 @@ class DatabaseTab(QWidget):
 
         self.tabs = QTabWidget()
         self.tabs.addTab(self.proteins_page, i18n.tr("遺伝子"))
-        self.tabs.addTab(self.interactions_page, i18n.tr("制御関係"))
+        self.tabs.addTab(self.interactions_page, i18n.pick("経路", "Relations"))   # 英語は 1 段の経路の一覧なので Relations
         self.tabs.addTab(self.categories_page, i18n.tr("カテゴリ"))
 
         self.export_button = QPushButton(i18n.tr("表示中の表を CSV エクスポート…"))
