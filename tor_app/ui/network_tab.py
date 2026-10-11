@@ -263,9 +263,10 @@ class NetworkTab(QWidget):
                            if (v := vals.get((p.standard_name or "").upper())) is not None}
                 ko = next((p.gene_name for p in self.model.proteins.values()
                            if (p.standard_name or "").upper() == strain), None)
-                label = f"{expression.DELETION_KINDS[dkind]}・{self.del_strain_combo.currentText()} 破壊株"
+                label = tr("{kind}・{strain} 破壊株", kind=tr(expression.DELETION_KINDS[dkind]),
+                           strain=self.del_strain_combo.currentText())
                 # 凡例の小見出し（白・灰の意味などは Help に書く）
-                note = "log2 比（Deleteome）" if dkind == "del_mrna" else "logFC（Bodenmiller 2010）"
+                note = tr("log2 比（Deleteome）") if dkind == "del_mrna" else "logFC（Bodenmiller 2010）"
                 self._data_cache = (key, f"app.setDataValues({json.dumps(by_gene, ensure_ascii=False)}, "
                                          f"{json.dumps(label, ensure_ascii=False)}, {json.dumps(note, ensure_ascii=False)}, "
                                          f"{json.dumps(ko, ensure_ascii=False)})")
@@ -278,7 +279,7 @@ class NetworkTab(QWidget):
             vals = expression.values(kind, cond)
             by_gene = {p.gene_name: [round(v[0], 3), v[1]] for p in self.model.proteins.values()
                        if (v := vals.get((p.standard_name or "").upper())) is not None}
-            label = f"{expression.KINDS[kind]}・{conditions.labels().get(cond, cond)}"
+            label = tr("{kind}・{cond}", kind=tr(expression.KINDS[kind]), cond=conditions.labels().get(cond, cond))
             self._data_cache = (key, f"app.setDataValues({json.dumps(by_gene, ensure_ascii=False)}, "
                                      f"{json.dumps(label, ensure_ascii=False)})")
         return self._data_cache[1]
@@ -350,7 +351,7 @@ class NetworkTab(QWidget):
         pane._record_history()
         pane.refresh_view(keep_positions=True)
         self._save_view()
-        self.statusMessage.emit("設定を最初の状態に戻しました")
+        self.statusMessage.emit(tr("設定を最初の状態に戻しました"))
 
     def filter_state(self) -> dict:
         """戻る・進むで覚える、全表示枠に共通の絞り込み（凡例で隠した項目・条件タブで外した条件・最も上流の経路）。"""
@@ -380,7 +381,7 @@ class NetworkTab(QWidget):
         panel = QWidget()
         layout = QVBoxLayout(panel)
         self.trf_search = QLineEdit()
-        self.trf_search.setPlaceholderText("名前で絞り込む")
+        self.trf_search.setPlaceholderText(tr("名前で絞り込む"))
         self.trf_search.setClearButtonEnabled(True)
         self.trf_search.textChanged.connect(lambda _t: self._apply_trf_search())
         layout.addWidget(self.trf_search)
@@ -397,12 +398,12 @@ class NetworkTab(QWidget):
         self.trf_tree.itemCollapsed.connect(lambda it: self._remember_trf_open(it, False))
         layout.addWidget(self.trf_tree, 1)
         buttons = QHBoxLayout()
-        for text, on in (("すべて選択", True), ("すべて解除", False)):
+        for text, on in ((tr("すべて選択"), True), (tr("すべて解除"), False)):
             b = QPushButton(text)
             b.clicked.connect(lambda _=False, on=on: self._set_all_trf(on))
             buttons.addWidget(b)
         layout.addLayout(buttons)
-        self.trf_shown_head = QLabel("今の地図の TF")
+        self.trf_shown_head = QLabel(tr("今の地図の TF"))
         self.trf_shown_head.setStyleSheet("font-weight: bold; margin-top: 4px;")
         layout.addWidget(self.trf_shown_head)
         self.trf_shown = QListWidget()
@@ -413,18 +414,18 @@ class NetworkTab(QWidget):
         # 左側はタブで切り替える: 遺伝子（今の地図の遺伝子）・TFs（転写因子）・経路（選んだ遺伝子どうしの経路）など
         self.left_tabs = QTabWidget()
         self.left_tabs.setMinimumWidth(290)   # 「経路」の中身（表示経路の選択肢など）が横にはみ出さない幅
-        self.left_tabs.addTab(self._build_gene_panel(), "遺伝子")
+        self.left_tabs.addTab(self._build_gene_panel(), tr("遺伝子"))
         self.left_tabs.addTab(self.trf_panel, "TF")
-        self.left_tabs.addTab(self._build_relation_panel(), "経路")
-        self.left_tabs.addTab(self._build_condition_panel(), "条件")
+        self.left_tabs.addTab(self._build_relation_panel(), tr("経路"))
+        self.left_tabs.addTab(self._build_condition_panel(), tr("条件"))
         if expression.has_deletions():
-            self.left_tabs.addTab(self._build_deletion_panel(), "破壊株")
+            self.left_tabs.addTab(self._build_deletion_panel(), tr("破壊株"))
         self.saved_views = SavedViewsPanel(self)
         saved_scroll = QScrollArea()
         saved_scroll.setWidget(self.saved_views)
         saved_scroll.setWidgetResizable(True)
         saved_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.left_tabs.addTab(saved_scroll, "登録")
+        self.left_tabs.addTab(saved_scroll, tr("登録"))
 
     def _fit_left_width(self) -> None:
         """左側の幅を、タブの見出しを全部並べた幅に合わせる（はみ出すと見出しが矢印で隠れ、広すぎると地図が狭くなる）。"""
@@ -2629,8 +2630,8 @@ class NetworkTab(QWidget):
             items.append(((0, not on_map, label if side == "上流" else self.model.names[end],
                            self.model.names[end] if side == "上流" else label),
                           f"<a href='edge:{rep.id}'>{text}</a> <span style='color:#777'>"
-                          f"{html.escape(type_label(kind))}・複合体として"
-                          f"{f'（{len(its)} 遺伝子）' if len(its) > 1 else ''}</span>"))
+                          f"{html.escape(type_label(kind))}{tr('・複合体として')}"
+                          f"{tr('（{n} 遺伝子）', n=len(its)) if len(its) > 1 else ''}</span>"))
         return sorted(items, key=lambda x: x[0])
 
     def _node_html(self, pid: int) -> str:
@@ -2640,9 +2641,9 @@ class NetworkTab(QWidget):
         known_only = self.known_only()
         level = self.model.levels(known_only).get(pid)
         place = (f"No. {self.model.layout_order(known_only)[pid]}"
-                 f"・{'階層なし' if level is None else f'第{level + 1}階層'}")
-        rows = [("Systematic 名", p.standard_name), ("配置の番号", place),
-                ("ORF の確度（SGD）", p.protein_properties)]
+                 f"・{tr('階層なし') if level is None else tr('第{n}階層', n=level + 1)}")
+        rows = [(tr("Systematic 名"), p.standard_name), (tr("配置の番号"), place),
+                (tr("ORF の確度（SGD）"), p.protein_properties)]
         table = "".join(f"<tr><td nowrap style='color:#777;padding-right:8px;white-space:nowrap'>{k}</td><td>{html.escape(v or '')}</td></tr>"
                         for k, v in rows)
         hidden = ""
@@ -2651,9 +2652,10 @@ class NetworkTab(QWidget):
             if pid in sub.nodes:
                 hu, hd = sub.hidden_up.get(pid, 0), sub.hidden_down.get(pid, 0)
                 if hu or hd:
-                    hidden = f"<p style='color:{self._tone('#b26a00', '#f0a040')}'>表示されていない上流 {hu} 個・下流 {hd} 個</p>"
+                    hidden = (f"<p style='color:{self._tone('#b26a00', '#f0a040')}'>"
+                              f"{tr('表示されていない上流 {up} 個・下流 {down} 個', up=hu, down=hd)}</p>")
             else:
-                hidden = f"<p style='color:{self._tone('#b26a00', '#f0a040')}'>操作中の表示枠にはありません</p>"
+                hidden = f"<p style='color:{self._tone('#b26a00', '#f0a040')}'>{tr('操作中の表示枠にはありません')}</p>"
             hidden += self._tf_pair_note(pid, ups + downs, sub)
         title = f"<h2 style='margin-bottom:2px'>{html.escape(p.gene_name)}</h2>"
         if self._render_pane:
@@ -2662,16 +2664,16 @@ class NetworkTab(QWidget):
                       "<span style='background-color:{3}'>&nbsp;{4}&nbsp;</span></a>").format
             title = (f"<table width='100%' cellspacing='0' cellpadding='0'><tr><td>{title}</td>"
                      f"<td align='right' valign='middle' style='white-space:nowrap'>"
-                     f"{button('mapfocus', pid, self._tone('#e65100', '#ffb74d'), self._tone('#fff3e0', '#3a2a17'), '注目')}&nbsp;"
-                     f"{button('mapgrow', pid, self._tone('#6a1b9a', '#ce93d8'), self._tone('#f3e5f5', '#2f2338'), '拡張')}"
+                     f"{button('mapfocus', pid, self._tone('#e65100', '#ffb74d'), self._tone('#fff3e0', '#3a2a17'), tr('注目'))}&nbsp;"
+                     f"{button('mapgrow', pid, self._tone('#6a1b9a', '#ce93d8'), self._tone('#f3e5f5', '#2f2338'), tr('拡張'))}"
                      f"</td></tr></table>")
         return (f"{title}"
                 f"{hidden}"
                 f"<table>{table}</table>{self._description_html(p.description or '')}{self._portal_html(p.gene_name)}"
                 f"{self._data_html(p.standard_name or '')}"
                 f"{self._deletion_html(p.standard_name or '')}"
-                f"{self._edge_list(ups, sub.nodes if sub else set(), 'up', '上流')}"
-                f"{self._edge_list(downs, sub.nodes if sub else set(), 'down', '下流')}")
+                f"{self._edge_list(ups, sub.nodes if sub else set(), 'up', tr('上流'))}"
+                f"{self._edge_list(downs, sub.nodes if sub else set(), 'down', tr('下流'))}")
 
     DELETION_SHOWN = 8   # 破壊株での実測の一覧で、開く前に出す数
 
@@ -2692,7 +2694,7 @@ class NetworkTab(QWidget):
         if not own and not seen_in and not info:
             return ""
         st = self._st
-        kinds = {"mrna": ("mRNA", "del_mrna"), "phospho": ("リン酸化", "del_phospho")}
+        kinds = {"mrna": ("mRNA", "del_mrna"), "phospho": (tr("リン酸化"), "del_phospho")}
 
         def ref(source: str, pmid: str) -> str:
             return f"<a href='https://pubmed.ncbi.nlm.nih.gov/{pmid}/'>{html.escape(source)}</a>"
@@ -2706,16 +2708,16 @@ class NetworkTab(QWidget):
                 color = ""
                 if show_strain:
                     color = (f" <a href='kocolor:{x.strain}:{kinds[x.kind][1]}' "
-                             f"style='text-decoration:none;font-size:11px;white-space:nowrap'>色分け</a>")
+                             f"style='text-decoration:none;font-size:11px;white-space:nowrap'>{tr('色分け')}</a>")
                 out.append(f"<tr><td align='right' style='white-space:nowrap;padding-right:6px'>{self._value_html(x.value)}</td>"
                            f"<td><span style='white-space:nowrap'>{name}{site}</span>{color}</td></tr>")
             more = ""
             if len(points) > self.DELETION_SHOWN:
                 more = (f"<a href='list:{key}' style='text-decoration:none;font-size:11px'>"
-                        f"{'▾ 閉じる' if is_open else f'▸ すべて（{len(points)}）'}</a>")
+                        f"{tr('▾ 閉じる') if is_open else tr('▸ すべて（{n}）', n=len(points))}</a>")
             return f"<table cellspacing='0' cellpadding='1'>{''.join(out)}</table>{more}"
 
-        parts = ["<h4 style='margin-bottom:2px'>破壊株での実測（野生型との log2 比）</h4>"]
+        parts = [f"<h4 style='margin-bottom:2px'>{tr('破壊株での実測（野生型との log2 比）')}</h4>"]
         # この遺伝子を壊した株
         for kind, (title, color_kind) in kinds.items():
             meta = next((m for m in info if m["kind"] == kind), None)
@@ -2723,10 +2725,12 @@ class NetworkTab(QWidget):
                 continue
             pts = [x for x in own if x.kind == kind]
             up = sum(1 for x in pts if x.value > 0)
-            unit = "部位" if kind == "phospho" else "遺伝子"
-            parts.append(f"<p style='margin:4px 0 2px 0'><b>この遺伝子を壊した株の{title}</b>"
-                         f"（{ref(meta['source'], meta['pmid'])}）: 上がった{unit} {up}・下がった{unit} {len(pts) - up} "
-                         f"<a href='kocolor:{orf}:{color_kind}' style='text-decoration:none;white-space:nowrap'>地図で色分け</a></p>")
+            counts = (tr("上がった部位 {up}・下がった部位 {down}", up=up, down=len(pts) - up) if kind == "phospho"
+                      else tr("上がった遺伝子 {up}・下がった遺伝子 {down}", up=up, down=len(pts) - up))
+            parts.append(f"<p style='margin:4px 0 2px 0'><b>{tr('この遺伝子を壊した株の{kind}', kind=title)}</b>"
+                         f"（{ref(meta['source'], meta['pmid'])}）: {counts} "
+                         f"<a href='kocolor:{orf}:{color_kind}' style='text-decoration:none;white-space:nowrap'>"
+                         f"{tr('地図で色分け')}</a></p>")
             if pts:
                 parts.append(rows(pts, False, f"ko-own-{kind}"))
         # この遺伝子が変わった破壊株
