@@ -88,8 +88,8 @@
  "{name} 複合体": "{name} complex",
  "構成する遺伝子 ({n})": "Member genes ({n})",
  "経路（1 本）": "Path",
- "省いた転写因子どうしの経路 {n} 本: {names}": "{n} omitted TF–TF edges: {names}",
- "経路: ": "Relations: ",
- "ほかの経路ですでに地図にあります": "Already on the map via other relations",
+ "省いた転写因子どうしの経路 {n} 本: {names}": "{n} omitted TF–TF paths: {names}",
+ "経路: ": "Paths: ",
+ "ほかの経路ですでに地図にあります": "Already on the map via other paths",
  "拡張から外す": "Remove from Expand"
 }

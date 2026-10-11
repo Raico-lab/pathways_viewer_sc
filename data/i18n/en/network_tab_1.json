@@ -78,11 +78,11 @@
  "拡張": "Expand",
  "注目": "Focus",
  "なし": "None",
- "経路の色\n修飾・制御: 修飾・制御の種類で色分け。リン酸化＝橙、転写制御＝青など\n作用: 促進＝赤、抑制＝青、作用不明＝灰、結合＝薄い灰": "Edge color\nModification/regulation: colored by type (phosphorylation = orange, transcriptional regulation = blue, etc.)\nEffect: activation = red, inhibition = blue, unknown effect = gray, binding = light gray",
- "経路: チェックした条件で報告された経路を目立たせます\n遺伝子: チェックした条件で発現・リン酸化が 2 倍以上変化した遺伝子を目立たせます": "Paths: highlight relations (edges) reported under the checked conditions\nGenes: highlight genes whose expression or phosphorylation changed ≥ 2-fold under the checked conditions",
- "チェックした条件に合う、今の地図の経路（名前の順）。押すと右側に経路の説明を出します": "Edges on the current map matching the checked conditions (by name). Click to show edge details on the right",
- "段数がちょうどこの数の経路だけを一覧にします。1 なら直接の経路です。複合体は 1 つとして数えます": "Lists only paths with exactly this many steps. 1 means direct relations. A complex counts as one",
- "経路を選ぶと地図で強調します。上流や「上流 … 行き先」の組を選ぶと、その中の経路をすべて強調します。\n記号: → 促進、⊣ 抑制、◇ 作用不明。← ⊢ は右から左への矢印。P・Tx などは経路の種類": "Select a path to highlight it on the map. Selecting an upstream gene or an \"upstream … target\" group highlights all paths in it.\nSymbols: → activation, ⊣ inhibition, ◇ unknown effect. ← ⊢ point right to left. P, Tx, etc. are relation types",
- "経路の色": "Edges",
- "今の地図の経路 {n} 本": "{n} edges on current map"
+ "経路の色\n修飾・制御: 修飾・制御の種類で色分け。リン酸化＝橙、転写制御＝青など\n作用: 促進＝赤、抑制＝青、作用不明＝灰、結合＝薄い灰": "Path color\nModification/regulation: colored by type (phosphorylation = orange, transcriptional regulation = blue, etc.)\nEffect: activation = red, inhibition = blue, unknown effect = gray, binding = light gray",
+ "経路: チェックした条件で報告された経路を目立たせます\n遺伝子: チェックした条件で発現・リン酸化が 2 倍以上変化した遺伝子を目立たせます": "Paths: highlight paths reported under the checked conditions\nGenes: highlight genes whose expression or phosphorylation changed ≥ 2-fold under the checked conditions",
+ "チェックした条件に合う、今の地図の経路（名前の順）。押すと右側に経路の説明を出します": "Paths on the current map matching the checked conditions (by name). Click to show path details on the right",
+ "段数がちょうどこの数の経路だけを一覧にします。1 なら直接の経路です。複合体は 1 つとして数えます": "Lists only paths with exactly this many steps. 1 means direct paths. A complex counts as one",
+ "経路を選ぶと地図で強調します。上流や「上流 … 行き先」の組を選ぶと、その中の経路をすべて強調します。\n記号: → 促進、⊣ 抑制、◇ 作用不明。← ⊢ は右から左への矢印。P・Tx などは経路の種類": "Select a path to highlight it on the map. Selecting an upstream gene or an \"upstream … target\" group highlights all paths in it.\nSymbols: → activation, ⊣ inhibition, ◇ unknown effect. ← ⊢ point right to left. P, Tx, etc. are path types",
+ "経路の色": "Paths",
+ "今の地図の経路 {n} 本": "{n} paths on current map"
 }

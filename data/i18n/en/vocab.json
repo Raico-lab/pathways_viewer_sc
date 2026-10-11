@@ -79,5 +79,5 @@
  "破壊株の mRNA": "Deletion strain mRNA",
  "破壊株のリン酸化": "Deletion strain phosphorylation",
  "{gene} の下流 {type} {n}": "{gene} downstream: {type} {n}",
- "推定だけの経路を除く（A〜C）": "Exclude inferred-only relations (A–C)"
+ "推定だけの経路を除く（A〜C）": "Exclude inferred-only paths (A–C)"
 }

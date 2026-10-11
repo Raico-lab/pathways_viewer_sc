@@ -2,7 +2,7 @@
 
 ## Pathways viewer for *Saccharomyces cerevisiae* — English summary
 
-A desktop and browser app that maps regulatory relations between budding yeast genes (phosphorylation, transcriptional
+A desktop and browser app that maps regulatory paths between budding yeast genes (phosphorylation, transcriptional
 regulation, binding, etc.) and lets you explore what lies upstream and downstream of a gene and which paths connect genes.
 It covers all genes (the bundled sample data center on the TOR pathway). The UI is available in Japanese and English.
 

@@ -23,7 +23,7 @@ ORDER = "ABCDU"
 
 # 計算に使う関係の選び方（画面の選択肢）: 値 → (表示名, 使う確度)
 CHOICES = {
-    "all": (pick("すべての経路", "All relations"), set(ORDER)),   # 経路タブの「すべての経路」（All paths）とは別
+    "all": (pick("すべての経路", "All paths"), set(ORDER)),
     "no_d": (tr("推定だけの経路を除く（A〜C）"), set("ABC")),
     "ab": (tr("個別実験・文献で確認のみ（A・B）"), set("AB")),
     "a": (tr("文献で確認のみ（A）"), {"A"}),

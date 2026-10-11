@@ -40,7 +40,7 @@ Complex Portal / papers (TORC1, PKA). Keep units/symbols (→ ⊣ ◇ ▸ ▾ lo
 | 新しい枠 | New panel |
 | 配置 | Layout |
 | 階層（縦）/ 階層（横）/ 同心円 / 格子 | Hierarchy (vertical) / Hierarchy (horizontal) / Concentric / Grid |
-| 線（の色） | Edges / edge color |
+| 経路（の色） | Paths / path color |
 | 修飾・制御 | Modification/regulation |
 | 作用 | Effect |
 | 戻る・進む | Back / Forward |
@@ -48,7 +48,7 @@ Complex Portal / papers (TORC1, PKA). Keep units/symbols (→ ⊣ ◇ ▸ ▾ lo
 ## Biology / data terms
 | Japanese | English |
 |---|---|
-| 関係 / 線 | relation / edge |
+| 経路（遺伝子どうしのつながり。旧 関係・線） | path（relation・edge は使わない） |
 | 促進 | activation (activates) |
 | 抑制 | inhibition (inhibits) |
 | 作用不明 | unknown effect |
