@@ -189,7 +189,7 @@ def main() -> None:
 def _open_window() -> None:
     from tor_app.ui.main_window import MainWindow
     window = MainWindow()
-    add_desktop_tab(window)
+    # デスクトップ版はしばらく配信しないので、「デスクトップアプリ」のタブは出さない（再開するときは add_desktop_tab(window)）
     _keep.append(window)
     window.show()
     started = window.start()

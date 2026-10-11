@@ -157,21 +157,21 @@ class NetworkTab(QWidget):
         self.layout_combo = QComboBox()
         for label, key in LAYOUT_CHOICES:
             self.layout_combo.addItem(label, key)
-        self.layout_combo.setToolTip("遺伝子の配置\n階層（縦）: 制御する側が上になるよう段に並べる\n階層（横）: 制御する側が左になるよう列に並べる\n"
-                                     "同心円: つながりの多い遺伝子ほど内側に置く\n格子: 配置の番号の順に格子状に並べる")
+        self.layout_combo.setToolTip(tr("遺伝子の配置\n階層（縦）: 制御する側が上になるよう段に並べる\n階層（横）: 制御する側が左になるよう列に並べる\n"
+                                        "同心円: つながりの多い遺伝子ほど内側に置く\n格子: 配置の番号の順に格子状に並べる"))
         self.layout_combo.currentIndexChanged.connect(lambda: self._save_view())   # 次回も同じ配置の方式で開く
         # 選んだらすぐ全表示枠に反映する
         self.layout_combo.currentIndexChanged.connect(
             lambda: self._all_js(f"app.runLayout({json.dumps(self.layout_name())})"))
         self.color_combo = QComboBox()
-        self.color_combo.addItem("役割", "role")
+        self.color_combo.addItem(tr("役割"), "role")
         # 画面には出さない（役割の色が普段。破壊株タブで株を選んでいる間だけ破壊株の実測の色）
-        tip = "遺伝子の色\n役割: SGD の機能説明から推定したキナーゼ・転写制御因子などの分類"
+        tip = tr("遺伝子の色\n役割: SGD の機能説明から推定したキナーゼ・転写制御因子などの分類")
         if expression.has_deletions():
             for key, label in expression.DELETION_KINDS.items():
-                self.color_combo.addItem(label, key)
-            tip += ("\n破壊株の mRNA・リン酸化: 左の「破壊株」タブで選んだ株での、野生型との log2 比（実測）。"
-                    "壊した遺伝子は黒。タブで株の選択が外れると、前の色に戻ります")
+                self.color_combo.addItem(tr(label), key)
+            tip += tr("\n破壊株の mRNA・リン酸化: 左の「破壊株」タブで選んだ株での、野生型との log2 比（実測）。"
+                      "壊した遺伝子は黒。タブで株の選択が外れると、前の色に戻ります")
         self.color_combo.setToolTip(tip)
         self.color_combo.currentIndexChanged.connect(lambda: self._save_view())
         self.color_combo.currentIndexChanged.connect(
@@ -181,8 +181,8 @@ class NetworkTab(QWidget):
         labels = conditions.labels()
         for key in expression.condition_keys():
             self.data_cond_combo.addItem(labels.get(key, key), key)
-        self.data_cond_combo.setToolTip("発現・リン酸化の条件\n"
-                                        "その種類のデータがない条件では、遺伝子はすべて灰色になります")
+        self.data_cond_combo.setToolTip(tr("発現・リン酸化の条件\n"
+                                           "その種類のデータがない条件では、遺伝子はすべて灰色になります"))
         saved = self._load_setting("data_condition", "", set(expression.condition_keys()))
         self.data_cond_combo.setCurrentIndex(max(0, self.data_cond_combo.findData(saved or "rapamycin")))
         self.data_cond_combo.currentIndexChanged.connect(lambda: self._save_view())
@@ -192,9 +192,9 @@ class NetworkTab(QWidget):
         strains = expression.deletion_strains()
         for orf, name, kinds in strains:
             self.del_strain_combo.addItem(name, orf)
-        self.del_strain_combo.setToolTip("破壊株の mRNA・リン酸化で色分けするときの、壊した遺伝子\n"
-                                         "mRNA は Deleteome（Kemmeren 2014）の 1,481 株、リン酸化は Bodenmiller 2010 の"
-                                         "キナーゼ・ホスファターゼの 113 株。その種類の測定がない株では、遺伝子はすべて灰色になります")
+        self.del_strain_combo.setToolTip(tr("破壊株の mRNA・リン酸化で色分けするときの、壊した遺伝子\n"
+                                            "mRNA は Deleteome（Kemmeren 2014）の 1,481 株、リン酸化は Bodenmiller 2010 の"
+                                            "キナーゼ・ホスファターゼの 113 株。その種類の測定がない株では、遺伝子はすべて灰色になります"))
         saved = self._load_setting("deletion_strain", "", {orf for orf, _, _ in strains})
         self.del_strain_combo.setCurrentIndex(max(0, self.del_strain_combo.findData(saved or "YMR037C")))
         self.del_strain_combo.currentIndexChanged.connect(lambda: self._save_view())
@@ -203,10 +203,10 @@ class NetworkTab(QWidget):
         self._data_cache: tuple[tuple, str] | None = None
         self._sync_data_cond_enabled()
         self.edge_color_combo = QComboBox()
-        self.edge_color_combo.addItem("修飾・制御", "type")
-        self.edge_color_combo.addItem("作用", "effect")
-        self.edge_color_combo.setToolTip("線の色\n修飾・制御: 修飾・制御の種類で色分け。リン酸化＝橙、転写制御＝青など\n"
-                                         "作用: 促進＝赤、抑制＝青、作用不明＝灰、結合＝薄い灰")
+        self.edge_color_combo.addItem(tr("修飾・制御"), "type")
+        self.edge_color_combo.addItem(tr("作用"), "effect")
+        self.edge_color_combo.setToolTip(tr("線の色\n修飾・制御: 修飾・制御の種類で色分け。リン酸化＝橙、転写制御＝青など\n"
+                                            "作用: 促進＝赤、抑制＝青、作用不明＝灰、結合＝薄い灰"))
         self.edge_color_combo.currentIndexChanged.connect(lambda: self._save_view())
         self.edge_color_combo.currentIndexChanged.connect(
             lambda: self._all_js(f"app.setEdgeColorMode({json.dumps(self.edge_color_mode())})"))
@@ -218,7 +218,7 @@ class NetworkTab(QWidget):
         """表示枠の検索窓の下に出す、全表示枠に共通の選択肢: (見出し, 値を持つ選択肢)。"""
         # 見出しは短くする（表示枠を 2 列に並べても枠が広がりすぎないように。説明は選択肢のツールチップ）
         # 遺伝子の色は左の「条件」（遺伝子）・「破壊株」タブで選ぶ（選択をやめると役割に戻る）ので、ここには出さない
-        return [("配置", self.layout_combo), ("線", self.edge_color_combo)]
+        return [(tr("配置"), self.layout_combo), (tr("線"), self.edge_color_combo)]
 
     def data_kind(self) -> str | None:
         """発現・リン酸化で色分けしているなら、その種類（mrna / phospho）。今は選べないので、いつも None。"""
@@ -1942,13 +1942,13 @@ class NetworkTab(QWidget):
         state = {"focus": [], "gene_set": sorted(names[n] for n in nodes),
                  "gene_set_edges": sorted([names[a], names[b]] for a, b in edges),
                  "gene_set_ends": [names[n] for n in r["pids"]],
-                 "gene_set_title": f"経路: {label}・{r['steps']} 段"}
+                 "gene_set_title": tr("経路: {mode}・{n} 段", mode=label, n=r['steps'])}
         new = self._create_pane(state)
         self._arrange()
         self.set_active(new)
         new.on_model_reloaded(use_default=False)
         self._save_view()
-        self.statusMessage.emit(f"強調中の遺伝子 {len(nodes)} 個を新しい枠で開きました")
+        self.statusMessage.emit(tr("強調中の遺伝子 {n} 個を新しい枠で開きました", n=len(nodes)))
 
     def _make_pane(self, state: dict | None) -> GraphPane:
         """表示枠を作る（state に "gene_set" があれば、遺伝子の組を固定した枠）。"""
@@ -1965,15 +1965,15 @@ class NetworkTab(QWidget):
         moved = len(self.panes) > 1 and pane in self.panes
         wpane = self._make_pane(state)
         self._wire_window_pane(wpane)
-        title = "、".join(state.get("focus", [])) or state.get("gene_set_title") or "地図"
-        window = MapWindow(wpane, f"地図: {title}")
+        title = tr("、").join(state.get("focus", [])) or state.get("gene_set_title") or tr("地図")
+        window = MapWindow(wpane, tr("地図: {title}", title=title))
         self.gene_windows.append(window)
         window.destroyed.connect(lambda _=None, w=window: self.gene_windows.remove(w) if w in self.gene_windows else None)
         wpane.on_model_reloaded(use_default=False)
         window.show()
         if moved:
             self.close_pane(pane)
-        self.statusMessage.emit("表示枠を別ウィンドウに移しました" if moved else "今の表示を別ウィンドウで開きました")
+        self.statusMessage.emit(tr("表示枠を別ウィンドウに移しました") if moved else tr("今の表示を別ウィンドウで開きました"))
 
     def _wire_window_pane(self, wpane: GraphPane) -> None:
         """別ウィンドウの表示枠: 詳細欄・凡例・状態表示はメインの画面とつなぐ（左のタブ・枠の管理とはつながない）。"""
@@ -2008,8 +2008,8 @@ class NetworkTab(QWidget):
         nav = QHBoxLayout()
         self.detail_back = QPushButton("◀")
         self.detail_forward = QPushButton("▶")
-        for button, step, tip in ((self.detail_back, -1, "前に表示した説明に戻る"),
-                                  (self.detail_forward, 1, "次に表示した説明に進む")):
+        for button, step, tip in ((self.detail_back, -1, tr("前に表示した説明に戻る")),
+                                  (self.detail_forward, 1, tr("次に表示した説明に進む"))):
             button.setFixedWidth(34)
             button.setToolTip(tip)
             button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -2022,7 +2022,7 @@ class NetworkTab(QWidget):
         layout.addLayout(self.detail_controls)
         # 一番下の Help（左のタブと同じ）: 出している説明（遺伝子・線・複合体・パラログ）の見方を、説明欄の新しいページとして出す
         detail_help = QPushButton("Help")
-        detail_help.setToolTip("この説明欄の見方を表示します（◀ で戻れます）")
+        detail_help.setToolTip(tr("この説明欄の見方を表示します（◀ で戻れます）"))
         detail_help.clicked.connect(self.show_detail_help)
         layout.addWidget(detail_help)
         self.clear_detail()
@@ -2163,7 +2163,7 @@ class NetworkTab(QWidget):
 
     def add_pane(self, focus_pid: int | None = None) -> GraphPane | None:
         if len(self.panes) >= MAX_PANES:
-            self.statusMessage.emit(f"表示枠は最大 {MAX_PANES} つまでです")
+            self.statusMessage.emit(tr("表示枠は最大 {n} つまでです", n=MAX_PANES))
             return None
         pane = self._create_pane({"focus": [], "up": DEFAULT_UP, "down": DEFAULT_DOWN})
         self._arrange()
@@ -2347,7 +2347,9 @@ class NetworkTab(QWidget):
                 if not members:
                     continue
                 mark, label, color = self.TRF_EFFECT[effect]
-                group = QTreeWidgetItem([f"{mark} {label}（{len(members)}）" if len(members) > 1 else f"{mark} {label}"])
+                label = tr(label)
+                group = QTreeWidgetItem([tr("{mark} {label}（{n}）", mark=mark, label=label, n=len(members))
+                                         if len(members) > 1 else f"{mark} {label}"])
                 font = group.font(0)
                 font.setBold(True)
                 group.setFont(0, font)
@@ -2364,8 +2366,8 @@ class NetworkTab(QWidget):
                     item = QTreeWidgetItem([self.model.names[n] + ("  ⇄" if shared else "")])
                     item.setData(0, Qt.ItemDataRole.UserRole, n)
                     item.setToolTip(0, self.model.proteins[n].description
-                                    + ("\n⇄ 複数の遺伝子の TF。チェックは連動します" if shared else "")
-                                    + ("\nほかの関係ですでに地図にあります" if gray else ""))
+                                    + ("\n" + tr("⇄ 複数の遺伝子の TF。チェックは連動します") if shared else "")
+                                    + ("\n" + tr("ほかの関係ですでに地図にあります") if gray else ""))
                     flags = Qt.ItemFlag.ItemIsEnabled
                     if not gray:
                         flags |= Qt.ItemFlag.ItemIsUserCheckable
@@ -2491,7 +2493,7 @@ class NetworkTab(QWidget):
             item = QListWidgetItem(name)
             item.setData(Qt.ItemDataRole.UserRole, pid)
             self.trf_shown.addItem(item)
-        self.trf_shown_head.setText(f"今の地図の TF（{len(shown)}）" if len(shown) > 1 else "今の地図の TF")
+        self.trf_shown_head.setText(tr("今の地図の TF（{n}）", n=len(shown)) if len(shown) > 1 else tr("今の地図の TF"))
         row = self.trf_shown.sizeHintForRow(0) if shown else 0
         self.trf_shown.setFixedHeight(min(max(len(shown), 3), 8) * (row or 18) + 2 * self.trf_shown.frameWidth() + 4)
 
@@ -2514,8 +2516,8 @@ class NetworkTab(QWidget):
 
     def help_button(self, topic: str) -> QPushButton:
         """左のタブの一番下に置く「Help」ボタン（押すと右側の説明欄に使い方を出す）。"""
-        button = QPushButton("Help")
-        button.setToolTip("このタブの使い方を右側に表示します")
+        button = QPushButton(tr("Help"))
+        button.setToolTip(tr("このタブの使い方を右側に表示します"))
         button.clicked.connect(lambda: self.show_help(topic))
         return button
 

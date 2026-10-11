@@ -6,6 +6,19 @@ const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.29.3/full/";
 const PERSIST_DIR = "/persist";       // この PC のブラウザに残すもの（ローカルの DB・表示の設定・登録）。IndexedDB に保存する
 const DOWNLOAD_DIR = "/downloads";    // ここに書いたファイルは、ブラウザのダウンロードとして保存する（CSV・PNG・SVG）
 
+// 起動画面の言語: Python が動く前は設定ファイル（/persist）を読めないので、Python が言語を決めたときに残す
+// localStorage の "pv-lang" を使う。なければブラウザの言語（ja で始まれば日本語、ほかは英語）
+const LANG = (() => {
+  try {
+    const saved = localStorage.getItem("pv-lang");
+    if (saved === "ja" || saved === "en") return saved;
+  } catch (e) { /* 読めなくてもブラウザの言語で決める */ }
+  return String(navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";
+})();
+const T = (ja, en) => (LANG === "en" ? en : ja);
+document.documentElement.lang = LANG;
+if (LANG === "en") document.querySelectorAll("[data-en]").forEach((el) => { el.textContent = el.dataset.en; });
+
 const bootEl = document.getElementById("boot");
 const stepEl = document.getElementById("boot-step");
 const barEl = document.getElementById("boot-bar");
@@ -19,7 +32,8 @@ function fail(error) {
   console.error(error);
   if (!bootEl) return;
   bootEl.classList.add("failed");
-  step("起動できませんでした。ページを再読み込みしてください。続くときは管理者に知らせてください。");
+  step(T("起動できませんでした。ページを再読み込みしてください。続くときは管理者に知らせてください。",
+         "Could not start. Please reload the page. If this keeps happening, contact the administrator."));
   const detail = document.getElementById("boot-detail");
   if (detail) detail.textContent = String(error && error.stack || error);
 }
@@ -39,7 +53,7 @@ async function fetchBytes(url, expected) {
     chunks.push(value);
     size += value.length;
     progress.loaded += value.length;
-    if (progress.total) step("データを読み込んでいます…", 0.1 + 0.5 * Math.min(1, progress.loaded / progress.total));
+    if (progress.total) step(T("データを読み込んでいます…", "Loading data…"), 0.1 + 0.5 * Math.min(1, progress.loaded / progress.total));
   }
   const out = new Uint8Array(size);
   let offset = 0;
@@ -104,7 +118,8 @@ window.pvReportError = (text) => {
   if (!box) {
     box = document.createElement("div");
     box.id = "pv-error";
-    box.innerHTML = "<button title='閉じる'>✕</button><b>エラーが起きました。</b> 操作は続けられます。続くときはページを再読み込みしてください。<pre></pre>";
+    box.innerHTML = T("<button title='閉じる'>✕</button><b>エラーが起きました。</b> 操作は続けられます。続くときはページを再読み込みしてください。<pre></pre>",
+                      "<button title='Close'>✕</button><b>An error occurred.</b> You can keep working. If it keeps happening, reload the page.<pre></pre>");
     box.querySelector("button").onclick = () => { box.style.display = "none"; };
     document.body.appendChild(box);
   }
@@ -116,7 +131,7 @@ const t0 = performance.now();
 const mark = (label) => console.debug(`起動 ${label}: ${((performance.now() - t0) / 1000).toFixed(1)} 秒`);
 
 async function boot() {
-  step("準備しています…", 0.02);
+  step(T("準備しています…", "Preparing…"), 0.02);
   const version = await (await fetch("version.json", { cache: "no-cache" })).json();
   const v = encodeURIComponent(version.version);
   window.PV_VERSION = version;
@@ -133,7 +148,7 @@ async function boot() {
   ]);
   const [pyodide, [appZip, dbGz, exprGz]] = await Promise.all([pyodideReady, files]);
   mark("ファイル");
-  step("展開しています…", 0.65);
+  step(T("展開しています…", "Unpacking…"), 0.65);
   const FS = pyodide.FS;
   window.pvPyodide = pyodide;   // 調べるとき用（開発者ツールから Python を動かせる）
   pyodide.unpackArchive(appZip, "zip", { extractDir: "/app" });
@@ -149,7 +164,7 @@ async function boot() {
   window.addEventListener("pagehide", () => FS.syncfs(false, () => {}));
   document.addEventListener("visibilitychange", () => { if (document.hidden) FS.syncfs(false, () => {}); });
 
-  step("アプリを起動しています…", 0.75);
+  step(T("アプリを起動しています…", "Starting the app…"), 0.75);
   // 画面の更新を挟むため、一度ブラウザに戻ってから Python を動かす
   await new Promise((r) => setTimeout(r, 30));
   pyodide.runPython(`

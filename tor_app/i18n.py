@@ -52,6 +52,13 @@ def set_language(lang: str) -> None:
     data = _read_settings()
     data["language"] = lang
     _SETTINGS.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    if on_web():
+        # ブラウザ版: 次の起動画面（Python が動く前）も同じ言語で出せるよう、ブラウザにも残す（webapp/boot.js が読む）
+        try:
+            import js   # ブラウザ版だけにあるモジュール
+            js.localStorage.setItem("pv-lang", lang)
+        except Exception:
+            pass
 
 
 def _load_catalog() -> dict[str, str]:
