@@ -1,7 +1,7 @@
 """画面の言語（日本語・英語）。
 
-- 言語は user_data_dir()/settings.json の "language"（"ja" / "en"）に保存する。選んでいなければ英語
-  （メニューの「言語 / Language」で日本語を選ぶと保存する）。
+- 言語は user_data_dir()/settings.json の "language"（"ja" / "en"）に保存する（メニューの「言語 / Language」で選ぶ）。
+  選んでいなければ、ブラウザ（ブラウザ版）か OS（デスクトップ版）の言語が日本語なら日本語、ほかは英語。
 - 画面の文字は日本語を元にして tr("…") で包む。英語のときは訳の辞書（data/i18n/en/*.json。{日本語: 英語}）を引き、
   訳がなければ日本語のまま出す。差し込む値は tr("遺伝子 {n} 個", n=5) のように名前で渡す（訳の側で順番を変えられる）。
 - 多くの文字はモジュールを読み込むときに決まるので、言語を変えたら再起動（ブラウザ版は再読み込み）して反映する。
@@ -34,11 +34,26 @@ def saved_language() -> str | None:
 
 
 def language() -> str:
-    """今の画面の言語（"ja" / "en"）。選んでいなければ英語。"""
+    """今の画面の言語（"ja" / "en"）。選んでいなければ、ブラウザ・OS の言語に合わせる。"""
     global _language
     if _language is None:
-        _language = saved_language() or "en"
+        _language = saved_language() or system_language()
     return _language
+
+
+def system_language() -> str:
+    """ブラウザ版はブラウザの言語、デスクトップ版は OS の言語が日本語なら "ja"、ほかは "en"。"""
+    try:
+        if on_web():
+            import js   # ブラウザ版だけにあるモジュール
+            name = str(js.navigator.language or "")
+        else:
+            from PyQt6.QtCore import QLocale
+            # 表示の言語（地域の書式ではなく）。例: ["ja-JP", "en-JP"]
+            name = next(iter(QLocale.system().uiLanguages()), "") or QLocale.system().name()
+    except Exception:   # noqa: BLE001 - 分からなければ英語
+        name = ""
+    return "ja" if name.lower().startswith("ja") else "en"
 
 
 def is_en() -> bool:

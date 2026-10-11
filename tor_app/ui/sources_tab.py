@@ -133,7 +133,7 @@ class SourcesTab(QWidget):
             lines = []
             n = site_counts.get(s["name"]) or 0
             if n:
-                lines.append(i18n.tr("関係 {n} 本", n=f"{n:,}"))
+                lines.append(i18n.tr("経路 {n} 本", n=f"{n:,}"))
             if s.get("note"):
                 lines.append(i18n.tr(s["note"]))
             bold = lambda text: re.sub(r"[\d,]+", lambda m: _number(m.group(0), 13), html.escape(text))   # noqa: E731
