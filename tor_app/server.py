@@ -21,7 +21,7 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import datastore
+from . import datastore, i18n
 from .paths import resource_path, user_data_dir
 
 CONFIG_FILE = resource_path("data", "server.json")
@@ -86,7 +86,7 @@ def fetch_update(manifest: dict) -> tuple[Path, str]:
         data = gzip.decompress(data)
     digest = hashlib.sha256(data).hexdigest()
     if manifest.get("sha256") and digest != manifest["sha256"]:
-        raise ValueError("ダウンロードしたデータが壊れています。ハッシュが一致しません")
+        raise ValueError(i18n.tr("ダウンロードしたデータが壊れています。ハッシュが一致しません"))
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
         f.write(data)
         tmp = Path(f.name)
@@ -94,7 +94,7 @@ def fetch_update(manifest: dict) -> tuple[Path, str]:
         with sqlite3.connect(tmp) as con:
             tables = {r[0] for r in con.execute("select name from sqlite_master where type='table'")}
         if not {"proteins", "interactions", "categories"} <= tables:
-            raise ValueError("ダウンロードしたデータに必要な表がありません")
+            raise ValueError(i18n.tr("ダウンロードしたデータに必要な表がありません"))
     except Exception:
         tmp.unlink(missing_ok=True)
         raise

@@ -212,5 +212,19 @@
  "CSV にエクスポート": "Export to CSV",
  "書き出せませんでした。\n{error}": "Could not export.\n{error}",
  "エクスポート完了": "Export complete",
- "{n} 件を {path} に保存しました。": "Saved {n} rows to {path}."
+ "{n} 件を {path} に保存しました。": "Saved {n} rows to {path}.",
+ "経路の遺伝子": "Path genes",
+ "枠{index}: {title}": "Panel {index}: {title}",
+ "この枠は経路を固定して表示しています": "This panel shows fixed paths",
+ "経路タブで強調していた遺伝子に戻して、配置し直しました": "Restored the genes highlighted in the Paths tab and laid them out again",
+ "この枠では「注目」は使えません。ほかの枠で注目してください": "Focus is not available in this panel. Use another panel",
+ "別ウィンドウ": "Separate window",
+ "題名・著者で絞り込む": "Filter by title or author",
+ "{n} 件": "{n} papers",
+ "該当する論文はありません": "No matching papers",
+ "ダウンロードしたデータが壊れています。ハッシュが一致しません": "The downloaded data is corrupted (hash mismatch)",
+ "ダウンロードしたデータに必要な表がありません": "The downloaded data is missing required tables",
+ "デスクトップアプリ": "Desktop app",
+ "利用条件あり": "Terms of use apply",
+ "明示なし・引用を依頼": "Not stated; citation requested"
 }

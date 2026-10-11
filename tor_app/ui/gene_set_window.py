@@ -9,6 +9,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QWidget
 
+from .. import i18n
 from ..subgraph import Subgraph
 from .graph_pane import GraphPane
 
@@ -22,7 +23,7 @@ class GeneSetPane(GraphPane):
     def __init__(self, tab, state: dict):
         self.default_nodes: set[int] = set()
         self._gene_set = {k: state.get(k, []) for k in ("gene_set", "gene_set_edges", "gene_set_ends")}
-        self._gene_set_title = state.get("gene_set_title", "経路の遺伝子")
+        self._gene_set_title = state.get("gene_set_title", i18n.tr("経路の遺伝子"))
         super().__init__(tab, {"focus": []})
         self.relation = None
         # 注目・段数は、遺伝子の組が決まっているこの枠では使わない
@@ -30,12 +31,12 @@ class GeneSetPane(GraphPane):
             w.hide()
         for i in range(self.info_bar.count()):
             label = self.info_bar.itemAt(i).widget()
-            if label is not None and label.__class__.__name__ == "QLabel" and label.text() in ("上流", "段 下流", "段"):
+            if label is not None and label.__class__.__name__ == "QLabel" and label.text() in (i18n.tr("上流"), i18n.tr("段 下流"), i18n.tr("段")):
                 label.hide()
 
     def set_title(self, index: int, closable: bool) -> None:
         super().set_title(index, closable)
-        self.title.setText(f"枠{index}: {self._gene_set_title}" if index else self._gene_set_title)
+        self.title.setText(i18n.tr("枠{index}: {title}", index=index, title=self._gene_set_title) if index else self._gene_set_title)
 
     def on_model_reloaded(self, use_default: bool) -> None:
         by_name = self.model.by_name
@@ -81,7 +82,7 @@ class GeneSetPane(GraphPane):
 
     # 「経路」タブの設定は、この枠には当てはめない（開いたときの経路をそのまま保つ）
     def show_relation(self, pids, mode, steps, anchor=None) -> str:
-        return "この枠は経路を固定して表示しています" if mode != "off" else ""
+        return i18n.tr("この枠は経路を固定して表示しています") if mode != "off" else ""
 
     def clear_relation(self) -> None:
         pass
@@ -92,10 +93,10 @@ class GeneSetPane(GraphPane):
         self.grown, self.grown_order, self.grown_info = set(), [], {}
         self._record_history()
         self.refresh_view()
-        self.statusMessage.emit("経路タブで強調していた遺伝子に戻して、配置し直しました")
+        self.statusMessage.emit(i18n.tr("経路タブで強調していた遺伝子に戻して、配置し直しました"))
 
     def set_focus(self, pid, center: bool = False) -> None:
-        self.statusMessage.emit("この枠では「注目」は使えません。ほかの枠で注目してください")
+        self.statusMessage.emit(i18n.tr("この枠では「注目」は使えません。ほかの枠で注目してください"))
 
     def _focus_clicked(self, pid: int) -> None:
         self.set_focus(pid)
@@ -104,7 +105,7 @@ class GeneSetPane(GraphPane):
         if not self.model:
             return
         edges = self.model.count_edges(self.sub, self.tab.known_only(), self.tab.hidden_filters())
-        self.focus_label.setText(f" 遺伝子 {len(self.sub.nodes)} 個　線 {edges} 本")
+        self.focus_label.setText(i18n.tr(" 遺伝子 {nodes} 個　線 {edges} 本", nodes=len(self.sub.nodes), edges=edges))
 
 
 class MapWindow(QWidget):
@@ -118,8 +119,8 @@ class MapWindow(QWidget):
         for w in (pane.new_pane_button, pane.close_button, pane.detach_button):
             w.hide()
         pane.set_title(0, closable=False)
-        if pane.title.text() == "枠0":
-            pane.title.setText("別ウィンドウ")
+        if pane.title.text() == i18n.tr("枠{index}", index=0):
+            pane.title.setText(i18n.tr("別ウィンドウ"))
         layout = QVBoxLayout(self)
         layout.setContentsMargins(4, 4, 4, 4)
         layout.addWidget(pane)

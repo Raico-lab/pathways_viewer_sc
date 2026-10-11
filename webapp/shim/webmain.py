@@ -57,7 +57,8 @@ def _urlopen(request, data=None, timeout=None, **_kw):
         raise urllib.error.URLError(str(e)) from None
     status = int(xhr.status)
     if status == 0:
-        raise urllib.error.URLError("接続できませんでした")
+        from tor_app import i18n
+        raise urllib.error.URLError(i18n.pick("接続できませんでした", "Could not connect"))
     if status >= 400:
         raise urllib.error.HTTPError(url, status, str(xhr.statusText), None, None)
     return _Response(str(xhr.responseText).encode("utf-8"), status, url)
@@ -71,46 +72,66 @@ def _patch() -> None:
 # ================= デスクトップアプリのタブ =================
 def desktop_html() -> str:
     """「デスクトップアプリ」のタブ: Windows 版・Mac 版のダウンロードと、ダウンロードした後の開き方。
-    どちらも署名していないアプリなので、初めて開くときは OS の警告を越える手順が要る（OS ごとのカードに書く）。"""
+    どちらも署名していないアプリなので、初めて開くときは OS の警告を越える手順が要る（OS ごとのカードに書く）。
+    文は日本語と英語の両方を書き、画面の言語で選ぶ（i18n.pick）。"""
+    from tor_app import i18n
+    t = i18n.pick
     repo = SITE.get("repo", "")
     version = SITE.get("desktop_version", "")
     base = f"https://github.com/{repo}/releases/latest/download/" if repo else ""
     sizes = SITE.get("desktop_sizes", {})
 
     def card(title: str, file: str, target: str, steps: list[str], after: str) -> str:
-        size = f"・約 {sizes[file] / 1e6:.0f} MB" if sizes.get(file) else ""
-        link = (f"<a class='dl-button' href='{html.escape(base + file)}'>{title} 版をダウンロード</a>" if base
-                else "<span style='color:#999'>準備中</span>")
+        size = t(f"・約 {sizes[file] / 1e6:.0f} MB", f" · about {sizes[file] / 1e6:.0f} MB") if sizes.get(file) else ""
+        link = (f"<a class='dl-button' href='{html.escape(base + file)}'>{t(f'{title} 版をダウンロード', f'Download for {title}')}</a>"
+                if base else f"<span style='color:#999'>{t('準備中', 'Coming soon')}</span>")
         items = "".join(f"<li>{x}</li>" for x in steps)
         return (f"<div class='dl-card'><div class='dl-title'>{title}</div>"
-                f"<div class='dl-file'>{html.escape(file)}{size}・{target}</div>{link}"
-                f"<div class='dl-howto'>ダウンロードした後の開き方</div><ol>{items}</ol>"
+                f"<div class='dl-file'>{html.escape(file)}{size}{t('・', ' · ')}{target}</div>{link}"
+                f"<div class='dl-howto'>{t('ダウンロードした後の開き方', 'How to open after downloading')}</div><ol>{items}</ol>"
                 f"<div class='dl-note'>{after}</div></div>")
 
     windows = card(
         "Windows", "PathwaysViewer-windows-setup.exe", "Windows 10 / 11",
-        ["ダウンロードした <b>PathwaysViewer-windows-setup.exe</b> をダブルクリックします。"
-         "ブラウザが「一般的にダウンロードされていません」などと止めたときは、ダウンロードの一覧の「…」から<b>「保存」→「保持する」</b>を選びます。",
-         "<b>「Windows によって PC が保護されました」</b>と出たら、<b>「詳細情報」</b>を押し、出てきた<b>「実行」</b>を押します"
-         "（署名していないアプリのため、そのままでは開けません）。",
-         "画面に従ってインストールします（管理者権限は要りません）。",
-         "スタートメニューの <b>Pathways viewer</b> から起動します。"],
-        "2 回目からは、ふつうに起動できます。アンインストールは「設定 &gt; アプリ」から行います。")
+        [t("ダウンロードした <b>PathwaysViewer-windows-setup.exe</b> をダブルクリックします。"
+           "ブラウザが「一般的にダウンロードされていません」などと止めたときは、ダウンロードの一覧の「…」から<b>「保存」→「保持する」</b>を選びます。",
+           "Double-click the downloaded <b>PathwaysViewer-windows-setup.exe</b>. "
+           "If the browser blocks it (e.g. \"isn't commonly downloaded\"), choose <b>Keep</b> from the \"…\" menu in the download list."),
+         t("<b>「Windows によって PC が保護されました」</b>と出たら、<b>「詳細情報」</b>を押し、出てきた<b>「実行」</b>を押します"
+           "（署名していないアプリのため、そのままでは開けません）。",
+           "If <b>\"Windows protected your PC\"</b> appears, click <b>More info</b>, then <b>Run anyway</b> "
+           "(the app is not signed, so it cannot be opened directly)."),
+         t("画面に従ってインストールします（管理者権限は要りません）。",
+           "Follow the instructions to install (no administrator rights needed)."),
+         t("スタートメニューの <b>Pathways viewer</b> から起動します。",
+           "Start it from <b>Pathways viewer</b> in the Start menu.")],
+        t("2 回目からは、ふつうに起動できます。アンインストールは「設定 &gt; アプリ」から行います。",
+          "From the second time on, it starts normally. To uninstall, use Settings &gt; Apps."))
     mac = card(
-        "Mac", "PathwaysViewer-mac.dmg", "Apple シリコン（M1 以降）",
-        ["ダウンロードした <b>PathwaysViewer-mac.dmg</b> をダブルクリックし、出てきた <b>PathwaysViewer.app</b> を"
-         "隣の<b>「アプリケーション」</b>フォルダへドラッグします。",
-         "Finder の「アプリケーション」で <b>PathwaysViewer.app</b> を<b>右クリック（control + クリック）→「開く」</b>を選び、"
-         "確認の画面でもう一度<b>「開く」</b>を押します（署名していないアプリのため、ダブルクリックでは開けません）。",
-         "macOS 15 以降で「開く」が出ないときは、一度ダブルクリックして警告を閉じてから、"
-         "<b>「システム設定」→「プライバシーとセキュリティ」</b>の下にある<b>「このまま開く」</b>を押し、パスワードを入れます。"],
-        "2 回目からは、ふつうにダブルクリックで起動できます。アンインストールは PathwaysViewer.app をゴミ箱に入れます。")
+        "Mac", "PathwaysViewer-mac.dmg", t("Apple シリコン（M1 以降）", "Apple silicon (M1 or later)"),
+        [t("ダウンロードした <b>PathwaysViewer-mac.dmg</b> をダブルクリックし、出てきた <b>PathwaysViewer.app</b> を"
+           "隣の<b>「アプリケーション」</b>フォルダへドラッグします。",
+           "Double-click the downloaded <b>PathwaysViewer-mac.dmg</b> and drag <b>PathwaysViewer.app</b> "
+           "to the <b>Applications</b> folder next to it."),
+         t("Finder の「アプリケーション」で <b>PathwaysViewer.app</b> を<b>右クリック（control + クリック）→「開く」</b>を選び、"
+           "確認の画面でもう一度<b>「開く」</b>を押します（署名していないアプリのため、ダブルクリックでは開けません）。",
+           "In Finder's Applications folder, <b>right-click (control-click) PathwaysViewer.app → Open</b>, "
+           "then click <b>Open</b> again in the confirmation (the app is not signed, so double-clicking does not open it)."),
+         t("macOS 15 以降で「開く」が出ないときは、一度ダブルクリックして警告を閉じてから、"
+           "<b>「システム設定」→「プライバシーとセキュリティ」</b>の下にある<b>「このまま開く」</b>を押し、パスワードを入れます。",
+           "On macOS 15 or later, if Open does not appear, double-click once and close the warning, then go to "
+           "<b>System Settings → Privacy &amp; Security</b>, click <b>Open Anyway</b> near the bottom and enter your password.")],
+        t("2 回目からは、ふつうにダブルクリックで起動できます。アンインストールは PathwaysViewer.app をゴミ箱に入れます。",
+          "From the second time on, double-click starts it normally. To uninstall, move PathwaysViewer.app to the Trash."))
+    shown_version = t(f"版: {html.escape(version)}", f"Version: {html.escape(version)}") if version else ""
     return f"""
 <div class='dl-page'>
-<h2>デスクトップアプリ</h2>
-<p>このページと同じ機能を、PC にインストールして使える版です。{f"版: {html.escape(version)}" if version else ""}</p>
+<h2>{t("デスクトップアプリ", "Desktop app")}</h2>
+<p>{t("このページと同じ機能を、PC にインストールして使える版です。", "The same features as this page, installed on your PC. ")}{shown_version}</p>
 <div class='dl-cards'>{windows}{mac}</div>
-<p class='dl-small'>データベースは、起動するたびにこのページと同じ最新の版に自動でそろいます（アプリを入れ直す必要はありません）。</p>
+<p class='dl-small'>{t("データベースは、起動するたびにこのページと同じ最新の版に自動でそろいます（アプリを入れ直す必要はありません）。",
+                       "Each time it starts, the database is automatically updated to the same latest version as this page "
+                       "(no need to reinstall the app).")}</p>
 </div>"""
 
 
@@ -121,7 +142,8 @@ def add_desktop_tab(window) -> None:
     view.setOpenLinks(False)
     view.anchorClicked.connect(lambda url: js.window.open(url.toString(), "_blank", "noopener"))
     view.setHtml(desktop_html())
-    window.tabs.addTab(view, "デスクトップアプリ")
+    from tor_app import i18n
+    window.tabs.addTab(view, i18n.tr("デスクトップアプリ"))
 
 
 # ================= コンパイルした結果の使い回し =================

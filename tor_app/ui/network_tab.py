@@ -169,7 +169,7 @@ class NetworkTab(QWidget):
         tip = tr("遺伝子の色\n役割: SGD の機能説明から推定したキナーゼ・転写制御因子などの分類")
         if expression.has_deletions():
             for key, label in expression.DELETION_KINDS.items():
-                self.color_combo.addItem(tr(label), key)
+                self.color_combo.addItem(label, key)
             tip += tr("\n破壊株の mRNA・リン酸化: 左の「破壊株」タブで選んだ株での、野生型との log2 比（実測）。"
                       "壊した遺伝子は黒。タブで株の選択が外れると、前の色に戻ります")
         self.color_combo.setToolTip(tip)
@@ -263,7 +263,7 @@ class NetworkTab(QWidget):
                            if (v := vals.get((p.standard_name or "").upper())) is not None}
                 ko = next((p.gene_name for p in self.model.proteins.values()
                            if (p.standard_name or "").upper() == strain), None)
-                label = tr("{kind}・{strain} 破壊株", kind=tr(expression.DELETION_KINDS[dkind]),
+                label = tr("{kind}・{strain} 破壊株", kind=expression.DELETION_KINDS[dkind],
                            strain=self.del_strain_combo.currentText())
                 # 凡例の小見出し（白・灰の意味などは Help に書く）
                 note = tr("log2 比（Deleteome）") if dkind == "del_mrna" else "logFC（Bodenmiller 2010）"
@@ -279,7 +279,7 @@ class NetworkTab(QWidget):
             vals = expression.values(kind, cond)
             by_gene = {p.gene_name: [round(v[0], 3), v[1]] for p in self.model.proteins.values()
                        if (v := vals.get((p.standard_name or "").upper())) is not None}
-            label = tr("{kind}・{cond}", kind=tr(expression.KINDS[kind]), cond=conditions.labels().get(cond, cond))
+            label = tr("{kind}・{cond}", kind=expression.KINDS[kind], cond=conditions.labels().get(cond, cond))
             self._data_cache = (key, f"app.setDataValues({json.dumps(by_gene, ensure_ascii=False)}, "
                                      f"{json.dumps(label, ensure_ascii=False)})")
         return self._data_cache[1]
@@ -941,7 +941,7 @@ class NetworkTab(QWidget):
         self.cond_kind_group = QButtonGroup(self)
         self.cond_kind_buttons: dict[str, QRadioButton] = {}
         for key, text in expression.SHORT.items():
-            b = QRadioButton(tr(text))
+            b = QRadioButton(text)
             self.cond_kind_group.addButton(b)
             self.cond_kind_buttons[key] = b
             kinds.addWidget(b)
@@ -1095,7 +1095,7 @@ class NetworkTab(QWidget):
                 ok_any |= ok
                 self._set_gray(item, not ok)
                 item.setToolTip(0, tr("{kinds} の測定があります", kinds=tr("、").join(
-                    tr(expression.SHORT[k]) for k in expression.SHORT if k in have.get(c.key, set()))))
+                    expression.SHORT[k] for k in expression.SHORT if k in have.get(c.key, set()))))
                 head.addChild(item)
             self._set_gray(head, not ok_any)
         self._cond_syncing = False

@@ -15,7 +15,7 @@ from PyQt6.QtCore import QObject, Qt, QTimer, QUrl, pyqtSignal
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QVBoxLayout, QWidget
 
-from .. import server
+from .. import i18n, server
 
 _loaded: dict[str, dict] = {}   # サーバーから新しく取ったもの（取れるまでは手元の版を使う）
 
@@ -56,7 +56,7 @@ class SourcesTab(QWidget):
         self.papers_view.anchorClicked.connect(open_url)
         self.papers_view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)   # 縦幅に収まらないときだけスクロール
         self.search = QLineEdit()
-        self.search.setPlaceholderText("題名・著者で絞り込む")
+        self.search.setPlaceholderText(i18n.tr("題名・著者で絞り込む"))
         self.search.setClearButtonEnabled(True)
         self.search.setMaximumWidth(320)
         self.search.textChanged.connect(lambda _t: self._show_page(0))
@@ -141,7 +141,8 @@ class SourcesTab(QWidget):
             hosts = "<br>".join(link(x["url"], re.sub(r"^https?://(www\.)?|/$", "", x["url"]))
                                for x in [s] + s.get("includes", []))
             # データの利用条件（data/sources.json の license。詳しくは DATA_LICENSES.md）
-            lic = f"<br><span style='color:#888;font-size:10px'>{html.escape(s['license'])}</span>" if s.get("license") else ""
+            lic = (f"<br><span style='color:#888;font-size:10px'>{html.escape(i18n.tr(s['license']))}</span>"
+                   if s.get("license") else "")
             # サイトが引用を求める論文（著者と年だけ。押すと論文を開く。papers.json に書誌がなければ PMID で）
             def short(p: dict) -> str:
                 return p["cite"][:p["cite"].find(p["year"]) + len(p["year"])] if p.get("year") in p["cite"] else p["cite"]
@@ -206,7 +207,7 @@ class SourcesTab(QWidget):
         self.page = max(0, min(page, pages - 1))
         shown = papers[self.page * PAGE_SIZE:(self.page + 1) * PAGE_SIZE]
         self.page_label.setText(f"{self.page + 1} / {pages}")
-        self.count_label.setText(f"{len(papers)} 件")
+        self.count_label.setText(i18n.tr("{n} 件", n=len(papers)))
         self.prev_button.setEnabled(self.page > 0)
         self.next_button.setEnabled(self.page < pages - 1)
 
@@ -218,5 +219,5 @@ class SourcesTab(QWidget):
             f"{html.escape(p['url'])}</a></td></tr>" for i, p in enumerate(shown))
         self.papers_view.setHtml(
             "<table width='100%' cellspacing='0' cellpadding='8'>" + rows + "</table>"
-            if shown else "<span style='color:#888'>該当する論文はありません</span>")
+            if shown else f"<span style='color:#888'>{i18n.tr('該当する論文はありません')}</span>")
         self.papers_view.verticalScrollBar().setValue(0)   # ページを送ったら一番上から（ブラウザ版は中身を替えても位置が残る）
