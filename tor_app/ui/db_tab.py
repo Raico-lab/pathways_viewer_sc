@@ -801,6 +801,7 @@ class DatabaseTab(QWidget):
             self.reload()
 
     def _reload_now(self) -> None:
+        from ..i18n_evidence import evidence_en
         proteins = self.db.proteins()
         interactions = self.db.interactions()
         categories = self.db.categories()
@@ -818,7 +819,7 @@ class DatabaseTab(QWidget):
             [[it.source.gene_name, it.target.gene_name, type_label(it.interaction_type),
               EFFECTS[resolve_effect(it.interaction_type, it.effect)] + ("" if it.effect else i18n.tr("・自動")),
               i18n.tr("・").join(cond_labels.get(k, k) for k in conditions.split(it.conditions)),
-              it.evidence] for it in interactions])
+              evidence_en(it.evidence) if i18n.is_en() else it.evidence] for it in interactions])   # 英語の画面なら根拠を訳して出す
         # 所属: 手作業の区分（Upstream など）は遺伝子の complex_category、Complex Portal・パラログは CategoryMember（複数に入れる）
         by_frame: dict[str, list[str]] = {}
         for p in proteins:

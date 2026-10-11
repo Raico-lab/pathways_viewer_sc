@@ -17,7 +17,7 @@ from .paths import resource_path
 _summaries: dict[str, str] | None = None
 _texts: dict[str, str] | None = None
 _cond_words: list[tuple[str, str]] | None = None
-_cache: dict[str, str] = {}
+_seg_cache: dict[str, str] = {}   # 区切り → 英語
 
 
 def _load(pattern: str) -> dict[str, str]:
@@ -167,7 +167,13 @@ def _record(m: re.Match) -> str:
 
 
 # 区切りごとの規則（順に当てる。re.sub で置き換え、最後に言葉ごとの置き換えをする）
-_RULES: list[tuple[re.Pattern, object]] = [(re.compile(p), r) for p, r in [
+def _needle(pattern: str) -> str:
+    """規則の正規表現の先頭にある、そのままの文字（これを含まない文には当てない。速くするため）。"""
+    m = re.match(r"\^?((?:\\[.+()]|[^\\.^$*+?()\[\]{}|])*)", pattern)
+    return re.sub(r"\\(.)", r"\1", m.group(1)) if m else ""
+
+
+_RULES: list[tuple[re.Pattern, object, str]] = [(re.compile(p), r, _needle(p)) for p, r in [
     # 取得日
     (r"（([\d\-, ]+) 取得）", r" (retrieved \1)"),
     (r"^文献で確認（([^、]*)、PubMed で PMID と要旨を確認）",
@@ -179,7 +185,8 @@ _RULES: list[tuple[re.Pattern, object]] = [(re.compile(p), r) for p, r in [
     (r"^実験の規模: ", "Scale: "),
     (r"^フィードバック（下流から上流への作用）$", "Feedback (downstream acting on upstream)"),
     (r"^複合体 (.+?)（(上流|下流)）として（論文は複合体の名前で書いている）$",
-     lambda m: f"As part of complex {m.group(1)} ({'upstream' if m.group(2) == '上流' else 'downstream'}; the paper names the complex)"),
+     lambda m: f"As {'' if 'complex' in m.group(1).lower() else 'complex '}{m.group(1)}"
+               f" ({'upstream' if m.group(2) == '上流' else 'downstream'}; the paper names the complex)"),
     (r"^⚠ 出典で作用が食い違う（この関係 (\S+) / 公開データ (\S+)）$",
      lambda m: f"⚠ Sources disagree on the effect (this relation: {_sign(m.group(1))} / public data: {_sign(m.group(2))})"),
     (r"^⚠ 破壊株データでは逆向き: ", "⚠ Opposite in deletion data: "),
@@ -188,7 +195,7 @@ _RULES: list[tuple[re.Pattern, object]] = [(re.compile(p), r) for p, r in [
     (r"^⚠ ", "⚠ "),
     (r"^作用の向き: ", "Effect direction: "),
     (r"^間接の作用（", "Indirect effect ("),
-    (r"([^（）、。\s][^（）、。]*?) ?を介する", r"via \1"),
+    (r"([^（）()、。\s][^（）()、。]*?) ?を介する", r"via \1"),
     (r"(\S+) 依存", r"\1-dependent"),
     (r"^公開データ: ", "Public data: "),
     (r"^条件: ", "Condition: "),
@@ -237,14 +244,21 @@ _YEASTRACT_COND = re.compile(r"(条件: )?(.+?)（YEASTRACT\+（([^（）]+)）�
 
 
 def segment_en(seg: str) -> str:
-    """根拠欄の 1 区切りを英語にする。"""
+    """根拠欄の 1 区切りを英語にする（同じ区切りが何度も出るので、訳は覚えておく）。"""
     seg = seg.strip()
+    hit = _seg_cache.get(seg)
+    if hit is None:
+        hit = _seg_cache[seg] = _segment_en(seg)
+    return hit
+
+
+def _segment_en(seg: str) -> str:
     if not seg or not has_japanese(seg):
         return seg
     if seg.startswith("要旨: "):
         body = seg[len("要旨: "):]
         en = _summary_catalog().get(body)
-        return f"Summary: {en}" if en else seg
+        return f"Summary: {en or body}"
     en = _text_catalog().get(seg)
     if en:
         return en
@@ -253,8 +267,9 @@ def segment_en(seg: str) -> str:
     if m:
         return f"{'Condition: ' if m.group(1) else ''}{_punct(_conds(m.group(2)))} (YEASTRACT+: {m.group(3)})"
     out = seg
-    for rx, rep in _RULES:
-        out = rx.sub(rep, out)
+    for rx, rep, needle in _RULES:
+        if needle in out:
+            out = rx.sub(rep, out)
     out = _words(out)
     if not has_japanese(out):
         return out
@@ -280,12 +295,7 @@ def evidence_en(text: str) -> str:
     """根拠欄の全体を英語にする（"; " で区切って 1 つずつ）。"""
     if not text or not has_japanese(text):
         return text or ""
-    hit = _cache.get(text)
-    if hit is None:
-        hit = "; ".join(segment_en(p) for p in text.split("; "))
-        if len(_cache) < 20000:
-            _cache[text] = hit
-    return hit
+    return "; ".join(segment_en(p) for p in text.split("; "))
 
 
 _GENETIC = {"生育の低下": "reduced growth", "表現型の増強": "phenotypic enhancement", "合成致死": "synthetic lethality",

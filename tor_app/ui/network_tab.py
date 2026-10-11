@@ -3027,6 +3027,8 @@ class NetworkTab(QWidget):
                 for n in m.group(2).split(",") if n.strip()), text)
             return text
 
+        from ..i18n import is_en
+        from ..i18n_evidence import segment_en
         lines = []
         for part in (p.strip() for p in evidence.split("; ")):
             if not part:
@@ -3034,7 +3036,9 @@ class NetworkTab(QWidget):
             label, color = next((v for k, v in EVIDENCE_SOURCES if part.startswith(k)), ("", "#455a64"))
             badge = (f"<span style='color:{color};font-weight:bold'>[{label}]</span> " if label else "")
             style = " style='color:#e65100'" if part.startswith("⚠") else ""
-            lines.append(f"<div{style}>{badge}{link(part)}</div>")
+            # 出典の見分けは日本語の元の文で行い、英語の画面なら出す文だけ訳す
+            shown = segment_en(part) if is_en() else part
+            lines.append(f"<div{style}>{badge}{link(shown)}</div>")
         return "".join(lines)
 
     def paralog_html(self, name: str, heading: bool = True) -> str:
@@ -3043,8 +3047,11 @@ class NetworkTab(QWidget):
         genes = self.model.paralogs.get(name, []) if self.model else []
         links = tr("・").join(f"<a href='node:{g}'>{html.escape(self.model.names[g])}</a>" for g in genes)
         lines = []
+        from ..i18n import is_en
+        from ..i18n_evidence import description_line_en
         for line in (cat.description if cat else "").split("\n"):
-            text = html.escape(line)
+            # PMID のリンクにする行かは日本語の元の行で見分け、英語の画面なら出す文だけ訳す
+            text = html.escape(description_line_en(line) if is_en() else line)
             text = re.sub(r"(\d{6,9})", lambda m: f"<a href='https://pubmed.ncbi.nlm.nih.gov/{m.group(1)}/'>{m.group(1)}</a>", text) \
                 if line.startswith("両方を壊すと") else text
             lines.append(f"<li>{text}</li>")
