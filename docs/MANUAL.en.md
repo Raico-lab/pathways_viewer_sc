@@ -23,7 +23,7 @@ Screenshots in sections 1, 6 (except Saved), and 7 are from the current version.
 5. [Map panel buttons and settings](#5-map-panel-buttons-and-settings)
 6. [Left tabs](#6-left-tabs)
    - [Genes](#6-1-genes--choose-genes-on-the-map-from-a-list)
-   - [TF](#6-2-tf--add-transcription-factors-to-the-map)
+   - [TF](#6-2-tfs--add-transcription-factors-to-the-map)
    - [Paths](#6-3-paths--explore-how-genes-are-connected)
    - [Conditions](#6-4-conditions--under-which-conditions-a-relation-was-reported)
    - [Deletions](#6-5-deletions--measured-data-in-deletion-strains)
@@ -43,7 +43,7 @@ The Network tab is divided into five areas (numbers are the red circles in the i
 
 | No. | Area | Purpose |
 |---|---|---|
-| 1 | **Left tabs** (Genes, TF, Paths, Conditions, Deletions, Saved) | Choose genes on the map from lists, add transcription factors, explore paths, highlight by condition, color by deletion strain data, etc. |
+| 1 | **Left tabs** (Genes, TFs, Paths, Conditions, Deletions, Saved) | Choose genes on the map from lists, add transcription factors, explore paths, highlight by condition, color by deletion strain data, etc. |
 | 2 | **Search box** (above the map panel) | Find a gene and put it on the map. The two rows below hold settings such as layout, edge color, and steps |
 | 3 | **Map** | Genes (boxes) and relations (edges) |
 | 4 | **Legend** (right edge of the map) | Meaning of colors, edges, and symbols. Uncheck an item to hide that type from the map |
@@ -225,9 +225,9 @@ Genes on the current map are listed under the headings "**Focus**" (orange), "**
 - **Click a gene selected in green again** to move to and zoom in on that gene on the map (same as clicking its name in the Legend).
 - Hold ⌘ (Ctrl on Windows) to select one at a time, or Shift to select a range.
 
-### 6-2. TF — add transcription factors to the map
+### 6-2. TFs — add transcription factors to the map
 
-![In the TF tab ①, the "activation" group under SCH9 is checked, showing CIN5 and CBF1 at the top of the map. ② TFs on the current map are listed below](manual/08_tfs.png)
+![In the TFs tab ①, the "activation" group under SCH9 is checked, showing CIN5 and CBF1 at the top of the map. ② TFs on the current map are listed below](manual/08_tfs.png)
 
 A list of the **transcription factors that regulate transcription** of the focused and expanded genes. Transcriptional regulation is not used for the vertical order of the map, so transcription factors are normally not shown. Only those checked here are placed in the **top step** of the map.
 
@@ -320,7 +320,7 @@ See on the map **how mRNA and phosphorylation of other genes actually changed** 
 
 Save map states you use often under a name and load them later.
 
-1. Under "Items to save", check the items to keep (Focus, Expand, Select, TF, Paths, Conditions, Legend; "Select all" / "Clear all" toggle them together).
+1. Under "Items to save", check the items to keep (Focus, Expand, Select, TFs, Paths, Conditions, Legend; "Select all" / "Clear all" toggle them together).
 2. Enter a name and click "**Save**".
 3. Pick a view in the "Saved views" list (sorted by name) and click "**Load**" (or double-click) to apply only the saved items to the active map panel. Other items stay as they are (a view without paths keeps the current paths).
 

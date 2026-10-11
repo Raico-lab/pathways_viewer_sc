@@ -31,7 +31,7 @@ class GeneSetPane(GraphPane):
             w.hide()
         for i in range(self.info_bar.count()):
             label = self.info_bar.itemAt(i).widget()
-            if label is not None and label.__class__.__name__ == "QLabel" and label.text() in (i18n.tr("上流"), i18n.tr("段 下流"), i18n.tr("段")):
+            if label is not None and label.__class__.__name__ == "QLabel" and label.text() in self.step_labels():
                 label.hide()
 
     def set_title(self, index: int, closable: bool) -> None:

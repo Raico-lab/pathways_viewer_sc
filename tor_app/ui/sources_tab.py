@@ -128,11 +128,16 @@ class SourcesTab(QWidget):
         papers = {p["pmid"]: p for p in self.papers}
 
         def site_count(s: dict) -> str:
-            """根拠の数 = 根拠欄に出てくる関係の本数 ＋ note の数（Complex Portal の「複合体 633 件」、SGD SPELL の測定の数）。"""
+            """何の数かを添えた数（1 行に 1 つ）: 根拠欄に出てくる関係の本数と、note の数（SGD SPELL の測定・
+            Complex Portal の複合体・Alliance のパラログの組）。数だけを太字にする。"""
+            lines = []
             n = site_counts.get(s["name"]) or 0
-            m = re.search(r"[\d,]+", s.get("note", ""))
-            n += int(m.group(0).replace(",", "")) if m else 0
-            return _number(f"{n:,}", 13) if n else ""
+            if n:
+                lines.append(i18n.tr("関係 {n} 本", n=f"{n:,}"))
+            if s.get("note"):
+                lines.append(i18n.tr(s["note"]))
+            bold = lambda text: re.sub(r"[\d,]+", lambda m: _number(m.group(0), 13), html.escape(text))   # noqa: E731
+            return "<br>".join(f"<span style='font-size:11px;color:#555'>{bold(x)}</span>" for x in lines)
 
         def link(url: str, text: str, color: str = URL_COLOR) -> str:
             return f"<a href='{html.escape(url)}' style='color:{color};text-decoration:none'>{html.escape(text)}</a>"
@@ -158,7 +163,10 @@ class SourcesTab(QWidget):
 
         # 横に SITE_COLUMNS 個ずつ並べる（上の枠に収まるように）
         rows = [sites[k:k + SITE_COLUMNS] for k in range(0, len(sites), SITE_COLUMNS)]
-        body = "".join("<tr>" + "".join(site_cells(x, _bg(r)) for x in row) + "</tr>" for r, row in enumerate(rows))
+        # 行の地の色は、行の端まで塗る（最後の行のサイトが足りない分も、空のマスで埋める）
+        empty = lambda bg: f"<td{bg}></td><td{bg}></td><td width='24'{bg}></td>"   # noqa: E731
+        body = "".join("<tr>" + "".join(site_cells(x, _bg(r)) for x in row) + empty(_bg(r)) * (SITE_COLUMNS - len(row))
+                       + "</tr>" for r, row in enumerate(rows))
         self.sites_view.setHtml(f"<table width='100%' cellspacing='0' cellpadding='6'>{body}</table>")
         self._fit_sites()
         self._show_page(self.page)

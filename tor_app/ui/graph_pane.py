@@ -289,8 +289,8 @@ class GraphPane(QFrame):
         self.lod_label = ShrinkLabel()
         self.lod_label.setStyleSheet("color:#777;")
         self.info_bar = QHBoxLayout()
-        for w in (QLabel(i18n.tr("上流")), self.up_spin, QLabel(i18n.tr("段 下流")), self.down_spin, QLabel(i18n.tr("段")),
-                  self.focus_label):
+        up, down, steps = self.step_labels()
+        for w in (QLabel(up), self.up_spin, QLabel(down), self.down_spin, QLabel(steps), self.focus_label):
             self.info_bar.addWidget(w)
         self.info_bar.addStretch(1)
         self.info_bar.addWidget(self.lod_label)
@@ -348,6 +348,11 @@ class GraphPane(QFrame):
         self.uncapped = set()
         self.excluded = set()
         self.grown_info = {g: {"added": a, "hidden": set(), "unextra": set()} for g, a in added.items()}
+
+    @staticmethod
+    def step_labels() -> tuple[str, str, str]:
+        """段数の欄の見出し（上流 [1] 段 下流 [1] 段）。英語は表示枠が狭くても収まるよう短く（Up [1] · Down [1] steps）。"""
+        return i18n.pick("上流", "Up"), i18n.pick("段 下流", "· Down"), i18n.pick("段", "steps")
 
     def fit_view(self) -> None:
         self.activate()

@@ -1,6 +1,6 @@
 {
- "階層（縦）": "Hierarchy (vertical)",
- "階層（横）": "Hierarchy (horizontal)",
+ "階層（縦）": "Hierarchy ↓",
+ "階層（横）": "Hierarchy →",
  "同心円": "Concentric",
  "格子": "Grid",
  "食い違い": "Conflict",
@@ -17,7 +17,7 @@
  "\n破壊株の mRNA・リン酸化: 左の「破壊株」タブで選んだ株での、野生型との log2 比（実測）。壊した遺伝子は黒。タブで株の選択が外れると、前の色に戻ります": "\nDeletion mRNA / phosphorylation: measured log2 ratio vs. wild type in the strain chosen in the Deletions tab. The deleted gene is black. Clearing the strain selection restores the previous colors",
  "発現・リン酸化の条件\nその種類のデータがない条件では、遺伝子はすべて灰色になります": "Condition for expression / phosphorylation\nIf a condition has no data of that kind, all genes are gray",
  "破壊株の mRNA・リン酸化で色分けするときの、壊した遺伝子\nmRNA は Deleteome（Kemmeren 2014）の 1,481 株、リン酸化は Bodenmiller 2010 のキナーゼ・ホスファターゼの 113 株。その種類の測定がない株では、遺伝子はすべて灰色になります": "Deleted gene used when coloring by deletion mRNA / phosphorylation\nmRNA: 1,481 strains from Deleteome (Kemmeren 2014); phosphorylation: 113 kinase/phosphatase strains from Bodenmiller 2010. If a strain has no measurement of that kind, all genes are gray",
- "修飾・制御": "Modification/regulation",
+ "修飾・制御": "Type",
  "作用": "Effect",
  "線の色\n修飾・制御: 修飾・制御の種類で色分け。リン酸化＝橙、転写制御＝青など\n作用: 促進＝赤、抑制＝青、作用不明＝灰、結合＝薄い灰": "Edge color\nModification/regulation: colored by type (phosphorylation = orange, transcriptional regulation = blue, etc.)\nEffect: activation = red, inhibition = blue, unknown effect = gray, binding = light gray",
  "線": "Edges",

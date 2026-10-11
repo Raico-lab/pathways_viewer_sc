@@ -18,7 +18,7 @@ from .. import complex_groups, conditions, confidence, expression, relation_path
 from ..db import Database
 from ..db.vocab import DETAILS, EFFECTS, INTERACTION_TYPES, detail_text, resolve_effect, type_label
 from ..graph_data import PathwayModel
-from ..i18n import tr
+from ..i18n import pick, tr
 from ..paths import resource_path, user_data_dir
 from . import help_text
 from .gene_set_window import GeneSetPane, MapWindow
@@ -415,7 +415,7 @@ class NetworkTab(QWidget):
         self.left_tabs = QTabWidget()
         self.left_tabs.setMinimumWidth(290)   # 「経路」の中身（表示経路の選択肢など）が横にはみ出さない幅
         self.left_tabs.addTab(self._build_gene_panel(), tr("遺伝子"))
-        self.left_tabs.addTab(self.trf_panel, "TF")
+        self.left_tabs.addTab(self.trf_panel, pick("TF", "TFs"))   # 英語は複数形
         self.left_tabs.addTab(self._build_relation_panel(), tr("経路"))
         self.left_tabs.addTab(self._build_condition_panel(), tr("条件"))
         if expression.has_deletions():

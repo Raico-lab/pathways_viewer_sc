@@ -36,7 +36,7 @@ On the map, if those genes are in the same box, a single edge is drawn from the 
 Which genes each name stands for is in data/complex_groups.csv (PKA means only the catalytic subunits TPK1–3).</li>
 <li>Paralogs (gene pairs from whole-genome duplication etc. whose roles may overlap) are enclosed in a double-line box with a color per pair and light shading (complexes use dotted boxes).
 If one of a pair is on the map, the other is added next to it (in the upper of the two steps, or in the step of the focused gene if there is one;
-unlike complexes, no separate step is made). Paralogs of transcription factors added from the TF list go in the same top step. Paralogs of genes in a downstream bundle are not added, but if both are in the same bundle they are enclosed inside the bundle box. Genes already in a complex box are not enclosed. "Evidence" in the box's or gene's details shows why their functions overlap (genetic interaction of the double deletion, GO).</li>
+unlike complexes, no separate step is made). Paralogs of transcription factors added from the TFs list go in the same top step. Paralogs of genes in a downstream bundle are not added, but if both are in the same bundle they are enclosed inside the bundle box. Genes already in a complex box are not enclosed. "Evidence" in the box's or gene's details shows why their functions overlap (genetic interaction of the double deletion, GO).</li>
 <li>Names of complex and paralog boxes are shown only when a member is selected in green or the box is clicked (names of downstream bundles are always shown).</li>
 <li>Transcriptional regulation edges between transcription factors are omitted (except edges of focused, expanded, or selected genes, and paths from the Paths tab).</li>
 </ul>
@@ -79,7 +79,7 @@ GENES = _STYLE + """
 """
 
 TFS = _STYLE + """
-<h3>TF</h3>
+<h3>TFs</h3>
 <p>A list of the <b>transcription factors that regulate transcription</b> of the focused and expanded genes. Check one to show it in the top step of the map.</p>
 <ul>
 <li>Type a name in the box at the top to keep transcription factors whose names contain it (if a gene's name contains it, all that gene's transcription factors are kept).</li>
@@ -143,7 +143,7 @@ SAVED = _STYLE + """
 <p>Save map states you use often under a name and load them later.</p>
 <ul>
 <li><b>Save</b>: check the items to keep under "Items to save" ("Select all" / "Clear all" toggle them together), enter a name, and click "Save".
-You can choose from Focus (genes and steps), Expand, Select (green selection), TF, Paths (checks, path mode, steps, anchor gene), Conditions, and Legend.</li>
+You can choose from Focus (genes and steps), Expand, Select (green selection), TFs, Paths (checks, path mode, steps, anchor gene), Conditions, and Legend.</li>
 <li><b>Load</b>: pick a view in the "Saved views" list (sorted by name) and click "Load" (or double-click). Only the saved items are applied to the active panel; other items stay as they are (a view without paths keeps the current paths).
 Selecting a view shows its date and contents on the right (this panel). Click the selected view again, or click outside the list, to deselect.</li>
 <li>Saving with an existing name overwrites it. Saved views are kept only on this computer.</li>

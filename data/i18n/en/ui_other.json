@@ -39,7 +39,7 @@
  "未設定": "not configured",
  "DB を開けません": "Cannot open the database",
  "データ: {path}": "Data: {path}",
- "遺伝子名で検索 例: TOR1": "Search gene name, e.g. TOR1",
+ "遺伝子名で検索 例: TOR1": "Gene, e.g. TOR1",
  "⧉ 新しい枠": "⧉ New panel",
  "新しい表示枠を開いて、緑で選択中の遺伝子に注目します。複数なら最後に選んだものです。\n緑がなければ最後に紫にしたもの、それもなければ注目中のものに注目します": "Open a new map panel focused on the gene in the green selection (the last one selected if several).\nWithout a green selection, the last expanded (purple) gene is used, or else the current focus",
  "この表示枠を閉じる": "Close this map panel",
@@ -226,5 +226,9 @@
  "デスクトップアプリ": "Desktop app",
  "利用条件あり": "Terms of use apply",
  "明示なし・引用を依頼": "Not stated; citation requested",
- "{error}\n\n「ファイル > データの保存フォルダを開く」で tor_pathway.db を消してから起動し直すと、同梱のデータに戻ります。": "{error}\n\nTo return to the bundled data, open \"File > Open data folder\", delete tor_pathway.db, and restart the app."
+ "{error}\n\n「ファイル > データの保存フォルダを開く」で tor_pathway.db を消してから起動し直すと、同梱のデータに戻ります。": "{error}\n\nTo return to the bundled data, open \"File > Open data folder\", delete tor_pathway.db, and restart the app.",
+ "関係 {n} 本": "{n} relations",
+ "発現の測定 93 件": "93 expression measurements",
+ "複合体 633 件": "633 complexes",
+ "パラログ 488 組": "488 paralog pairs"
 }
