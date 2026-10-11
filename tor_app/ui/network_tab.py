@@ -26,10 +26,10 @@ from .saved_views import SavedViewsPanel
 from .graph_pane import DEFAULT_DOWN, DEFAULT_UP, GraphPane
 
 LAYOUT_CHOICES = [
-    ("階層（縦）", "dagre_tb"),
-    ("階層（横）", "dagre_lr"),
-    ("同心円", "concentric"),
-    ("格子", "grid"),
+    (tr("階層（縦）"), "dagre_tb"),
+    (tr("階層（横）"), "dagre_lr"),
+    (tr("同心円"), "concentric"),
+    (tr("格子"), "grid"),
 ]
 
 VIEW_FILE = user_data_dir() / "view.json"
@@ -38,21 +38,21 @@ MAX_LIST = 40            # 詳細パネルに並べる上流・下流の最大�
 
 # 根拠欄の項目の出典（先頭の語で見分ける）: (見出し, 色)
 EVIDENCE_SOURCES = [
-    ("⚠", ("食い違い", "#e65100")),
-    ("文献で確認", ("文献", "#ad1457")),
+    ("⚠", (tr("食い違い"), "#e65100")),
+    ("文献で確認", (tr("文献"), "#ad1457")),
     ("作用の向き: IDEA", ("IDEA", "#00695c")),
-    ("SGD GO 注釈", ("SGD の GO 注釈", "#5d4037")),
+    ("SGD GO 注釈", (tr("SGD の GO 注釈"), "#5d4037")),
     ("作用の向き: GO-CAM", ("GO-CAM", "#5d4037")),
     ("GO-CAM", ("GO-CAM", "#5d4037")),
-    ("作用の向き: 破壊株データ", ("破壊株データからの推定", "#6a1b9a")),
-    ("破壊株データ", ("破壊株データ", "#6a1b9a")),
+    ("作用の向き: 破壊株データ", (tr("破壊株データからの推定"), "#6a1b9a")),
+    ("破壊株データ", (tr("破壊株データ"), "#6a1b9a")),
     ("BioGRID", ("BioGRID", "#1565c0")),
     ("YEASTRACT", ("YEASTRACT+", "#00838f")),
     ("TF acting", ("YEASTRACT+", "#00838f")),
     ("activator と inhibitor", ("YEASTRACT+", "#00838f")),
-    ("公開データ", ("公開データ", "#455a64")),
-    ("注記", ("BioGRID の注記", "#1565c0")),
-    ("サンプル", ("サンプル", "#9e9e9e")),
+    ("公開データ", (tr("公開データ"), "#455a64")),
+    ("注記", (tr("BioGRID の注記"), "#1565c0")),
+    ("サンプル", (tr("サンプル"), "#9e9e9e")),
 ]
 
 
@@ -1661,15 +1661,15 @@ class NetworkTab(QWidget):
 
     @staticmethod
     def _count_text(shown: int, total: int, capped: bool) -> str:
-        count = f"{total} 本以上" if capped else f"{total} 本"
-        return f"{shown} 本 / {count}" if shown != total else count
+        count = tr("{n} 本以上", n=total) if capped else tr("{n} 本", n=total)
+        return tr("{shown} 本 / {count}", shown=shown, count=count) if shown != total else count
 
     def _set_pair_rows(self, pair: QTreeWidgetItem, graph, rows: list, hidden: bool | None = None) -> None:
         """組（上流 … 行き先）に表示する経路を決める（経路の行は開いたときに作る）。hidden を省くと、経路がなければ隠す。
         隠さずに経路がない組は灰色にする（地図でクリックした遺伝子を通らない組）。"""
         left, right = pair.data(0, self.PAIR)
         count = self._count_text(len(rows), len(pair.data(0, self.ALL_ROWS)), pair.data(0, self.CAPPED))
-        text = f"{graph.label(left)} … {graph.label(right)}（{count}）"
+        text = tr("{left} … {right}（{count}）", left=graph.label(left), right=graph.label(right), count=count)
         pair.setText(0, text)
         pair.setToolTip(0, text)
         pair.setData(0, self.SHOWN_ROWS, rows)
@@ -1692,7 +1692,7 @@ class NetworkTab(QWidget):
         rows = [row for pair in pairs if not pair.data(0, self.HIDE) for row in pair.data(0, self.SHOWN_ROWS) or []]
         count = self._count_text(len(rows), len(top.data(0, self.ALL_ROWS)), top.data(0, self.CAPPED))
         left = top.data(0, self.PAIR)[0]
-        text = f"{graph.label(left)} から（{count}）"
+        text = tr("{name} から（{count}）", name=graph.label(left), count=count)
         top.setText(0, text)
         top.setToolTip(0, text)
         top.setData(0, self.SHOWN_ROWS, rows)
@@ -1748,7 +1748,7 @@ class NetworkTab(QWidget):
             child = QTreeWidgetItem([text])
             child.setData(0, self.SHOWN_ROWS, [row])
             edges = sorted(GraphPane.row_edges(graph, row), key=lambda e: (names[e[0]], names[e[1]]))
-            child.setToolTip(0, text + "\n関係: " + "、".join(f"{names[x]} → {names[y]}" for x, y in edges))
+            child.setToolTip(0, text + "\n" + tr("関係: ") + tr("、").join(f"{names[x]} → {names[y]}" for x, y in edges))
             children.append(child)
         item.addChildren(children)
         item.setData(0, self.FILLED, True)
@@ -1800,7 +1800,8 @@ class NetworkTab(QWidget):
                 mark = {"→": "←", "⊣": "⊢", "─◇": "◇─"}[mark]
             return mark, its
 
-        parts = [f"<h3 style='margin:0 0 6px 0'>経路{'' if len(rows) == 1 else f' {len(rows)} 本'}</h3>"]
+        heading = tr("経路") if len(rows) == 1 else tr("経路 {n} 本", n=len(rows))
+        parts = [f"<h3 style='margin:0 0 6px 0'>{heading}</h3>"]
         for row in rows[:self.PATHS_SHOWN]:
             steps = [step(row.nodes[i], row.nodes[i + 1], row.forward[i]) for i in range(len(row.nodes) - 1)]
             title = html.escape(graph.label(row.nodes[0])) + "".join(
@@ -1809,11 +1810,11 @@ class NetworkTab(QWidget):
             for _mark, its in steps:
                 for it in sorted(its, key=lambda it: (it.source.gene_name, it.target.gene_name)):
                     level = self.model.confidence.get(it.id, "U")
-                    lines.append(f"<li>{self._link_edge(it)} <span style='color:#777'>確度 "
-                                 f"{html.escape(confidence.label(level))}</span></li>")
+                    lines.append(f"<li>{self._link_edge(it)} <span style='color:#777'>"
+                                 f"{tr('確度 {level}', level=html.escape(confidence.label(level)))}</span></li>")
             parts.append(f"<p style='margin:8px 0 2px 0'><b>{title}</b></p><ul>{''.join(lines)}</ul>")
         if len(rows) > self.PATHS_SHOWN:
-            parts.append(f"<p style='color:#777'>ほか {len(rows) - self.PATHS_SHOWN} 本</p>")
+            parts.append(f"<p style='color:#777'>{tr('ほか {n} 本', n=len(rows) - self.PATHS_SHOWN)}</p>")
         self.selected = None
         self._set_controls([])
         self.detail.setHtml(help_text._STYLE + "".join(parts))
@@ -1883,7 +1884,8 @@ class NetworkTab(QWidget):
         self._expand_few_tops()
         self.rel_tree.blockSignals(False)
         name = graph.label(unit)
-        self._set_relation_filter_text(f"{name} を通る経路（{shown} 本）" if shown else f"{name} を通る経路はありません")
+        self._set_relation_filter_text(tr("{name} を通る経路（{n} 本）", name=name, n=shown) if shown
+                                       else tr("{name} を通る経路はありません", name=name))
         self._relation_unit_rows(pane)
 
     def _on_relation_background(self, pane: GraphPane) -> None:
@@ -1930,7 +1932,7 @@ class NetworkTab(QWidget):
         if pane is None or pane.relation is None or not self.model:
             return
         if len(self.panes) >= MAX_PANES:
-            self.statusMessage.emit(f"表示枠は最大 {MAX_PANES} つまでです")
+            self.statusMessage.emit(tr("表示枠は最大 {n} つまでです", n=MAX_PANES))
             return
         r = pane.relation
         names = self.model.names

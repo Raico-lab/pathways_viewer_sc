@@ -3,6 +3,16 @@
 (function () {
   "use strict";
 
+  // 画面の言語（アプリが network.html?lang=en|ja で渡す。なければ日本語）
+  const LANG = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ja";
+  const T = (ja, en) => (LANG === "en" ? en : ja);
+  // HTML に固定で書いた文字: 英語のときは data-en（文字）・data-en-title（ツールチップ）に差し替える
+  document.documentElement.lang = LANG;
+  if (LANG === "en") {
+    document.querySelectorAll("[data-en]").forEach((el) => { el.textContent = el.dataset.en; });
+    document.querySelectorAll("[data-en-title]").forEach((el) => { el.title = el.dataset.enTitle; });
+  }
+
   let bridge = null;
   let colorMode = "role";
   // 線の色: "type" は修飾の種類ごと、"effect" は作用（促進・抑制・作用不明・結合）ごと
@@ -88,8 +98,10 @@
       const shownTotal = (r.edgeIds || []).filter(visible).length;
       const shownOverlap = (r.overlapped || []).filter(visible).length;
       if (r.dense && shownOverlap && shownTotal > NOTICE_EDGES) {
-        showMessage(`線が多いため、${shownTotal} 本のうち ${shownOverlap} 本は重なりを避けきれていません。` +
-                    "段数を減らすか、凡例のチェックで種類を絞ると見やすくなります");
+        showMessage(T(`線が多いため、${shownTotal} 本のうち ${shownOverlap} 本は重なりを避けきれていません。` +
+                      "段数を減らすか、凡例のチェックで種類を絞ると見やすくなります",
+                      `There are many edges: ${shownOverlap} of ${shownTotal} could not avoid overlapping. ` +
+                      "Reduce the steps or narrow the types with the legend checkboxes to make the map easier to read."));
         setTimeout(() => showMessage(""), 8000);
       }
     });
@@ -514,8 +526,8 @@
   let lastPickedKey = "[]";
   function renderMarks() {
     const chip = (n, kind, removable = true) =>
-      `<span class="mark-chip ${kind}" data-node="${n.id()}" title="地図で場所を見る">${n.data("label")}` +
-      (removable ? `<button data-kind="${kind}" data-id="${n.id()}" title="解除">×</button>` : "<span style='width:4px'></span>") +
+      `<span class="mark-chip ${kind}" data-node="${n.id()}" title="${T("地図で場所を見る", "Show on the map")}">${n.data("label")}` +
+      (removable ? `<button data-kind="${kind}" data-id="${n.id()}" title="${T("解除", "Remove")}">×</button>` : "<span style='width:4px'></span>") +
       "</span>";
     const genes = cy.nodes().filter(isGene).sort((a, b) => a.data("label").localeCompare(b.data("label")));
     const picked = genes.filter((n) => n.hasClass("picked"));
@@ -756,7 +768,7 @@
     bands.forEach(({ mains, levels }, key) => {
       const at = (Math.min(...mains) + Math.max(...mains)) / 2;
       const lo = Math.min(...levels) + 1, hi = Math.max(...levels) + 1;
-      const text = !levels.size ? "階層なし" : lo === hi ? `第${lo}階層` : `第${lo}〜${hi}階層`;
+      const text = !levels.size ? T("階層なし", "No level") : lo === hi ? T(`第${lo}階層`, `Level ${lo}`) : T(`第${lo}〜${hi}階層`, `Levels ${lo}–${hi}`);
       cy.add({
         group: "nodes", selectable: false, grabbable: false,
         data: { id: `level:${key}`, isLabel: true, label: text },
@@ -1376,14 +1388,14 @@
     const row = (color, name, cls = "", kind = null, key = null) =>
       legendRow(kind, key, `<span class="swatch${cls}" style="background:${color}"></span>${name}`);
     const roleRows = (lastLegend.roles || []).map((r) => row(r.color, r.name, "", "roles", r.key)).join("");
-    const titles = { role: "役割" };
+    const titles = { role: T("役割", "Role") };
     let html = "";
     if (DATA_KINDS.includes(colorMode)) {
       titles[colorMode] = dataTitle || "";
       html = [2, 1, 0.5, 0, -0.5, -1, -2].map((v) =>
-        row(dataColor(v), `${v > 0 ? "+" : v < 0 ? "−" : "±"}${Math.abs(v)}${Math.abs(v) === DATA_MAX ? " 以上" : ""}`)).join("")
-        + (dataKo ? row(DATA_KO, "壊した遺伝子") : "")
-        + row(DATA_NONE, "データなし") + `<div class="legend-row" style="color:#777">${dataNote || "log2 比"}</div>`;
+        row(dataColor(v), `${v > 0 ? "+" : v < 0 ? "−" : "±"}${Math.abs(v)}${Math.abs(v) === DATA_MAX ? T(" 以上", " or more") : ""}`)).join("")
+        + (dataKo ? row(DATA_KO, T("壊した遺伝子", "Deleted gene")) : "")
+        + row(DATA_NONE, T("データなし", "No data")) + `<div class="legend-row" style="color:#777">${dataNote || T("log2 比", "log2 ratio")}</div>`;
     } else if (colorMode === "role") html = roleRows;
     document.getElementById("legend-node-title").textContent = titles[colorMode] || "";
     document.getElementById("legend-nodes").innerHTML = html;
@@ -1510,7 +1522,8 @@
       cy.elements().remove();
       if (!elements.length) {
         endBusy();
-        showMessage("上の欄に注目する遺伝子名を入力して「表示」を押してください。例: TOR1");
+        showMessage(T("上の欄に注目する遺伝子名を入力して「表示」を押してください。例: TOR1",
+                      "Enter a gene name to focus on in the box above and press \u201cShow\u201d. Example: TOR1"));
         renderLegend({ types: [], categories: [], roles: [] });
         return;
       }
