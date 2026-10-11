@@ -22,7 +22,7 @@ Complex Portal / papers (TORC1, PKA). Keep units/symbols (→ ⊣ ◇ ▸ ▾ lo
 | 経路（タブ） | Paths |
 | 条件（タブ） | Conditions |
 | 破壊株（タブ） | Deletions |
-| 登録（タブ） | Saved views |
+| 登録（タブ） | Saved（登録した表示の一覧は Saved views） |
 | Help（ボタン） | Help |
 
 ## Map operations

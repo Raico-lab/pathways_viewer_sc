@@ -10,7 +10,7 @@ This guide walks first-time users through **map operations** and **the left tabs
 
 Detailed rules (layout, how levels are determined, etc.) are in the app's "Help" buttons and the [README](../README.md).
 
-Screenshots in sections 1, 6 (except Saved views), and 7 are from the current version. Others are from an earlier version, so selectors above the map ("Color", "Condition", etc.) and left tab names ("TFs", etc.) may differ, but the operations are the same.
+Screenshots in sections 1, 6 (except Saved), and 7 are from the current version. Others are from an earlier version, so selectors above the map ("Color", "Condition", etc.) and left tab names ("TFs", etc.) may differ, but the operations are the same.
 
 ---
 
@@ -27,7 +27,7 @@ Screenshots in sections 1, 6 (except Saved views), and 7 are from the current ve
    - [Paths](#6-3-paths--explore-how-genes-are-connected)
    - [Conditions](#6-4-conditions--under-which-conditions-a-relation-was-reported)
    - [Deletions](#6-5-deletions--measured-data-in-deletion-strains)
-   - [Saved views](#6-6-saved-views--save-maps-you-use-often)
+   - [Saved](#6-6-saved--save-maps-you-use-often)
 7. [Expression and phosphorylation by condition](#7-expression-and-phosphorylation-by-condition)
 8. [Database and Sources tabs](#8-database-and-sources-tabs)
 9. [Examples](#9-examples)
@@ -43,7 +43,7 @@ The Network tab is divided into five areas (numbers are the red circles in the i
 
 | No. | Area | Purpose |
 |---|---|---|
-| 1 | **Left tabs** (Genes, TF, Paths, Conditions, Deletions, Saved views) | Choose genes on the map from lists, add transcription factors, explore paths, highlight by condition, color by deletion strain data, etc. |
+| 1 | **Left tabs** (Genes, TF, Paths, Conditions, Deletions, Saved) | Choose genes on the map from lists, add transcription factors, explore paths, highlight by condition, color by deletion strain data, etc. |
 | 2 | **Search box** (above the map panel) | Find a gene and put it on the map. The two rows below hold settings such as layout, edge color, and steps |
 | 3 | **Map** | Genes (boxes) and relations (edges) |
 | 4 | **Legend** (right edge of the map) | Meaning of colors, edges, and symbols. Uncheck an item to hide that type from the map |
@@ -314,9 +314,9 @@ See on the map **how mRNA and phosphorylation of other genes actually changed** 
 - Map colors: red = increased, blue = decreased, black = deleted gene. Role colors return when the strain is deselected: by clicking the colored strain again, when a filter removes it from the list, or by switching to "Changed gene".
 - Effects of a deletion include indirect ones (X → Z → Y). Deleteome was measured in rich medium, so genes that act only under stress may show no change when deleted.
 
-### 6-6. Saved views — save maps you use often
+### 6-6. Saved — save maps you use often
 
-![Saved views tab (①). Check the items to keep, enter a name, and click "Save"](manual/12_saved.png)
+![Saved tab (①). Check the items to keep, enter a name, and click "Save"](manual/12_saved.png)
 
 Save map states you use often under a name and load them later.
 

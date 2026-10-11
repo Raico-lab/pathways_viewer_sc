@@ -139,7 +139,7 @@ For pairs where counting stopped at … paths, the count is shown as "… or mor
 """
 
 SAVED = _STYLE + """
-<h3>Saved views</h3>
+<h3>Saved</h3>
 <p>Save map states you use often under a name and load them later.</p>
 <ul>
 <li><b>Save</b>: check the items to keep under "Items to save" ("Select all" / "Clear all" toggle them together), enter a name, and click "Save".
