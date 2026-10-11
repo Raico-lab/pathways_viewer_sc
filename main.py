@@ -12,7 +12,7 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView  # noqa: F401 - QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication
 
-from tor_app.ui.popup_guard import ComboPopupGuard
+from pathways_app.ui.popup_guard import ComboPopupGuard
 
 
 def main() -> int:
@@ -24,7 +24,7 @@ def main() -> int:
     app.setStyle("Fusion")
     app.setPalette(app.style().standardPalette())
     ComboPopupGuard(app)   # 配置・色などのプルダウンが稀に開かないときに開き直す
-    from tor_app.ui.main_window import MainWindow
+    from pathways_app.ui.main_window import MainWindow
     window = MainWindow()
     if not window.start():
         return 0

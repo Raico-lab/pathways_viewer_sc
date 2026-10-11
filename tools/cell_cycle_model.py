@@ -15,7 +15,7 @@
   .venv/bin/python tools/cell_cycle_model.py --verify       # 論文の表と照らし合わせる
   .venv/bin/python tools/cell_cycle_model.py                # 野生型の 1 周期（START から）と、止まる状態
   .venv/bin/python tools/cell_cycle_model.py --ko Sic1      # 単位を壊したときの移り変わり
-  .venv/bin/python tools/cell_cycle_model.py --db           # つながりを DB（tor_pathway.db）の関係と照らし合わせる
+  .venv/bin/python tools/cell_cycle_model.py --db           # つながりを DB（pathways.db）の関係と照らし合わせる
 """
 import argparse
 import sqlite3
@@ -23,7 +23,7 @@ from collections import Counter
 from itertools import product
 from pathlib import Path
 
-DB = Path(__file__).resolve().parent.parent / "data" / "tor_pathway.db"
+DB = Path(__file__).resolve().parent.parent / "data" / "pathways.db"
 
 NODES = ["Cln3", "MBF", "SBF", "Cln1,2", "Cdh1", "Swi5", "Cdc20,14", "Clb5,6", "Sic1", "Clb1,2", "Mcm1,SFF"]
 # (上流, 下流, +1 促進 / -1 抑制)

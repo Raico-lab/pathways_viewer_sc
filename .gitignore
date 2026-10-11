@@ -30,7 +30,7 @@ scratch/
 # 手元だけで使う作業の記録・古い文書（GitHub には置かない。手元のファイルは残す）
 /ダウンロードとインストール.md
 /ブラウザ版.webloc
-/TOR_NETWORK_APP_SPEC.md
+/PATHWAYS_APP_SPEC.md
 docs/TODO.md
 docs/EXTERNAL_DB_PLAN.md
 docs/curation/request_round2.md

@@ -30,7 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MARKERS = ROOT / "data" / "activity_markers.csv"
 EXPRESSION = ROOT / "data" / "expression.db"
-DB = ROOT / "data" / "tor_pathway.db"
+DB = ROOT / "data" / "pathways.db"
 Z_CHANGED = 1.0
 SIGN = {"up": 1, "transient_up": 1, "down": -1, "transient_down": -1}
 EFFECT_SIGN = {"activate": 1, "inhibit": -1}

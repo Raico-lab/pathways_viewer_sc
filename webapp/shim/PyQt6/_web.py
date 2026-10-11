@@ -1,6 +1,6 @@
 """地図を表示する iframe（QWebEngineView）と、地図のページとのやりとり（QWebChannel）。
 
-地図のページ（tor_app/web/network.html）は表示枠ごとに iframe で開く。ページの qwebchannel.js（webapp/qwebchannel.js）は、
+地図のページ（pathways_app/web/network.html）は表示枠ごとに iframe で開く。ページの qwebchannel.js（webapp/qwebchannel.js）は、
 iframe の要素に付けた pvChannel から Python の bridge を受け取る。Qt と同じく、やりとりはどちらの向きも後回しで届ける
 （JavaScript の実行・bridge の呼び出しは、それぞれ setTimeout の順に）。
 """

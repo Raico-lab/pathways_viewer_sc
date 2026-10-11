@@ -1,6 +1,6 @@
 """文献で確かめるべき関係の一覧（docs/curation/review_queue.tsv）を、優先度の順に作る。
 
-DB（data/tor_pathway.db）の関係のうち、まだ文献で確認していない（根拠欄が「文献で確認」で始まらない）ものを、
+DB（data/pathways.db）の関係のうち、まだ文献で確認していない（根拠欄が「文献で確認」で始まらない）ものを、
 次の区分に分けて並べる。区分の中では、中心の経路の遺伝子（文献で確認した関係に出てくる遺伝子）を
 両端に含むもの、根拠の論文（BioGRID の PMID）が多いものを上にする。
 
@@ -16,7 +16,7 @@ DB（data/tor_pathway.db）の関係のうち、まだ文献で確認してい�
 探したが裏付けが見つからなかった組（docs/curation/searched_not_found.csv）は、区分の後ろに回し、列「探した日」を出す。
 根拠の論文が網羅的な実験の論文だけの組（15 本以上の関係に根拠として出てくる PMID。プロテインチップ・大規模リン酸化解析など）も、
 作用を書いた論文が見つかりにくいので、その次に回し、列「網羅的な論文だけ」に印を付ける。
-最後に、関係の確度（tor_app/confidence.py の A〜D）ごとの本数を、全体と中心の経路の遺伝子どうしで出す（進み具合の目安）。
+最後に、関係の確度（pathways_app/confidence.py の A〜D）ごとの本数を、全体と中心の経路の遺伝子どうしで出す（進み具合の目安）。
 
 使い方: .venv/bin/python tools/make_review_queue.py [--out docs/curation/review_queue.tsv]
 """
@@ -30,11 +30,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from tor_app import i18n  # noqa: E402
+from pathways_app import i18n  # noqa: E402
 i18n._language = "ja"   # 一覧（docs/curation）は画面の言語によらず日本語で書く
-from tor_app import confidence  # noqa: E402
+from pathways_app import confidence  # noqa: E402
 
-DB = ROOT / "data" / "tor_pathway.db"
+DB = ROOT / "data" / "pathways.db"
 COMMON = ROOT / "archive" / "data" / "common_response_genes.csv"
 LITERATURE = ROOT / "sample_data" / "literature"
 NOT_FOUND = ROOT / "docs" / "curation" / "searched_not_found.csv"

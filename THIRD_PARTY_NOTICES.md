@@ -1,9 +1,9 @@
 # Third-party software / ほかの部品のライセンス
 
-Pathways Viewer itself is licensed under the GNU General Public License version 3 (see `LICENSE`).
+Pathways viewer itself is licensed under the GNU General Public License version 3 (see `LICENSE`).
 It uses the following third-party software. Each component remains under its own license.
 
-Pathways Viewer 本体は GPLv3（`LICENSE`）です。次の部品を使っており、それぞれの部品にはそれぞれのライセンスが適用されます。
+Pathways viewer 本体は GPLv3（`LICENSE`）です。次の部品を使っており、それぞれの部品にはそれぞれのライセンスが適用されます。
 
 ## デスクトップ版（同梱して配布）
 
@@ -20,7 +20,7 @@ Pathways Viewer 本体は GPLv3（`LICENSE`）です。次の部品を使って�
 
 The desktop version ships Qt as separate shared libraries, so users can replace them with their own build as permitted by LGPL-3.0.
 
-## 地図の表示（デスクトップ版・ブラウザ版の両方。`tor_app/web/lib/`）
+## 地図の表示（デスクトップ版・ブラウザ版の両方。`pathways_app/web/lib/`）
 
 | 部品 | 版 | ライセンス | 入手先 |
 |---|---|---|---|

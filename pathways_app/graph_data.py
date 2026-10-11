@@ -333,7 +333,7 @@ class PathwayModel:
         return elements
 
     def _group_edges(self, grouped: dict[tuple, list[Interaction]], frame: dict[int, str]) -> list[dict]:
-        """複合体の名前で書かれた文献の関係（tor_app/complex_groups.py）。構成遺伝子ごとの関係を、複合体の側の遺伝子が
+        """複合体の名前で書かれた文献の関係（pathways_app/complex_groups.py）。構成遺伝子ごとの関係を、複合体の側の遺伝子が
         いちばん多く入っている地図の枠から 1 本の線にまとめる（id は代表の関係。説明欄はその根拠を出す）。
         複合体には型違い（TORC1 の TOR1 型・TOR2 型など）があり、1 つの遺伝子は 1 つの枠にしか入らないので、
         枠の外の構成遺伝子（TOR2 など）の線もこの 1 本に含める。どの構成遺伝子も枠に入っていなければ、遺伝子ごとの線のまま描く。

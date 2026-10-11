@@ -1,11 +1,11 @@
 """DB の写しを各 PC のローカルに置いて使う（地図を軽く描くため）。DB はサーバーの版が正で、各 PC では編集しない。
 
-- 初回起動時: 同梱 DB (data/tor_pathway.db) をユーザーデータへコピーする。
+- 初回起動時: 同梱 DB (data/pathways.db) をユーザーデータへコピーする。
 - 同梱 DB が新しくなったアプリで起動したとき: サーバーから入れた写しがなければ、尋ねずに同梱 DB に置き換える
-  （サーバーから入れた写しがあればそのまま。起動後にサーバーと照らす。tor_app/ui/main_window.py の start）。
+  （サーバーから入れた写しがあればそのまま。起動後にサーバーと照らす。pathways_app/ui/main_window.py の start）。
 同梱 DB の変化はファイルのハッシュで判定する（最後に取り込んだハッシュを bundle.json に記録）。
 
-サーバーの新しい版は、tor_app/server.py が確かめたファイルを install_file でローカルへ入れる
+サーバーの新しい版は、pathways_app/server.py が確かめたファイルを install_file でローカルへ入れる
 （アプリは常にローカル DB を読む）。方針は docs/EXTERNAL_DB_PLAN.md を参照。
 """
 import hashlib
@@ -16,8 +16,14 @@ from pathlib import Path
 
 from .paths import resource_path, user_data_dir
 
-BUNDLED_DB = resource_path("data", "tor_pathway.db")
-LOCAL_DB = user_data_dir() / "tor_pathway.db"
+BUNDLED_DB = resource_path("data", "pathways.db")
+LOCAL_DB = user_data_dir() / "pathways.db"
+_OLD_LOCAL_DB = user_data_dir() / "tor_pathway.db"   # 2026-10-11 までの名前。残っていれば新しい名前へ移す（サーバーから入れた写しを保つ）
+if _OLD_LOCAL_DB.exists() and not LOCAL_DB.exists():
+    try:
+        _OLD_LOCAL_DB.rename(LOCAL_DB)
+    except OSError:   # 移せなければ、同梱 DB から入れ直す（起動時の処理のまま）
+        pass
 BACKUP_DIR = user_data_dir() / "backups"
 _STATE_FILE = user_data_dir() / "bundle.json"
 
@@ -60,7 +66,7 @@ def bundled_is_newer() -> bool:
 
 def backup_local() -> Path:
     BACKUP_DIR.mkdir(exist_ok=True)
-    stem = f"tor_pathway_{datetime.now():%Y%m%d_%H%M%S}"
+    stem = f"pathways_{datetime.now():%Y%m%d_%H%M%S}"
     dest = BACKUP_DIR / f"{stem}.db"
     n = 1
     while dest.exists():

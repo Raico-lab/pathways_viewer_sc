@@ -165,7 +165,7 @@ class QWidget(QObject):
         self._qid = _next_id[0]
         _registry[self._qid] = self
         self._el = _dom.el(self._tag, "qw " + " ".join(f"q-{c.__name__}" for c in type(self).__mro__
-                                                        if c.__module__.startswith(("PyQt6", "tor_app", "webmain"))
+                                                        if c.__module__.startswith(("PyQt6", "pathways_app", "webmain"))
                                                         or issubclass(c, QWidget) and c is not object))
         self._el.dataset.qid = str(self._qid)
         self._layout = None          # この部品に置いた並び

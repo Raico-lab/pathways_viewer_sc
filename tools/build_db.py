@@ -1,4 +1,4 @@
-"""CSV から同梱用の DB (data/tor_pathway.db) を作り直す。
+"""CSV から同梱用の DB (data/pathways.db) を作り直す。
 
     python tools/build_db.py [proteins.csv] [interactions.csv]
 
@@ -10,14 +10,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from tor_app.db import Database  # noqa: E402
-from tor_app.db import csv_io  # noqa: E402
+from pathways_app.db import Database  # noqa: E402
+from pathways_app.db import csv_io  # noqa: E402
 
 
 def main() -> None:
     proteins = sys.argv[1] if len(sys.argv) > 1 else ROOT / "sample_data" / "proteins.csv"
     interactions = sys.argv[2] if len(sys.argv) > 2 else ROOT / "sample_data" / "interactions.csv"
-    out = ROOT / "data" / "tor_pathway.db"
+    out = ROOT / "data" / "pathways.db"
     out.parent.mkdir(exist_ok=True)
     out.unlink(missing_ok=True)
     db = Database(str(out))

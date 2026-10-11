@@ -12,7 +12,7 @@
   動いた部位 regulated_datasets が中心。TORC1 の部位はラパマイシンの実験から来ているので、ラパマイシンでの答え合わせは甘くなる）。
   PhosphoGRID 由来の phosphogrid_Regulated・phosphogrid（キナーゼの破壊で動いた部位。向きも直接か間接かも区別しない）は使わない:
   それだけで推定すると目印との一致 64%（PKA が炭素飢餓・非発酵性炭素源などで 4 回逆）、外すと全体の一致が 72% → 86%（2026-10-06）
-- DB: tor_pathway.db のリン酸化・脱リン酸化の関係で部位（site）のあるもの
+- DB: pathways.db のリン酸化・脱リン酸化の関係で部位（site）のあるもの
 
 単位: 目印の表の単位（TORC1・PKA・MSN2/4 など）と、その genes 列の遺伝子。Leutert の一覧の単位名（TORC1・PKA・CLB2 など）は
 ALIASES で合わせる。
@@ -34,7 +34,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 EXPRESSION = ROOT / "data" / "expression.db"
-DB = ROOT / "data" / "tor_pathway.db"
+DB = ROOT / "data" / "pathways.db"
 MARKERS = ROOT / "data" / "activity_markers.csv"
 LEUTERT_KS = ROOT / "raw_data" / "LEUTERT2023" / "zenodo" / "kinase_phos_substrate_yeast_2.csv"
 BIOGRID_PTM = ROOT / "raw_data" / "BIOGRID-PTM" / "BIOGRID-PTM-5.0.262.yeast.tsv"

@@ -32,7 +32,7 @@
 
 - `source_protein`・`target_protein`: 遺伝子名（標準名。DB の gene_name。無い遺伝子は系統名 YxxNNNx）。向きは作用する側 → 受ける側。
   DB の名前と論文の名前が違うことがある（例: GET5 は DB では MDY2）。書いたら
-  `sqlite3 data/tor_pathway.db "select gene_name from proteins where gene_name='名前'"` で DB にあるか確かめる
+  `sqlite3 data/pathways.db "select gene_name from proteins where gene_name='名前'"` で DB にあるか確かめる
 - 一覧の列「文献で済んだ組」にある組（以前 flag・reject にしたもの）は書かない。書いても A にならないので、別の関係を探す
 - `interaction_type`: `phosphorylation`・`dephosphorylation`・`ubiquitination`・`acetylation`・`methylation`・`sumoylation`・`proteolysis`・
   `transcription`・`activation`・`inhibition`・`binding`・`localization`・`enzymatic`・`other` から

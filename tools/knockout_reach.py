@@ -36,7 +36,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import deleteome  # noqa: E402
 
-DB = ROOT / "data" / "tor_pathway.db"
+DB = ROOT / "data" / "pathways.db"
 PARALOGS = ROOT / "data" / "paralogs.tsv"
 COMPLEXES = ROOT / "data" / "complex_portal.tsv"
 BIOGRID = ROOT / "raw_data" / "BIOGRID-ORGANISM-LATEST" / "BIOGRID-ORGANISM-Saccharomyces_cerevisiae_S288c-5.0.261.tab3.txt"

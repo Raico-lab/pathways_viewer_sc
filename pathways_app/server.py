@@ -6,7 +6,7 @@
 
 サーバーに置くもの（base_url からの相対パス。data/server.json で変えられる）:
 - manifest.json: 配信している DB の版（tools/make_manifest.py で作る）
-    {"data_version": "2026-10-15", "schema_version": 1, "sha256": "…", "url": "tor_pathway.db", "notes": "…"}
+    {"data_version": "2026-10-15", "schema_version": 1, "sha256": "…", "url": "pathways.db", "notes": "…"}
 - papers.json・sources.json: 情報源タブの論文・サイトの情報（サーバー上の DB から書き出したもの。形は data/ の同名のファイルと同じ）。
   地図で使う DB（遺伝子・関係）はローカルで扱い、情報源の情報はサーバーを正とする。取ってきたものはこの PC に写しを置き、
   つながらないときは写し（なければ同梱の data/ のファイル）を使う
@@ -80,7 +80,7 @@ def check_update() -> UpdateStatus:
 def fetch_update(manifest: dict) -> tuple[Path, str]:
     """新しい DB を一時ファイルにダウンロードして確かめる（画面とは別のスレッドから呼ぶ）。返り値: (一時ファイル, ハッシュ)。
     ハッシュが合わない・SQLite として開けない・表がそろわないときは例外を出す（一時ファイルは消す）。"""
-    url = urllib.parse.urljoin(_url("manifest", "manifest.json"), manifest.get("url", "tor_pathway.db"))
+    url = urllib.parse.urljoin(_url("manifest", "manifest.json"), manifest.get("url", "pathways.db"))
     data = _get(url, DOWNLOAD_TIMEOUT)
     if url.endswith(".gz"):   # 圧縮して置いた DB（約 1/9 の大きさ）。ハッシュは展開した DB のもの
         data = gzip.decompress(data)

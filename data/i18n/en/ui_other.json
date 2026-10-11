@@ -219,7 +219,7 @@
  "デスクトップアプリ": "Desktop app",
  "利用条件あり": "Terms of use apply",
  "明示なし・引用を依頼": "Not stated; citation requested",
- "{error}\n\n「ファイル > データの保存フォルダを開く」で tor_pathway.db を消してから起動し直すと、同梱のデータに戻ります。": "{error}\n\nTo return to the bundled data, open \"File > Open data folder\", delete tor_pathway.db, and restart the app.",
+ "{error}\n\n「ファイル > データの保存フォルダを開く」で pathways.db を消してから起動し直すと、同梱のデータに戻ります。": "{error}\n\nTo return to the bundled data, open \"File > Open data folder\", delete pathways.db, and restart the app.",
  "発現の測定 93 件": "93 expression measurements",
  "複合体 633 件": "633 complexes",
  "パラログ 488 組": "488 paralog pairs",

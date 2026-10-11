@@ -1,13 +1,13 @@
 """ブラウザ版（GitHub Pages に置く静的なファイル一式）を web_dist/ に作る。
 
-ブラウザの中の Python（Pyodide）で、デスクトップ版と同じ tor_app のコードを動かす。PyQt6 の代わりに、
+ブラウザの中の Python（Pyodide）で、デスクトップ版と同じ pathways_app のコードを動かす。PyQt6 の代わりに、
 webapp/shim/PyQt6/ の互換層（Qt の部品を HTML で作る）を読み込ませる。
 
 作るもの（web_dist/）:
 - index.html・boot.js・qt.css: 読み込みの画面と、Pyodide を起動する JavaScript
-- app.zip: tor_app の .py・互換層・networkx・data/ の小さいファイル（Pyodide の中で /app に展開する）
+- app.zip: pathways_app の .py・互換層・networkx・data/ の小さいファイル（Pyodide の中で /app に展開する）
 - data/*.db.gz: 地図の DB と発現の DB（GitHub Pages は 1 ファイル 100MB まで。圧縮して置き、ブラウザで展開する）
-- tor_app/web/: 地図のページ（表示枠ごとに iframe で開く。qrc:// の qwebchannel.js は互換のものに差し替える）
+- pathways_app/web/: 地図のページ（表示枠ごとに iframe で開く。qrc:// の qwebchannel.js は互換のものに差し替える）
 - version.json: 版（ファイルの取り直しの判定に使う）
 
 使い方: python tools/build_web.py            （web_dist/ を作る）
@@ -28,7 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "web_dist"
 WEBAPP = ROOT / "webapp"
-BIG_DATA = ("tor_pathway.db", "expression.db")   # 圧縮して別に置く
+BIG_DATA = ("pathways.db", "expression.db")   # 圧縮して別に置く
 SMALL_DATA_SUFFIXES = (".csv", ".tsv", ".json")
 
 
@@ -48,8 +48,8 @@ def _add_tree(zf: zipfile.ZipFile, src: Path, arc: str) -> None:
 
 def build_app_zip(dest: Path) -> None:
     with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
-        # tor_app の Python（地図のページ tor_app/web/ は iframe で開くので zip には入れない）
-        for path in sorted((ROOT / "tor_app").rglob("*.py")):
+        # pathways_app の Python（地図のページ pathways_app/web/ は iframe で開くので zip には入れない）
+        for path in sorted((ROOT / "pathways_app").rglob("*.py")):
             if "__pycache__" not in path.parts:
                 zf.write(path, path.relative_to(ROOT).as_posix())
         _add_tree(zf, WEBAPP / "shim", "shim")
@@ -66,7 +66,7 @@ def build_app_zip(dest: Path) -> None:
                 zf.writestr("data/server.json", json.dumps({"base_url": ""}))
             elif path.suffix in SMALL_DATA_SUFFIXES:
                 zf.write(path, f"data/{path.name}")
-        # 英語の訳の辞書（tor_app/i18n.py が読む）
+        # 英語の訳の辞書（pathways_app/i18n.py が読む）
         for path in sorted((ROOT / "data" / "i18n" / "en").glob("*.json")):
             zf.write(path, f"data/i18n/en/{path.name}")
 
@@ -103,8 +103,8 @@ def build(out: Path = OUT) -> dict:
             f.write(raw)
         sizes[name] = len(raw)
     # 地図のページ（表示枠ごとの iframe）。Qt の qwebchannel.js は互換のものに差し替える
-    web = out / "tor_app" / "web"
-    shutil.copytree(ROOT / "tor_app" / "web", web, ignore=shutil.ignore_patterns(".*"))
+    web = out / "pathways_app" / "web"
+    shutil.copytree(ROOT / "pathways_app" / "web", web, ignore=shutil.ignore_patterns(".*"))
     html = (web / "network.html").read_text(encoding="utf-8")
     html = html.replace("qrc:///qtwebchannel/qwebchannel.js", "qwebchannel.js")
     # 地図のページの JS・CSS は、中身が変わったら取り直させる（ブラウザが古いものを覚えていると、Python 側と食い違う）

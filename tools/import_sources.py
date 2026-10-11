@@ -1,4 +1,4 @@
-"""公開データベースの元データから同梱用 DB (data/tor_pathway.db) を作る。
+"""公開データベースの元データから同梱用 DB (data/pathways.db) を作る。
 
     python tools/import_sources.py
 
@@ -44,17 +44,17 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
 
-from tor_app import i18n  # noqa: E402
+from pathways_app import i18n  # noqa: E402
 i18n._language = "ja"   # DB の根拠欄などに書く名前（種類・条件など）は、画面の言語によらず日本語にする
 
 import condition_expression  # noqa: E402
 import deleteome  # noqa: E402
 import idea  # noqa: E402
-from tor_app import complex_groups  # noqa: E402
-from tor_app.db import Database  # noqa: E402
-from tor_app.db import csv_io  # noqa: E402
-from tor_app.db.models import Category, CategoryMember, Interaction, Protein  # noqa: E402
-from tor_app.db.vocab import (FEEDBACK, PARALOG_COLOR, PARALOG_SOURCE, guess_is_complex, resolve_effect,  # noqa: E402
+from pathways_app import complex_groups  # noqa: E402
+from pathways_app.db import Database  # noqa: E402
+from pathways_app.db import csv_io  # noqa: E402
+from pathways_app.db.models import Category, CategoryMember, Interaction, Protein  # noqa: E402
+from pathways_app.db.vocab import (FEEDBACK, PARALOG_COLOR, PARALOG_SOURCE, guess_is_complex, resolve_effect,  # noqa: E402
                               type_label)
 from sqlalchemy import select  # noqa: E402
 
@@ -216,7 +216,7 @@ def load_literature(folder: Path, name_to_gene: dict[str, str]) -> pd.DataFrame:
 
 def literature_problems(folder: Path, name_to_gene: dict[str, str]) -> list[list[str]]:
     """文献の CSV のうち、取り込めない・画面で困る行（SGD で特定できない遺伝子名、知らない interaction_type）を一覧にする。"""
-    from tor_app.db.vocab import INTERACTION_TYPES
+    from pathways_app.db.vocab import INTERACTION_TYPES
     out = []
     for path in sorted(folder.glob("*.csv")):
         table = pd.read_csv(path, dtype=str, keep_default_na=False)
@@ -245,7 +245,7 @@ def merge_curated(sgd: pd.DataFrame, curated: pd.DataFrame) -> pd.DataFrame:
     return sgd.reset_index(drop=True)
 
 
-# BioGRID の Modification 欄 → 制御の種類（tor_app/db/vocab.py の INTERACTION_TYPES）
+# BioGRID の Modification 欄 → 制御の種類（pathways_app/db/vocab.py の INTERACTION_TYPES）
 MODIFICATION_TYPES = {
     "Phosphorylation": "phosphorylation", "Dephosphorylation": "dephosphorylation",
     "Ubiquitination": "ubiquitination", "Deubiquitination": "deubiquitination",
@@ -932,7 +932,7 @@ def apply_condition_expression(frames: list[pd.DataFrame], name_to_gene: dict[st
     if not condition_expression.available():
         print("条件ごとの発現: data/expression.db か data/activity_markers.csv がないので使いません")
         return
-    from tor_app import conditions
+    from pathways_app import conditions
     labels = conditions.labels()
     activity, z = condition_expression.load(lambda n: name_to_gene.get(str(n).upper()))
     # 転写因子ごとの関門: 記録の向きのある関係と 10 本以上比べられて、一致が 65% 未満の転写因子は使わない
@@ -1000,9 +1000,9 @@ def collect_conditions(name_to_gene: dict[str, str], report: list) -> dict[tuple
       ファイル名が環境条件の群・小群（例: "Stress - Heat.tsv"、"Carbon source quality_availability.tsv"）
     - 細胞周期の時期: data/cell_cycle_tfs.csv の転写因子 → 標的の転写制御で、標的の発現の山（raw_data/CELL_CYCLE/peak_phase.tsv）が
       転写因子の働く時期と同じものに、その時期を付ける（例: MBP1 → CLB5 は G1 期）
-    条件の言葉は data/conditions.csv で当てはめる（tor_app/conditions.py）。
+    条件の言葉は data/conditions.csv で当てはめる（pathways_app/conditions.py）。
     """
-    from tor_app import conditions
+    from pathways_app import conditions
     found: dict[tuple[str, str, bool], dict[str, set[str]]] = {}
 
     def add(a, b, tx_only, keys, origin):
@@ -1072,7 +1072,7 @@ def collect_conditions(name_to_gene: dict[str, str], report: list) -> dict[tuple
 
 def apply_conditions(db: Database, found: dict) -> None:
     """集めた条件を DB の interactions.conditions に書き、根拠欄に出典を足す。"""
-    from tor_app import conditions
+    from pathways_app import conditions
     labels = conditions.labels()
     with db.session() as s, s.begin():
         ids = {p.gene_name: p.id for p in s.scalars(select(Protein))}
@@ -1102,7 +1102,7 @@ def apply_details(db: Database, name_to_gene: dict[str, str], report: list) -> N
     """文献の CSV の性質の列（partner・site など。vocab.DETAILS）を、同じ組・同じ種類の関係に入れる（reject の行は使わない）。
     同じ関係に文献の行がいくつもあれば、値を重ねずに ";" でつなぐ。1 つの値であるべき列（necessity・strength）が食い違えば
     両方を残し、根拠欄に ⚠ を付けて一覧に出す。種類の合う関係がなければ、その組の関係が 1 本だけのときはそれに入れる。"""
-    from tor_app.db.vocab import DETAILS, SINGLE_DETAILS
+    from pathways_app.db.vocab import DETAILS, SINGLE_DETAILS
     columns = [name for name, _ in DETAILS]
     values: dict[tuple[str, str, str], dict[str, list[str]]] = {}
     for path in sorted(LITERATURE.glob("*.csv")):
@@ -1163,7 +1163,7 @@ def main() -> None:
     parser.add_argument("--curated-proteins", type=Path, default=ROOT / "sample_data" / "proteins.csv")
     parser.add_argument("--curated-interactions", type=Path, default=None,
                         help="手作業の関係の CSV（既定は取り込まない。sample_data/interactions.csv は構造確認用）")
-    parser.add_argument("--out", type=Path, default=ROOT / "data" / "tor_pathway.db")
+    parser.add_argument("--out", type=Path, default=ROOT / "data" / "pathways.db")
     args = parser.parse_args()
 
     biogrid = args.biogrid or next(iter(sorted(RAW.glob(

@@ -1,6 +1,6 @@
 """遺伝子ごとの文献の裏どりの作業一覧（docs/curation/gene_worklist.tsv）と進み具合。
 
-遺伝子が「済み」とは、文献で確認した関係（確度 A。tor_app/confidence.py）に 1 本以上出てくるか、
+遺伝子が「済み」とは、文献で確認した関係（確度 A。pathways_app/confidence.py）に 1 本以上出てくるか、
 探したが論文が見つからなかった記録（docs/curation/genes_not_found.csv）があること（2026-10-04 に決めた）。
 
 まだの遺伝子を、手がかりの多い順に並べる:
@@ -23,9 +23,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from tor_app import confidence  # noqa: E402
+from pathways_app import confidence  # noqa: E402
 
-DB = ROOT / "data" / "tor_pathway.db"
+DB = ROOT / "data" / "pathways.db"
 LITERATURE = ROOT / "sample_data" / "literature"
 NOT_FOUND = ROOT / "docs" / "curation" / "genes_not_found.csv"
 BULK_MIN = 15

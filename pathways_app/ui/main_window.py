@@ -16,7 +16,7 @@ from . import help_text
 from .network_tab import NetworkTab
 from .sources_tab import SourcesTab
 
-# メニューの「使い方」: Help ボタンと同じ説明（tor_app/ui/help_text.py）に、データの保存場所を加える
+# メニューの「使い方」: Help ボタンと同じ説明（pathways_app/ui/help_text.py）に、データの保存場所を加える
 HELP_TEXT = f"<h2>{TITLE_HTML}</h2>" + help_text.ALL + i18n.pick("""<h3>データ</h3>
 <p>データベースはサーバー（公開しているブラウザ版の置き場）の版が正です。地図を軽く描くため、この PC にも写しを置いて使います。
 起動するたびにサーバーの版と照らし、新しい版があれば自動で入れ替えます（状態の帯に知らせます）。
@@ -49,7 +49,7 @@ def manual_url() -> str:
 
 
 ABOUT_TEXT = (
-    "<b>Pathways Viewer for Saccharomyces cerevisiae</b><br>"
+    "<b>Pathways viewer for <i>Saccharomyces cerevisiae</i></b><br>"
     "Copyright (C) 2026 Rai Katsukawa<br>"
     + i18n.pick(
         f"連絡先: <a href='mailto:{CONTACT}'>{CONTACT}</a><br><br>"
@@ -263,7 +263,7 @@ class MainWindow(QMainWindow):
             db.proteins()  # 接続確認
         except Exception as e:  # noqa: BLE001 - 破損などを利用者に伝える
             QMessageBox.critical(self, i18n.tr("DB を開けません"),
-                                 i18n.tr("{error}\n\n「ファイル > データの保存フォルダを開く」で tor_pathway.db を消してから起動し直すと、同梱のデータに戻ります。", error=e))
+                                 i18n.tr("{error}\n\n「ファイル > データの保存フォルダを開く」で pathways.db を消してから起動し直すと、同梱のデータに戻ります。", error=e))
             return False
         self.db = db
         self.db_tab.set_database(db)

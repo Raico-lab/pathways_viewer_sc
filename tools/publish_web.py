@@ -3,7 +3,7 @@
 公開用のリポジトリ（webapp/site.json の repo。中身は書き出したものだけで、ソースは置かない）に:
 - gh-pages ブランチ: tools/build_web.py で作った web_dist/ の中身（毎回 1 つのコミットで置き換える。履歴に DB を溜めない）
 - gh-pages ブランチの一番上に、デスクトップ版が起動時に照らすもの（data/server.json の base_url がここを指す）:
-  manifest.json（DB の版・ハッシュ・取り先 data/tor_pathway.db.gz）と、情報源タブの papers.json・sources.json
+  manifest.json（DB の版・ハッシュ・取り先 data/pathways.db.gz）と、情報源タブの papers.json・sources.json
 - Releases の「desktop」: Windows 版・Mac 版のインストーラー（--desktop のとき。ソースのリポジトリの Actions「build」の
   最新の成功した成果物を、決まった名前 PathwaysViewer-windows-setup.exe・PathwaysViewer-mac.dmg で置き換える）
 
@@ -28,7 +28,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import build_web  # noqa: E402
 
 sys.path.insert(0, str(ROOT))
-from tor_app.server import SCHEMA_VERSION  # noqa: E402
+from pathways_app.server import SCHEMA_VERSION  # noqa: E402
 
 SITE_FILE = ROOT / "webapp" / "site.json"
 SOURCE_REPO = "Raico-lab/signal-pathway-viewer"
@@ -116,11 +116,11 @@ def desktop_info(repo: str) -> dict:
 
 
 def write_server_files(out: Path, version: dict, notes: str) -> None:
-    """デスクトップ版がサーバーとして読むもの（tor_app/server.py）: DB の版の manifest.json と、情報源の情報。"""
-    db = ROOT / "data" / "tor_pathway.db"
+    """デスクトップ版がサーバーとして読むもの（pathways_app/server.py）: DB の版の manifest.json と、情報源の情報。"""
+    db = ROOT / "data" / "pathways.db"
     manifest = {"data_version": f"{version['built_at']}（{version.get('commit', '')}）",
                 "schema_version": SCHEMA_VERSION, "sha256": hashlib.sha256(db.read_bytes()).hexdigest(),
-                "url": "data/tor_pathway.db.gz", "notes": notes}
+                "url": "data/pathways.db.gz", "notes": notes}
     (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     for name in ("papers.json", "sources.json"):
         shutil.copy2(ROOT / "data" / name, out / name)

@@ -21,7 +21,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DB = ROOT / "data" / "tor_pathway.db"
+DB = ROOT / "data" / "pathways.db"
 EXPRESSION_DB = ROOT / "data" / "expression.db"
 CURATION = ROOT / "sample_data" / "literature"
 OUT = ROOT / "data" / "papers.json"

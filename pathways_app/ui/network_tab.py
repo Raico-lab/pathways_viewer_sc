@@ -1354,7 +1354,7 @@ class NetworkTab(QWidget):
 
     def _build_relation_panel(self) -> QWidget:
         """左の「経路」タブ: 注目・拡張している遺伝子のうちチェックしたものが、どの経路でどう関わるかを一覧にする。
-        一覧の経路を選ぶと地図で強調する（tor_app/relation_paths.py）。上の行で表示経路を選び、名前で絞り込む
+        一覧の経路を選ぶと地図で強調する（pathways_app/relation_paths.py）。上の行で表示経路を選び、名前で絞り込む
         （遺伝子の一覧と経路の一覧の両方）。題名は一覧の外（上）に置く。"""
         panel = QWidget()
         layout = QVBoxLayout(panel)
@@ -2558,7 +2558,7 @@ class NetworkTab(QWidget):
         return button
 
     def show_help(self, topic: str) -> None:
-        """右側の説明欄に使い方を出す（tor_app/ui/help_text.py）。"""
+        """右側の説明欄に使い方を出す（pathways_app/ui/help_text.py）。"""
         self.selected = None
         self._set_controls([])
         self.detail.setHtml(help_text.TOPICS[topic])
@@ -2645,7 +2645,7 @@ class NetworkTab(QWidget):
 
     def _edge_items(self, edges, shown: set[int]) -> list[tuple[tuple, str]]:
         """上流・下流の一覧の行（並べ替えの鍵, HTML）。論文が複合体の名前で書いた関係（構成遺伝子ごとに広げてある。
-        tor_app/complex_groups.py）は、遺伝子ごとに並べず「TORC1 → RPC82」の 1 行にまとめ、先頭に並べる（リンクは代表の関係）。"""
+        pathways_app/complex_groups.py）は、遺伝子ごとに並べず「TORC1 → RPC82」の 1 行にまとめ、先頭に並べる（リンクは代表の関係）。"""
         items, grouped = [], {}
         for it in edges:
             marks = complex_groups.parse(it.evidence)

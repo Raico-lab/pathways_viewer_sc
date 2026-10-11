@@ -1,4 +1,4 @@
-"""条件ごとの発現・リン酸化の DB（data/expression.db）を作る。地図の DB（tor_pathway.db）とは別のファイル。
+"""条件ごとの発現・リン酸化の DB（data/expression.db）を作る。地図の DB（pathways.db）とは別のファイル。
 
 情報源と対応表:
 - mRNA: SGD の発現データ（SPELL、raw_data/SPELL/datasets/）。対応表 data/expression_sources.csv の 1 行が 1 つの測定

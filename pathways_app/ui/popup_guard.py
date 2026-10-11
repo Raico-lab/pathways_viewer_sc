@@ -13,7 +13,7 @@ from PyQt6.QtCore import QEvent, QObject, Qt, QTimer
 from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import QApplication, QComboBox
 
-from tor_app.paths import user_data_dir
+from pathways_app.paths import user_data_dir
 
 CHECK_MS = 250             # 押してから、開いたかを確かめるまでの時間
 LOG_MAX_BYTES = 200_000    # 記録がこれを超えたら古い分を捨てる

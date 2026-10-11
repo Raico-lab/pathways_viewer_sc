@@ -67,7 +67,7 @@ class Interaction(Base):
     weight: Mapped[float] = mapped_column(Float, default=1.0)
     signal_threshold_rule: Mapped[str] = mapped_column(Text, default="")
     evidence: Mapped[str] = mapped_column(Text, default="")
-    # 関係が働く条件（tor_app/conditions.py のキーを ";" でつないだもの。記録がなければ空）
+    # 関係が働く条件（pathways_app/conditions.py のキーを ";" でつないだもの。記録がなければ空）
     conditions: Mapped[str] = mapped_column(Text, default="")
     # 文献から拾った関係の性質（docs/curation/literature_fields.md。文献の関係だけに入る。複数は ";"。列の名前は vocab.DETAILS）
     partner: Mapped[str] = mapped_column(Text, default="")          # 組む相手（サイクリン・調節サブユニットなど）

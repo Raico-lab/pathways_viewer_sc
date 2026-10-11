@@ -143,7 +143,7 @@ async function boot() {
   })();
   const files = Promise.all([
     fetchBytes(`app.zip?v=${v}`),
-    fetchBytes(`data/tor_pathway.db.gz?v=${v}`),
+    fetchBytes(`data/pathways.db.gz?v=${v}`),
     fetchBytes(`data/expression.db.gz?v=${v}`),
   ]);
   const [pyodide, [appZip, dbGz, exprGz]] = await Promise.all([pyodideReady, files]);
@@ -152,7 +152,7 @@ async function boot() {
   const FS = pyodide.FS;
   window.pvPyodide = pyodide;   // 調べるとき用（開発者ツールから Python を動かせる）
   pyodide.unpackArchive(appZip, "zip", { extractDir: "/app" });
-  FS.writeFile("/app/data/tor_pathway.db", await gunzip(dbGz));
+  FS.writeFile("/app/data/pathways.db", await gunzip(dbGz));
   FS.writeFile("/app/data/expression.db", await gunzip(exprGz));
   FS.mkdirTree(PERSIST_DIR);
   FS.mount(FS.filesystems.IDBFS, {}, PERSIST_DIR);

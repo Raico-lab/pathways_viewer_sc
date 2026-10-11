@@ -4,7 +4,7 @@
 同じところが出すもの（SGD と SGD SPELL、BioGRID と PhosphoGRID）は includes で 1 つにまとめ、cite にサイトが引用を求める論文を並べる。
 論文: data/papers.json（tools/fetch_paper_list.py が作る。1 本ずつ書誌と URL）。
 10 本ずつのページに分け（枠の縦幅に収まらないときはスクロール）、題名で絞り込める。サイトの本数は DB を開いたときに数える。
-サーバーがあれば、論文・サイトの情報はサーバーのものを使う（tor_app/server.py。取れるまでは手元の写しか同梱のもの）。
+サーバーがあれば、論文・サイトの情報はサーバーのものを使う（pathways_app/server.py。取れるまでは手元の写しか同梱のもの）。
 """
 import html
 import re

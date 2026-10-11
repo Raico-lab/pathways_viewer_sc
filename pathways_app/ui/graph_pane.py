@@ -218,7 +218,7 @@ class GraphPane(QFrame):
         self.bridge.filterReset.connect(self.filterReset)
         self.bridge.displayOptionChanged.connect(self.displayOptionChanged)
         # 画面の言語を地図のページに渡す（network.html の側で ?lang= を読む）
-        url = QUrl.fromLocalFile(str(resource_path("tor_app", "web", "network.html")))
+        url = QUrl.fromLocalFile(str(resource_path("pathways_app", "web", "network.html")))
         url.setQuery(f"lang={i18n.language()}")
         self.view.setUrl(url)
 
@@ -682,7 +682,7 @@ class GraphPane(QFrame):
 
     def show_relation(self, pids: list[int], mode: str, steps: int, anchor: int | None = None) -> str:
         """左の「経路」タブの設定で経路の一覧を求め、その経路を地図で目立たせる。結果の説明を返す。
-        経路はちょうど steps 段のものだけ（tor_app/relation_paths.py）。mode が "off" なら普段の地図に戻す。"""
+        経路はちょうど steps 段のものだけ（pathways_app/relation_paths.py）。mode が "off" なら普段の地図に戻す。"""
         if mode == "off":
             self.clear_relation()
             return ""

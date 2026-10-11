@@ -4,7 +4,7 @@
     .venv/bin/python tools/check_conditions.py --list      # 書ける言葉の一覧（群ごと）
 
 行ごとに、当てはまった条件（細胞周期の時期も含む）を出し、当てはまらない行を最後にまとめる。
-当てはめ方は取り込み（tools/import_sources.py）と同じ（tor_app/conditions.py の classify。"/" では分けない）。
+当てはめ方は取り込み（tools/import_sources.py）と同じ（pathways_app/conditions.py の classify。"/" では分けない）。
 """
 import argparse
 import csv
@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from tor_app import conditions  # noqa: E402
+from pathways_app import conditions  # noqa: E402
 
 
 def show_list() -> None:

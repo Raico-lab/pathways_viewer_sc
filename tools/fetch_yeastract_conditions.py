@@ -1,6 +1,6 @@
 """YEASTRACT+ の Regulation Matrix から、環境条件（群・小群）ごとの転写制御の表を取る。
 
-関係が働く条件（tor_app/conditions.py）を付けるのに使う。群・小群の一覧は Regulation Matrix の画面から読み、
+関係が働く条件（pathways_app/conditions.py）を付けるのに使う。群・小群の一覧は Regulation Matrix の画面から読み、
 小群ごとに 1 回問い合わせて、raw_data/YEASTRACT/conditions/「群 - 小群.tsv」（"/" は "_"）に
 「転写因子<TAB>標的」の 2 列で保存する。記録がなければ空のファイルを置く（取得済みの印）。
 

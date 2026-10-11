@@ -1,16 +1,16 @@
 # Data sources and licenses / データの出典と利用条件
 
-The source code of Pathways Viewer is licensed under GPLv3 (`LICENSE`). **The data bundled with it (`data/`) are NOT covered by
+The source code of Pathways viewer is licensed under GPLv3 (`LICENSE`). **The data bundled with it (`data/`) are NOT covered by
 the GPL**; each data set remains under the terms of its original source listed below. The data were processed (selected,
 merged, summarized) for this tool. Please cite the original sources when you use the data.
 
-Pathways Viewer のソースコードは GPLv3（`LICENSE`）です。**同梱のデータ（`data/`）には GPL は及びません。** それぞれ元の出典の条件のままです。
+Pathways viewer のソースコードは GPLv3（`LICENSE`）です。**同梱のデータ（`data/`）には GPL は及びません。** それぞれ元の出典の条件のままです。
 データはこのツールのために加工（選択・統合・要約）しています。使うときは元の出典を引用してください。アプリの「情報源」タブにも、
 サイトごとの利用条件と、サイトが引用を求める論文、参考にした論文を並べています。
 
 （2026-10-07 に各出典の公式の記載を確かめた。下の「根拠」は公式のページの記載）
 
-## 地図の DB（`data/tor_pathway.db`）
+## 地図の DB（`data/pathways.db`）
 
 | 出典 | 使っているもの | 利用条件と根拠 | 必要な表記・引用 |
 |---|---|---|---|
@@ -45,12 +45,12 @@ YEASTRACT+ の代わりにデータを配ることは目的にしていない。
 - 取得: Regulation Matrix（Documented。DNA binding and/or expression evidence・TF acting as activator / inhibitor）を 2026-10-01・02 に、
   環境条件の小群ごとの関係を 2026-10-03・04 に取得した（`raw_data/YEASTRACT/README.md`）。
 - 経路の説明欄に、YEASTRACT+ のその組の根拠のページ（`view.php?existing=regulation&proteinname=<TF>&orfname=<標的>`。論文・実験・条件の一覧）へのリンクを出す。
-- データベースタブの CSV の書き出しでは、YEASTRACT+ だけが根拠の経路（2026-10-11 時点で 49,887 本）を書き出さない（`tor_app/db/csv_io.py` の `yeastract_only`）。
+- データベースタブの CSV の書き出しでは、YEASTRACT+ だけが根拠の経路（2026-10-11 時点で 49,887 本）を書き出さない（`pathways_app/db/csv_io.py` の `yeastract_only`）。
   文献・SGD・BioGRID など、ほかの出典もある経路は書き出す。
 - 条件の分類（群・小群）は YEASTRACT+ のもの。日本語の名前はこのプロジェクトで付けた。
 - 3 節ではデータの持ち主は元の論文の著者とされるが、Regulation Matrix には論文が含まれないので、YEASTRACT+ だけが根拠の経路には元の論文（PMID）が付いていない。
   元の論文は、説明欄のリンク先（YEASTRACT+ の組ごとのページ）で見られる。論文を DB に取り込むかは、YEASTRACT+ への問い合わせの返事で決める。
-- ブラウザ版は動作のために DB（`data/tor_pathway.db.gz`）を読み込むので、そのファイルは公開先から取得できる。
+- ブラウザ版は動作のために DB（`data/pathways.db.gz`）を読み込むので、そのファイルは公開先から取得できる。
 
 ## そのほか
 

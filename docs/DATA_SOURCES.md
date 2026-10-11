@@ -58,8 +58,8 @@ DB の作り直し:
 .venv/bin/python tools/import_sources.py
 ```
 
-`raw_data/` の元データと `sample_data/` の精査済み CSV から `data/tor_pathway.db` を作る。
-アプリに同梱されるのは `data/tor_pathway.db` だけで、`raw_data/` は同梱しない。
+`raw_data/` の元データと `sample_data/` の精査済み CSV から `data/pathways.db` を作る。
+アプリに同梱されるのは `data/pathways.db` だけで、`raw_data/` は同梱しない。
 
 ## 酵素-基質の関係の「種類」と「作用」を補う
 

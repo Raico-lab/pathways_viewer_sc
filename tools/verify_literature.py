@@ -27,7 +27,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 import sys  # noqa: E402
 sys.path.insert(0, str(ROOT))
-from tor_app import complex_groups  # noqa: E402
+from pathways_app import complex_groups  # noqa: E402
 
 SGD = ROOT / "raw_data" / "SGD_features.tab"
 PROTEIN_NAMES = ROOT / "data" / "protein_names.csv"

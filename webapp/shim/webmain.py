@@ -57,7 +57,7 @@ def _urlopen(request, data=None, timeout=None, **_kw):
         raise urllib.error.URLError(str(e)) from None
     status = int(xhr.status)
     if status == 0:
-        from tor_app import i18n
+        from pathways_app import i18n
         raise urllib.error.URLError(i18n.pick("接続できませんでした", "Could not connect"))
     if status >= 400:
         raise urllib.error.HTTPError(url, status, str(xhr.statusText), None, None)
@@ -74,7 +74,7 @@ def desktop_html() -> str:
     """「デスクトップアプリ」のタブ: Windows 版・Mac 版のダウンロードと、ダウンロードした後の開き方。
     どちらも署名していないアプリなので、初めて開くときは OS の警告を越える手順が要る（OS ごとのカードに書く）。
     文は日本語と英語の両方を書き、画面の言語で選ぶ（i18n.pick）。"""
-    from tor_app import i18n
+    from pathways_app import i18n
     t = i18n.pick
     repo = SITE.get("repo", "")
     version = SITE.get("desktop_version", "")
@@ -142,7 +142,7 @@ def add_desktop_tab(window) -> None:
     view.setOpenLinks(False)
     view.anchorClicked.connect(lambda url: js.window.open(url.toString(), "_blank", "noopener"))
     view.setHtml(desktop_html())
-    from tor_app import i18n
+    from pathways_app import i18n
     window.tabs.addTab(view, i18n.tr("デスクトップアプリ"))
 
 
@@ -207,7 +207,7 @@ def main() -> None:
 
 
 def _open_window() -> None:
-    from tor_app.ui.main_window import MainWindow
+    from pathways_app.ui.main_window import MainWindow
     window = MainWindow()
     # デスクトップ版はしばらく配信しないので、「デスクトップアプリ」のタブは出さない（再開するときは add_desktop_tab(window)）
     _keep.append(window)
