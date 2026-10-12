@@ -59,7 +59,11 @@ def ensure_pages(repo: str) -> None:
     if subprocess.run(["gh", "api", f"repos/{repo}/pages"], capture_output=True).returncode == 0:
         return
     print("GitHub Pages を有効にします（gh-pages ブランチ）")
-    run("gh", "api", "-X", "POST", f"repos/{repo}/pages", "-f", "source[branch]=gh-pages", "-f", "source[path]=/")
+    # gh-pages を初めて push すると GitHub が自動で有効にすることがある（そのときは 409 が返る）
+    result = subprocess.run(["gh", "api", "-X", "POST", f"repos/{repo}/pages", "-f", "source[branch]=gh-pages",
+                             "-f", "source[path]=/"], capture_output=True, text=True)
+    if result.returncode != 0 and "already enabled" not in result.stdout + result.stderr:
+        raise SystemExit(f"GitHub Pages を有効にできませんでした: {result.stdout or result.stderr}")
 
 
 def update_desktop(repo: str, local: Path | None = None) -> None:
