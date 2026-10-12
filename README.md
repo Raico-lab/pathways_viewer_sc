@@ -6,7 +6,7 @@ A desktop and browser app that maps regulatory paths between budding yeast genes
 regulation, binding, etc.) and lets you explore what lies upstream and downstream of a gene and which paths connect genes.
 It covers all genes. The UI is available in Japanese and English.
 
-- Browser version: https://raico-lab.github.io/pathways-viewer/
+- Browser version: https://raico-lab.github.io/pathways_viewer_sc/
 - User guide: [docs/MANUAL.en.md](docs/MANUAL.en.md) (Japanese: [docs/MANUAL.md](docs/MANUAL.md))
 - License: source code under the GNU GPL v3 ([LICENSE](LICENSE)). Bundled data are not covered by the GPL; see
   [DATA_LICENSES.md](DATA_LICENSES.md) for sources and terms of use. Transcriptional regulation data from YEASTRACT+ are used
@@ -46,7 +46,7 @@ The source code is licensed under the GNU GPL v3 ([LICENSE](LICENSE)). Bundled d
 
 ## データ（サーバーの版が正）
 
-DB はサーバー（ブラウザ版の置き場 https://raico-lab.github.io/pathways-viewer/ 。`data/server.json` の `base_url`）の版が正です。
+DB はサーバー（ブラウザ版の置き場 https://raico-lab.github.io/pathways_viewer_sc/ 。`data/server.json` の `base_url`）の版が正です。
 地図を軽く描くため、各 PC には写しを置いて使い、データベースタブは閲覧だけです（追加・編集・削除はしない）。
 
 - 起動のたびに、サーバーの `manifest.json`（DB の版とハッシュ）と照らし、新しい版があれば尋ねずに入れ替えます（状態の帯に知らせる）。

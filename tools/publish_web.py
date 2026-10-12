@@ -1,6 +1,6 @@
 """ブラウザ版を GitHub Pages に公開し、デスクトップ版のインストーラーを Releases に置く。
 
-公開用のリポジトリ（webapp/site.json の repo。中身は書き出したものだけで、ソースは置かない）に:
+公開先は webapp/site.json の repo（ソースのリポジトリと同じ。2026-10-12 にソースとブラウザ版の置き場を 1 つにまとめた）に:
 - gh-pages ブランチ: tools/build_web.py で作った web_dist/ の中身（毎回 1 つのコミットで置き換える。履歴に DB を溜めない）
 - gh-pages ブランチの一番上に、デスクトップ版が起動時に照らすもの（data/server.json の base_url がここを指す）:
   manifest.json（DB の版・ハッシュ・取り先 data/pathways.db.gz）と、情報源タブの papers.json・sources.json
@@ -13,6 +13,9 @@
   python tools/publish_web.py --installers <フォルダ>   取ってあるインストーラーを使う
   python tools/publish_web.py --dry-run   作るだけで、公開しない
 初めて使うとき、公開用のリポジトリがなければ作り、GitHub Pages を有効にする。公開先は https://<owner>.github.io/<repo>/。
+
+site.json の legacy_repo（以前のブラウザ版の置き場 pathways-viewer）の gh-pages には、新しい URL へ転送するページと、
+インストール済みのデスクトップ版が今も照らす manifest.json・DB・情報源の情報だけを毎回置く。
 """
 import argparse
 import hashlib
@@ -31,7 +34,6 @@ sys.path.insert(0, str(ROOT))
 from pathways_app.server import SCHEMA_VERSION  # noqa: E402
 
 SITE_FILE = ROOT / "webapp" / "site.json"
-SOURCE_REPO = "Raico-lab/signal-pathway-viewer"
 RELEASE_TAG = "desktop"
 ASSETS = {"windows-setup.exe": "PathwaysViewer-windows-setup.exe", "mac.dmg": "PathwaysViewer-mac.dmg"}
 
@@ -67,7 +69,7 @@ def update_desktop(repo: str, local: Path | None = None) -> None:
         if local is not None:
             source, sha = local, ""
         else:
-            runs = gh_json("run", "list", "-R", SOURCE_REPO, "--workflow", "build", "--status", "success", "-L", "1",
+            runs = gh_json("run", "list", "-R", repo, "--workflow", "build", "--status", "success", "-L", "1",
                            "--json", "databaseId,headSha")
             if not runs:
                 raise SystemExit("成功した build が見つかりません")
@@ -76,7 +78,7 @@ def update_desktop(repo: str, local: Path | None = None) -> None:
             print(f"build {run_id}（{sha}）の成果物を取ってきます")
             for attempt in range(3):   # 大きいので途中で切れることがある
                 shutil.rmtree(source, ignore_errors=True)
-                if subprocess.run(["gh", "run", "download", str(run_id), "-R", SOURCE_REPO, "-D", str(source)]).returncode == 0:
+                if subprocess.run(["gh", "run", "download", str(run_id), "-R", repo, "-D", str(source)]).returncode == 0:
                     break
                 print("取り直します")
             else:
@@ -92,7 +94,7 @@ def update_desktop(repo: str, local: Path | None = None) -> None:
                     files.append(dest)
         if len(files) != len(ASSETS):
             raise SystemExit(f"インストーラーが足りません: {[f.name for f in files]}")
-        notes = f"デスクトップ版 {version}（{SOURCE_REPO} の {sha}）"
+        notes = f"デスクトップ版 {version}（{repo} の {sha}）"
         if subprocess.run(["gh", "release", "view", RELEASE_TAG, "-R", repo], capture_output=True).returncode != 0:
             run("gh", "release", "create", RELEASE_TAG, "-R", repo, "--target", "gh-pages", "--title", "デスクトップアプリ",
                 "--notes", notes,
@@ -124,6 +126,24 @@ def write_server_files(out: Path, version: dict, notes: str) -> None:
     (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     for name in ("papers.json", "sources.json"):
         shutil.copy2(ROOT / "data" / name, out / name)
+
+
+REDIRECT_HTML = """<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pathways viewer for Saccharomyces cerevisiae</title>
+<link rel="canonical" href="{url}"><meta http-equiv="refresh" content="0; url={url}">
+<script>location.replace("{url}" + location.search + location.hash);</script></head>
+<body><p>移転しました / This page has moved: <a href="{url}">{url}</a></p></body></html>
+"""
+
+
+def write_legacy_site(dest: Path, out: Path, new_url: str) -> None:
+    """以前の置き場に置くもの: 新しい URL への転送のページと、デスクトップ版が照らすもの（manifest・DB・情報源）。"""
+    (dest / "data").mkdir(parents=True)
+    (dest / "index.html").write_text(REDIRECT_HTML.format(url=new_url), encoding="utf-8")
+    for name in ("manifest.json", "papers.json", "sources.json", "version.json"):
+        shutil.copy2(out / name, dest / name)
+    shutil.copy2(out / "data" / "pathways.db.gz", dest / "data" / "pathways.db.gz")
 
 
 def push_pages(repo: str, out: Path) -> None:
@@ -168,7 +188,12 @@ def main() -> int:
         write_version()                # ダウンロードのタブに新しい版と大きさを出す
         push_pages(repo, build_web.OUT)
     owner, name = repo.split("/")
-    print(f"公開しました: https://{owner.lower()}.github.io/{name}/（反映まで 1〜2 分かかります）")
+    url = f"https://{owner.lower()}.github.io/{name}/"
+    if site.get("legacy_repo"):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_legacy_site(Path(tmp) / "legacy", build_web.OUT, url)
+            push_pages(site["legacy_repo"], Path(tmp) / "legacy")
+    print(f"公開しました: {url}（反映まで 1〜2 分かかります）")
     return 0
 
 

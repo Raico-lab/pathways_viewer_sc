@@ -36,7 +36,7 @@ class _Done(QObject):
 
 
 # 「ヘルプ > このアプリについて」: 著作権・ライセンス・保証がないこと・ソースの場所（GPLv3 の第 5 条 d が求める表示）
-SOURCE_URL = "https://github.com/Raico-lab/signal-pathway-viewer"
+SOURCE_URL = "https://github.com/Raico-lab/pathways_viewer_sc"
 CONTACT = "25wm2519@student.gs.chiba-u.jp"   # 連絡先（作者）
 MANUAL_URL = SOURCE_URL + "/blob/main/docs/MANUAL.md"   # 画像付きの操作ガイド（docs/MANUAL.md）
 MANUAL_URL_EN = SOURCE_URL + "/blob/main/docs/MANUAL.en.md"   # 英語版（docs/MANUAL.en.md）

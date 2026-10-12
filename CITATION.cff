@@ -6,8 +6,8 @@ authors:
   - family-names: "Katsukawa"
     given-names: "Rai"
 license: GPL-3.0-only
-repository-code: "https://github.com/Raico-lab/signal-pathway-viewer"
-url: "https://raico-lab.github.io/pathways-viewer/"
+repository-code: "https://github.com/Raico-lab/pathways_viewer_sc"
+url: "https://raico-lab.github.io/pathways_viewer_sc/"
 version: "2026.10.07"
 date-released: "2026-10-07"
 keywords:

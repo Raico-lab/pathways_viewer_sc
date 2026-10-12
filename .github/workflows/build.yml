@@ -6,6 +6,8 @@
 name: build
 on:
   push:
+    branches: [main]   # gh-pages（ブラウザ版の置き場）への push ではビルドしない
+    tags: ["v*"]
   workflow_dispatch:
 permissions:
   contents: write
