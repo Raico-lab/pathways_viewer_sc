@@ -151,7 +151,8 @@ textarea.qtextedit { padding: 4px 6px; resize: vertical; }
 .qsplitter { display: flex; }
 .qsplitter.h { flex-direction: row; }
 .qsplitter.v { flex-direction: column; }
-.qsplitter > .qw { display: flex; flex-direction: column; overflow: hidden; }
+.qsplitter > .qw { display: flex; overflow: hidden; }
+.qsplitter > .qw:not(.qsplitter) { flex-direction: column; }   /* 分割の中の分割は、自分の向き（.h・.v）のままにする */
 .qsplitter-handle { flex: 0 0 6px; background: transparent; position: relative; }
 .qsplitter.h > .qsplitter-handle { cursor: col-resize; }
 .qsplitter.v > .qsplitter-handle { cursor: row-resize; }
