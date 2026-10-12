@@ -1,10 +1,9 @@
-"""CSV 一括インポート／エクスポート。Excel で扱えるよう UTF-8 (BOM 付き) で書き出し、読み込みは Shift_JIS も受け付ける。
+"""CSV 一括インポート（DB を作る道具で使う）。読み込みは UTF-8 と Shift_JIS を受け付ける。
+アプリからの CSV の書き出しは、2026-10-12 に外した（データを配り直す形にしないため）。
 
-書き出し（アプリのデータベースタブ）は標準の csv で行い、pandas は読み込み（取り込みの道具）でだけ使う
-（配布するアプリに pandas・numpy を入れずに済むように。PathwaysViewer.spec で外している）。"""
+pandas は読み込みでだけ使う（配布するアプリに pandas・numpy を入れずに済むように。PathwaysViewer.spec で外している）。"""
 from __future__ import annotations
 
-import csv
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -12,7 +11,7 @@ from sqlalchemy import delete, select
 
 from .database import Database
 from .models import Interaction, Protein
-from .vocab import DETAILS, EFFECT_ALIASES, guess_threshold, resolve_effect
+from .vocab import DETAILS, EFFECT_ALIASES, guess_threshold
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -21,14 +20,6 @@ PROTEIN_COLUMNS = ["gene_name", "standard_name", "complex_category", "protein_pr
                    "description", "basal_activity"]
 INTERACTION_COLUMNS = ["source_protein", "target_protein", "interaction_type", "effect", "threshold",
                        "weight", "signal_threshold_rule", "evidence"]
-# 書き出す列。閾値・強度・閾値ルールはシミュレーション用で今は使わないので書き出さない（DB の列は残してある。archive/README.md）。
-# 読み込みでは、これらの列があれば今までどおり使い、なければ既定の値にする
-EXPORT_INTERACTION_COLUMNS = ["source_protein", "target_protein", "interaction_type", "effect", "evidence", "conditions"] \
-    + [name for name, _ in DETAILS]   # 条件（キーを ";" で）と、文献から拾った性質（組む相手・部位など）
-# 遺伝子の基底活性（basal_activity）もシミュレーション用なので書き出さない（読み込みでは、列があれば使う）
-# 遺伝子ごとのカテゴリ（complex_category）も、手作業の区分を外したので書き出さない
-EXPORT_PROTEIN_COLUMNS = ["gene_name", "standard_name", "protein_properties", "description"]
-
 # 列名のゆらぎを吸収する
 COLUMN_ALIASES = {
     "gene": "gene_name", "name": "gene_name", "遺伝子名": "gene_name",
@@ -189,42 +180,3 @@ def import_interactions(db: Database, df: pd.DataFrame, replace: bool) -> Import
                     setattr(it, name, row.get(name, "") or "")
         db.ensure_categories(s, ["未分類"] if report.created_proteins else [])
     return report
-
-
-def export_proteins(db: Database, path: str, ids: set[int] | None = None) -> None:
-    """ids を渡すと、その遺伝子だけを書き出す（データベースで絞り込んだ行）。"""
-    rows = [[p.gene_name, p.standard_name, p.protein_properties, p.description]
-            for p in db.proteins() if ids is None or p.id in ids]
-    _write(path, EXPORT_PROTEIN_COLUMNS, rows)
-
-
-# YEASTRACT+ 以外の出典の印。どれもなく YEASTRACT+ だけが根拠の経路は、CSV に書き出さない
-# （YEASTRACT+ の利用条件: 内容の相当部分を、YEASTRACT+ と競合する形で再公開しない。https://www.yeastract-plus.org/termsusage.php ）
-OTHER_SOURCES = ("文献で確認", "SGD GO", "GO-CAM", "BioGRID", "PhosphoGRID", "UniProt", "PMID")
-
-
-def yeastract_only(evidence: str | None) -> bool:
-    """根拠が YEASTRACT+ だけの経路か。"""
-    ev = evidence or ""
-    return "YEASTRACT" in ev and not any(mark in ev for mark in OTHER_SOURCES)
-
-
-def export_interactions(db: Database, path: str, ids: set[int] | None = None) -> tuple[int, int]:
-    """ids を渡すと、その制御関係だけを書き出す（データベースで絞り込んだ行）。
-    YEASTRACT+ だけが根拠の経路は書き出さない。戻り値は（書き出した数, 外した数）。"""
-    chosen = [it for it in db.interactions() if ids is None or it.id in ids]
-    kept = [it for it in chosen if not yeastract_only(it.evidence)]
-    rows = [[it.source.gene_name, it.target.gene_name, it.interaction_type,
-             resolve_effect(it.interaction_type, it.effect), it.evidence, it.conditions]
-            + [getattr(it, name) for name, _ in DETAILS]
-            for it in kept]
-    _write(path, EXPORT_INTERACTION_COLUMNS, rows)
-    return len(kept), len(chosen) - len(kept)
-
-
-def _write(path: str, columns: list[str], rows: list[list]) -> None:
-    """Excel で開けるよう UTF-8（BOM 付き）で書く。"""
-    with open(path, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.writer(f, lineterminator="\n")
-        writer.writerow(columns)
-        writer.writerows(["" if v is None else v for v in row] for row in rows)

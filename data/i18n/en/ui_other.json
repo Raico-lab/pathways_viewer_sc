@@ -187,7 +187,6 @@
  "出典": "Source",
  "遺伝子": "Genes",
  "カテゴリ": "Categories",
- "表示中の表を CSV エクスポート…": "Export shown table as CSV…",
  "前に表示した説明に戻る": "Back to the previous details",
  "次に表示した説明に進む": "Forward to the next details",
  "この説明欄の見方を表示します（◀ で戻れます）": "Show how to read this details panel (◀ to go back)",
@@ -201,10 +200,6 @@
  "複合体の説明（Complex Portal）": "Complex description (Complex Portal)",
  "・自動": " (auto)",
  "手作業": "manual",
- "CSV にエクスポート": "Export to CSV",
- "書き出せませんでした。\n{error}": "Could not export.\n{error}",
- "エクスポート完了": "Export complete",
- "{n} 件を {path} に保存しました。": "Saved {n} rows to {path}.",
  "経路の遺伝子": "Path genes",
  "枠{index}: {title}": "Panel {index}: {title}",
  "この枠は経路を固定して表示しています": "This panel shows fixed paths",
@@ -229,6 +224,5 @@
  "チェックした遺伝子から、別のチェックした遺伝子へ矢印の向きにたどれる経路。途中はどの遺伝子でもよく、1 段なら直接の経路": "Paths following the arrows from one checked gene to another. Any gene may be in between; one step means a direct path",
  "経路が多くなります": "Many paths",
  "表示すると経路が {edges} 本、遺伝子が {nodes} 個になり、経路の計算と描画に時間がかかることがあります。\n表示しますか？": "This view has {edges} paths and {nodes} genes, and may take time to route and draw.\nShow it?",
- "段数を減らすか、凡例のチェックで転写制御などの種類を隠すと、経路を減らせます。": "Reduce the steps, or hide types such as transcriptional regulation in the legend, to get fewer paths.",
- "YEASTRACT+ だけが根拠の経路 {n} 本は書き出していません（YEASTRACT+ の利用条件のため。根拠は各経路の説明欄から YEASTRACT+ で見られます）。": "{n} paths supported only by YEASTRACT+ were not exported (per the YEASTRACT+ terms of use; their evidence can be viewed on YEASTRACT+ from each path's details)."
+ "段数を減らすか、凡例のチェックで転写制御などの種類を隠すと、経路を減らせます。": "Reduce the steps, or hide types such as transcriptional regulation in the legend, to get fewer paths."
 }

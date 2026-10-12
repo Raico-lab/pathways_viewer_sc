@@ -45,8 +45,7 @@ YEASTRACT+ の代わりにデータを配ることは目的にしていない。
 - 取得: Regulation Matrix（Documented。DNA binding and/or expression evidence・TF acting as activator / inhibitor）を 2026-10-01・02 に、
   環境条件の小群ごとの関係を 2026-10-03・04 に取得した（`raw_data/YEASTRACT/README.md`）。
 - 経路の説明欄に、YEASTRACT+ のその組の根拠のページ（`view.php?existing=regulation&proteinname=<TF>&orfname=<標的>`。論文・実験・条件の一覧）へのリンクを出す。
-- データベースタブの CSV の書き出しでは、YEASTRACT+ だけが根拠の経路（2026-10-11 時点で 49,887 本）を書き出さない（`pathways_app/db/csv_io.py` の `yeastract_only`）。
-  文献・SGD・BioGRID など、ほかの出典もある経路は書き出す。
+- アプリから DB を CSV などで書き出す機能は置かない（2026-10-12 に外した）。
 - 条件の分類（群・小群）は YEASTRACT+ のもの。日本語の名前はこのプロジェクトで付けた。
 - 3 節ではデータの持ち主は元の論文の著者とされるが、Regulation Matrix には論文が含まれないので、YEASTRACT+ だけが根拠の経路には元の論文（PMID）が付いていない。
   元の論文は、説明欄のリンク先（YEASTRACT+ の組ごとのページ）で見られる。論文を DB に取り込むかは、YEASTRACT+ への問い合わせの返事で決める。

@@ -1,4 +1,4 @@
-"""① データベースタブ：一覧・絞り込み・説明・CSV への書き出し（閲覧だけ。DB はサーバーの版が正で、各 PC では編集しない）。"""
+"""① データベースタブ：一覧・絞り込み・説明（閲覧だけ。CSV には書き出さない。DB はサーバーの版が正で、各 PC では編集しない）。"""
 import html
 import time
 from contextlib import contextmanager
@@ -6,14 +6,13 @@ from contextlib import contextmanager
 from PyQt6.QtCore import (QAbstractTableModel, QEvent, QModelIndex, QObject, QPointF, QSortFilterProxyModel, Qt, QTimer,
                           QUrl, pyqtSignal)
 from PyQt6.QtGui import QBrush, QColor, QDesktopServices, QMouseEvent
-from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QCompleter, QFileDialog, QHBoxLayout, QHeaderView,
-                             QLabel, QLineEdit, QMenu, QMessageBox, QPushButton, QSpinBox, QSplitter, QTableView,
+from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QCompleter, QHBoxLayout, QHeaderView,
+                             QLabel, QLineEdit, QMenu, QPushButton, QSpinBox, QSplitter, QTableView,
                              QTabWidget, QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout,
                              QWidget, QWidgetAction)
 
 from .. import conditions, i18n
 from ..db import Database
-from ..db import csv_io
 from ..db.vocab import EFFECTS, PARALOG_SOURCE, resolve_effect, type_label
 from . import help_text
 from .network_tab import DetailState, WidthWatcher
@@ -413,15 +412,10 @@ class DatabaseTab(QWidget):
         self.tabs.addTab(self.interactions_page, i18n.tr("経路"))
         self.tabs.addTab(self.categories_page, i18n.tr("カテゴリ"))
 
-        self.export_button = QPushButton(i18n.tr("表示中の表を CSV エクスポート…"))
-        bottom = QHBoxLayout()
-        bottom.addStretch(1)
-        bottom.addWidget(self.export_button)
         left = QWidget()
         left_layout = QVBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.addWidget(self.tabs)
-        left_layout.addLayout(bottom)
 
         # 右側の説明欄: 最初は空。表の行を選ぶとその遺伝子・制御関係・カテゴリの説明（各表の右上の Help で使い方に戻る）
         self.network = None   # 説明欄の中身を地図の説明欄と同じ関数で作るのに使う（MainWindow がつなぐ。set_network）
@@ -473,9 +467,6 @@ class DatabaseTab(QWidget):
             page.help_button.clicked.connect(self.show_help)
             page.table.selectionModel().selectionChanged.connect(
                 lambda *_a, page=page, kind=kind: self._show_row(page, kind))
-        self.export_button.clicked.connect(self.export_csv)
-        # カテゴリの表は CSV に書き出せないので、そのタブではボタンを押せなくする
-        self.tabs.currentChanged.connect(lambda i: self.export_button.setEnabled(i != 2))
 
     # ---- 絞り込み ----
     def _build_filters(self) -> None:
@@ -841,28 +832,3 @@ class DatabaseTab(QWidget):
         self._filter_interactions()
         self._filter_categories()
 
-    # ---- CSV ----
-    def export_csv(self) -> None:
-        index = self.tabs.currentIndex()
-        if index == 2:   # カテゴリのタブではボタンを押せない
-            return
-        page = self.proteins_page if index == 0 else self.interactions_page
-        ids = page.shown_ids() if page.proxy.rowCount() < page.model.rowCount() else None
-        name = "proteins.csv" if index == 0 else "interactions.csv"
-        path, _ = QFileDialog.getSaveFileName(self, i18n.tr("CSV にエクスポート"), name, "CSV (*.csv)")
-        if not path:
-            return
-        try:
-            if index == 0:
-                csv_io.export_proteins(self.db, path, ids)
-                written, dropped = page.proxy.rowCount(), 0
-            else:
-                written, dropped = csv_io.export_interactions(self.db, path, ids)
-        except OSError as e:
-            QMessageBox.critical(self, i18n.tr("エラー"), i18n.tr("書き出せませんでした。\n{error}", error=e))
-            return
-        text = i18n.tr("{n} 件を {path} に保存しました。", n=written, path=path)
-        if dropped:   # YEASTRACT+ の利用条件のため
-            text += "\n" + i18n.tr("YEASTRACT+ だけが根拠の経路 {n} 本は書き出していません（YEASTRACT+ の利用条件のため。"
-                                    "根拠は各経路の説明欄から YEASTRACT+ で見られます）。", n=f"{dropped:,}")
-        QMessageBox.information(self, i18n.tr("エクスポート完了"), text)

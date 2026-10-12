@@ -2,7 +2,7 @@
 
     python tools/build_db.py [proteins.csv] [interactions.csv]
 
-引数を省略すると sample_data/ の CSV を使う。アプリの「CSV エクスポート」で書き出したファイルもそのまま使える。
+引数を省略すると sample_data/ の CSV を使う。
 """
 import sys
 from pathlib import Path

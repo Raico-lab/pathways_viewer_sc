@@ -64,7 +64,7 @@ DB はサーバー（ブラウザ版の置き場 https://raico-lab.github.io/pat
 
 ## CSV フォーマット
 
-UTF-8 または Shift_JIS（Excel 保存）の CSV を読み込めます。書き出しは Excel で開ける UTF-8 (BOM 付き)。
+DB を作る道具（`tools/build_db.py`・`tools/import_sources.py`）は、UTF-8 または Shift_JIS（Excel 保存）の CSV を読み込めます。アプリからの CSV の書き出しはありません。
 
 **遺伝子** (`gene_name` 必須)
 
@@ -72,10 +72,10 @@ UTF-8 または Shift_JIS（Excel 保存）の CSV を読み込めます。書�
 |---|---|
 | gene_name | 遺伝子名（表示名・照合キー） |
 | standard_name | Systematic 名 |
-| complex_category | 手作業のカテゴリ。2026-10-03 に手作業の複合体・区分（Upstream など）を外したので今は使わない（画面・CSV の書き出しには出さない） |
+| complex_category | 手作業のカテゴリ。2026-10-03 に手作業の複合体・区分（Upstream など）を外したので今は使わない（画面には出さない） |
 | protein_properties | ORF の確度（SGD の Verified / Uncharacterized / Dubious。取り込みで SGD の値を入れる） |
 | description | 機能説明 |
-| basal_activity | 上流入力がないときの活性 0〜1。空欄＝自動（シミュレーション用。今のアプリでは使わない。読み込みでは使うが、データベースの表・編集画面・CSV の書き出しには出さない） |
+| basal_activity | 上流入力がないときの活性 0〜1。空欄＝自動（シミュレーション用。今のアプリでは使わない。読み込みでは使うが、データベースの表・編集画面には出さない） |
 
 複合体は Complex Portal のものだけを使う（以前の手作業の枠 `groups.csv` と `data/complexes.csv` は 2026-10-03 に外した。`archive/` を参照）。
 パラログ（役割が重なりうる遺伝子の組）は `tools/build_paralogs.py` が Alliance の組を BioGRID の遺伝的相互作用と SGD の GO で裏付けて `data/paralogs.tsv` に書き、`tools/import_sources.py` がカテゴリ（出典「パラログ」）として入れる。地図では組ごとの色の二重線の枠で囲み、片方が地図にあればもう片方も加えて、上の段（注目している遺伝子があればその段）に並べる（複合体のような専用の段は作らない）。
@@ -89,7 +89,7 @@ UTF-8 または Shift_JIS（Excel 保存）の CSV を読み込めます。書�
 | effect | 作用の向き activate / inhibit / none（空欄＝種類から自動。例: 抑制的なリン酸化は `phosphorylation` + `inhibit`） |
 | threshold | 閾値 0〜1。空欄なら signal_threshold_rule の語から仮決め（High→0.7, Low→0.2, それ以外 0.5） |
 | weight | 強度 0〜1（空欄＝1.0） |
-| signal_threshold_rule | 閾値ルールのメモ。threshold・weight・signal_threshold_rule はシミュレーション用で、今のアプリでは使わない（読み込みでは使うが、データベースの表・編集画面・CSV の書き出しには出さない。`archive/README.md`） |
+| signal_threshold_rule | 閾値ルールのメモ。threshold・weight・signal_threshold_rule はシミュレーション用で、今のアプリでは使わない（読み込みでは使うが、データベースの表・編集画面には出さない。`archive/README.md`） |
 | evidence | 根拠・文献 |
 
 サンプルは `sample_data/` を参照。データの集め方は [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) を参照。
