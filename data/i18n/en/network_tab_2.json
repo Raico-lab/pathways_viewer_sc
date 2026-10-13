@@ -92,5 +92,6 @@
  "経路: ": "Paths: ",
  "ほかの経路ですでに地図にあります": "Already on the map via other paths",
  "拡張から外す": "Remove from Expand",
- "YEASTRACT+ の {a} → {b} の根拠": "YEASTRACT+ evidence for {a} → {b}"
+ "YEASTRACT+ の {a} → {b} の根拠": "YEASTRACT+ evidence for {a} → {b}",
+ "リスト内になし": "None in the list"
 }

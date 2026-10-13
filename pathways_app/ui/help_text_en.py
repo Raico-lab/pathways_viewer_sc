@@ -71,7 +71,7 @@ With path color set to "Effect", paths are colored <span style='color:#e53935'>r
 
 GENES = _STYLE + """
 <h3>Genes</h3>
-<p>Genes on the current map (the active map panel) are split into three lists — <b>Focus</b> (orange), <b>Expand</b> (purple), and <b>Others</b> — each sorted by name (the number in each title is the gene count; empty lists are not shown). Type a name in the box at the top to filter. Click × at the right of a gene in the Expand list to remove it from Expand (same as × in the legend).</p>
+<p>Genes on the current map (the active map panel) are split into three lists — <b>Focus</b> (orange), <b>Expand</b> (purple), and <b>Others</b> — each sorted by name (the number in each title is the gene count; empty lists are not shown, except Expand, which shows “None in the list”). Type a name in the box at the top to filter. Click × at the right of a gene in the Expand list to remove it from Expand (same as × in the legend).</p>
 <ul>
 <li>Click a gene to <b>select it in green</b> on the map and show its details on the right. Genes selected in green on the map are also selected in the lists.</li>
 <li>Hold Shift or ⌘ (Ctrl on Windows) to select several (selections in other lists are kept).</li>

@@ -496,7 +496,7 @@ class NetworkTab(QWidget):
 
     def _refill_gene_list(self) -> None:
         """「遺伝子」タブの一覧を、操作中の表示枠の地図の遺伝子で作り直す（注目・拡張・そのほかの一覧に分け、
-        それぞれ名前の順。題名に数を添え、空の一覧は隠す。緑で選んでいる遺伝子は選んだままにする）。"""
+        それぞれ名前の順。題名に数を添え、空の一覧は隠す（拡張は「リスト内になし」と出して残す）。緑で選んでいる遺伝子は選んだままにする）。"""
         if getattr(self, "gene_lists", None) is None:
             return
         pane = self.active_pane
@@ -520,13 +520,19 @@ class NetworkTab(QWidget):
                 lst.addItem(item)
                 if title == "拡張":
                     lst.setItemWidget(item, self._ungrow_button(pid))
+            # 拡張は空でも一覧を出し、「リスト内になし」と書く（選べない行）
+            keep = bool(genes) or (title == "拡張" and bool(groups))   # groups は地図があるときだけ作る
+            if keep and not genes:
+                item = QListWidgetItem(tr("リスト内になし"))
+                item.setFlags(Qt.ItemFlag.NoItemFlags)
+                lst.addItem(item)
             lst.blockSignals(False)
             head.setText(tr("{title}（{n}）", title=tr(title), n=len(genes)))
-            head.setVisible(bool(genes))
-            lst.setVisible(bool(genes))
-            if title != "そのほか" and genes:   # 注目・拡張は中身の高さに合わせる（多ければスクロール）
+            head.setVisible(keep)
+            lst.setVisible(keep)
+            if title != "そのほか" and keep:   # 注目・拡張は中身の高さに合わせる（多ければスクロール）
                 row = lst.sizeHintForRow(0) or 18
-                lst.setFixedHeight(min(len(genes), 8) * row + 2 * lst.frameWidth() + 4)
+                lst.setFixedHeight(min(max(len(genes), 1), 8) * row + 2 * lst.frameWidth() + 4)
         self._sync_gene_list(pane.picked if pane is not None else [])
 
     def _sync_gene_list(self, picked: list[int]) -> None:
