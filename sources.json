@@ -1,0 +1,227 @@
+{
+ "sites": [
+  {
+   "name": "SGD",
+   "url": "https://www.yeastgenome.org/",
+   "includes": [
+    {
+     "name": "SGD SPELL",
+     "url": "https://spell.yeastgenome.org/"
+    }
+   ],
+   "match": [
+    "SGD GO 注釈"
+   ],
+   "note": "発現の測定 93 件",
+   "license": "CC BY 4.0",
+   "cite": [
+    "39530598",
+    "17724061"
+   ],
+   "retrieved": "2026-09-30〜10-04"
+  },
+  {
+   "name": "BioGRID",
+   "url": "https://thebiogrid.org/",
+   "includes": [
+    {
+     "name": "PhosphoGRID",
+     "url": "https://phosphogrid.org/"
+    }
+   ],
+   "match": [
+    "BioGRID",
+    "PhosphoGRID"
+   ],
+   "license": "MIT",
+   "cite": [
+    "33070389",
+    "16381927",
+    "20428315"
+   ],
+   "retrieved": "2026-08-31・10-03"
+  },
+  {
+   "name": "YEASTRACT+",
+   "url": "https://yeastract-plus.org/",
+   "match": [
+    "YEASTRACT"
+   ],
+   "license": "利用条件あり",
+   "license_url": "https://www.yeastract-plus.org/termsusage.php",
+   "cite": [
+    "36350610"
+   ],
+   "retrieved": "2026-10-01〜04"
+  },
+  {
+   "name": "GO-CAM",
+   "url": "https://geneontology.org/",
+   "match": [
+    "GO-CAM"
+   ],
+   "license": "CC BY 4.0",
+   "cite": [
+    "36866529",
+    "10802651"
+   ],
+   "retrieved": "2026-10-03"
+  },
+  {
+   "name": "UniProt",
+   "url": "https://www.uniprot.org/",
+   "match": [
+    "UniProt"
+   ],
+   "license": "CC BY 4.0",
+   "cite": [
+    "39552041"
+   ],
+   "retrieved": "2026-10-03"
+  },
+  {
+   "name": "Complex Portal",
+   "url": "https://www.ebi.ac.uk/complexportal/",
+   "match": [],
+   "note": "複合体 633 件",
+   "license": "CC0",
+   "cite": [
+    "34718729"
+   ],
+   "retrieved": "2026-10-03"
+  },
+  {
+   "name": "Alliance",
+   "url": "https://www.alliancegenome.org/",
+   "match": [],
+   "note": "パラログ 488 組",
+   "license": "CC BY 4.0",
+   "cite": [
+    "38552170"
+   ],
+   "retrieved": "2026-10-03"
+  }
+ ],
+ "papers": [
+  {
+   "pmid": "32181581",
+   "match": [
+    "IDEA"
+   ]
+  },
+  {
+   "pmid": "24766815",
+   "match": [
+    "破壊株データ"
+   ]
+  },
+  {
+   "pmid": "21177495",
+   "match": [
+    "21177495"
+   ]
+  },
+  {
+   "pmid": "10847680",
+   "match": [
+    "10847680"
+   ]
+  },
+  {
+   "pmid": "15037758",
+   "match": [
+    "細胞周期の論理モデル"
+   ]
+  },
+  {
+   "pmid": "24376454",
+   "match": [
+    "細胞周期の論理モデル"
+   ]
+  },
+  {
+   "pmid": "34535069",
+   "match": [
+    "細胞周期の論理モデル"
+   ]
+  },
+  {
+   "pmid": "3306402",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "7628692",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "8598289",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "10733573",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "10983975",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "11809814",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "12455951",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "15911613",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "17438333",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "20702584",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "27554843",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "28993463",
+   "match": [
+    "中心経路の論理モデル"
+   ]
+  },
+  {
+   "pmid": "36350610",
+   "match": [
+    "YEASTRACT"
+   ]
+  }
+ ]
+}

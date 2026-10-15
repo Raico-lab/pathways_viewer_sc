@@ -1,0 +1,11 @@
+{
+ "version": "de972177c431",
+ "commit": "98f4a39",
+ "built_at": "2026-10-15 15:57",
+ "sizes": {
+  "pathways.db": 27389952,
+  "expression.db": 35409920
+ },
+ "repo": "Raico-lab/pathways_viewer_sc",
+ "legacy_repo": "Raico-lab/pathways-viewer"
+}
