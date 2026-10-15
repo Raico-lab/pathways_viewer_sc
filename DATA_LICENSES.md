@@ -17,7 +17,7 @@ Pathways viewer のソースコードは GPLv3（`LICENSE`）です。**同梱�
 | SGD（Saccharomyces Genome Database） | 遺伝子名・機能説明・GO 注釈 | **CC BY 4.0**（"SGD operates under the Creative Commons Attribution 4.0 International license" — https://sites.google.com/view/yeastgenome-help/about ） | SGD・CC BY 4.0・加工したこと。Engel SR et al. 2025 Genetics（PMID 39530598）。データの元の論文も |
 | Gene Ontology（GO 注釈・GO-CAM） | 関係の向きの根拠 | **CC BY 4.0**（https://geneontology.org/docs/go-citation-policy/ ） | GO の論文（Aleksander et al. 2023 Genetics、PMID 36866529・Ashburner et al. 2000 Nat Genet、PMID 10802651）と GO のリリース日 |
 | BioGRID（PhosphoGRID・BioGRID-PTM を含む） | 物理的相互作用・酵素と基質・修飾部位・破壊株のリン酸化（Bodenmiller 2010 の記録） | **MIT**（https://wiki.thebiogrid.org/doku.php/terms_and_conditions ）。許諾文は `licenses/BioGRID-MIT.txt` | 著作権表示と許諾文の同梱（済み）。BioGRID の論文（Oughtred et al. 2021 Protein Sci、PMID 33070389・Stark et al. 2006 NAR、PMID 16381927）。PhosphoGRID は Stark et al. 2010 Database（PMID 20428315） |
-| YEASTRACT+ | 転写制御（Documented の関係・作用の向き・環境条件） | 利用条件（https://www.yeastract-plus.org/termsusage.php 、2026-10-11 に読み直した）: 内容の全部・相当部分を、YEASTRACT+ の利益を不当に損なう形や競合する形で再公開しない（2 節）。データの持ち主は元の論文の著者で、元の持ち主の条件のほかにデータの利用・再配布の制限はない（3 節）。出典を示し、下の論文を引用する（6 節） | Monteiro PT et al. 2020 Nucleic Acids Res 48:D642（PMID 31586406、doi:10.1093/nar/gkz859）。取得は 2026-10-01・02（Regulation Matrix）。扱いは下の「YEASTRACT+ の扱い」。**再配布について開発者に確認する（未）** |
+| YEASTRACT+ | 転写制御（Documented の関係・作用の向き・環境条件） | 利用条件（https://www.yeastract-plus.org/termsusage.php 、2026-10-11 に読み直した）: 内容の全部・相当部分を、YEASTRACT+ の利益を不当に損なう形や競合する形で再公開しない（2 節）。データの持ち主は元の論文の著者で、元の持ち主の条件のほかにデータの利用・再配布の制限はない（3 節）。出典を示し、下の論文を引用する（6 節） | Teixeira MC et al. 2023 Nucleic Acids Res 51:D785（PMID 36350610、doi:10.1093/nar/gkac1041）。2026 年の新しい版の論文が出たらそれに替える（開発者の依頼）。取得は 2026-10-01〜04（情報源タブに取得日を出す）。扱いは下の「YEASTRACT+ の扱い」。**2026-10-15 に開発者（P. T. Monteiro）から、出典を示せば今の使い方・配り方でよいと返事があった** |
 | Complex Portal（EMBL-EBI） | 複合体の構成と説明 | **CC0**（Complex Portal 2022, NAR, https://pmc.ncbi.nlm.nih.gov/articles/PMC8689886/ ） | 義務なし（引用を推奨。Meldal et al. 2022 NAR、PMID 34718729） |
 | UniProt | 修飾された残基 | **CC BY 4.0**（https://www.uniprot.org/help/license ） | UniProt の論文（UniProt Consortium 2025 NAR、PMID 39552041）・CC BY 4.0 |
 | Alliance of Genome Resources | パラログ | **CC BY 4.0**（Alliance の Terms of Use） | Alliance・CC BY 4.0（Alliance of Genome Resources Consortium 2024 Genetics、PMID 38552170） |
@@ -48,7 +48,8 @@ YEASTRACT+ の代わりにデータを配ることは目的にしていない。
 - アプリから DB を CSV などで書き出す機能は置かない（2026-10-12 に外した）。
 - 条件の分類（群・小群）は YEASTRACT+ のもの。日本語の名前はこのプロジェクトで付けた。
 - 3 節ではデータの持ち主は元の論文の著者とされるが、Regulation Matrix には論文が含まれないので、YEASTRACT+ だけが根拠の経路には元の論文（PMID）が付いていない。
-  元の論文は、説明欄のリンク先（YEASTRACT+ の組ごとのページ）で見られる。論文を DB に取り込むかは、YEASTRACT+ への問い合わせの返事で決める。
+  元の論文は、説明欄のリンク先（YEASTRACT+ の組ごとのページ）で見られる。2026-10-15 の返事では、2026 年の版でダウンロードの欄（種ごとの .tsv.gz、論文付き）を
+  置くとのことなので、それが出たら論文（PMID）も取り込む。
 - ブラウザ版は動作のために DB（`data/pathways.db.gz`）を読み込むので、そのファイルは公開先から取得できる。
 
 ## そのほか

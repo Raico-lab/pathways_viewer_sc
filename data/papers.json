@@ -33206,18 +33206,6 @@
    ]
   },
   {
-   "pmid": "31586406",
-   "cite": "Monteiro et al. 2020 Nucleic Acids Res",
-   "title": "YEASTRACT+: a portal for cross-species comparative genomics of transcription regulation in yeasts",
-   "url": "https://doi.org/10.1093/nar/gkz859",
-   "first": "Monteiro",
-   "year": "2020",
-   "authors": "Monteiro PT, Oliveira J, Pais P, Antunes M, Palma M, Cavalheiro M, Galocha M, Godinho CP, Martins LC, Bourbon N, Mota MN, Ribeiro RA, Viana R, Sá-Correia I, Teixeira MC",
-   "used": [
-    "data"
-   ]
-  },
-  {
    "pmid": "29717126",
    "cite": "Montemayor et al. 2018 Nat Commun",
    "title": "Architecture of the U6 snRNP reveals specific recognition of 3'-end processed U6 snRNA",
@@ -48167,6 +48155,18 @@
    "authors": "Teixeira MC, Cabrito TR, Hanif ZM, Vargas RC, Tenreiro S, Sá-Correia I",
    "used": [
     "literature"
+   ]
+  },
+  {
+   "pmid": "36350610",
+   "cite": "Teixeira et al. 2023 Nucleic Acids Res",
+   "title": "YEASTRACT+: a portal for the exploitation of global transcription regulation and metabolic model data in yeast biotechnology and pathogenesis",
+   "url": "https://doi.org/10.1093/nar/gkac1041",
+   "first": "Teixeira",
+   "year": "2023",
+   "authors": "Teixeira MC, Viana R, Palma M, Oliveira J, Galocha M, Mota MN, Couceiro D, Pereira MG, Antunes M, Costa IV, Pais P, Parada C, Chaouiya C, Sá-Correia I, Monteiro PT",
+   "used": [
+    "data"
    ]
   },
   {

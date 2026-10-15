@@ -17,7 +17,8 @@
    "cite": [
     "39530598",
     "17724061"
-   ]
+   ],
+   "retrieved": "2026-09-30〜10-04"
   },
   {
    "name": "BioGRID",
@@ -37,7 +38,8 @@
     "33070389",
     "16381927",
     "20428315"
-   ]
+   ],
+   "retrieved": "2026-08-31・10-03"
   },
   {
    "name": "YEASTRACT+",
@@ -46,10 +48,11 @@
     "YEASTRACT"
    ],
    "license": "利用条件あり",
-  "license_url": "https://www.yeastract-plus.org/termsusage.php",
+   "license_url": "https://www.yeastract-plus.org/termsusage.php",
    "cite": [
-    "31586406"
-   ]
+    "36350610"
+   ],
+   "retrieved": "2026-10-01〜04"
   },
   {
    "name": "GO-CAM",
@@ -61,7 +64,8 @@
    "cite": [
     "36866529",
     "10802651"
-   ]
+   ],
+   "retrieved": "2026-10-03"
   },
   {
    "name": "UniProt",
@@ -72,7 +76,8 @@
    "license": "CC BY 4.0",
    "cite": [
     "39552041"
-   ]
+   ],
+   "retrieved": "2026-10-03"
   },
   {
    "name": "Complex Portal",
@@ -82,7 +87,8 @@
    "license": "CC0",
    "cite": [
     "34718729"
-   ]
+   ],
+   "retrieved": "2026-10-03"
   },
   {
    "name": "Alliance",
@@ -92,7 +98,8 @@
    "license": "CC BY 4.0",
    "cite": [
     "38552170"
-   ]
+   ],
+   "retrieved": "2026-10-03"
   }
  ],
  "papers": [
@@ -211,7 +218,7 @@
    ]
   },
   {
-   "pmid": "31586406",
+   "pmid": "36350610",
    "match": [
     "YEASTRACT"
    ]

@@ -1,7 +1,7 @@
 """上部の「情報源」タブ: DB を作るのに使ったサイトと、参考にした論文を分けて並べる。
 
 サイト: data/sources.json の sites（名前・URL・根拠欄で見分ける語）と、それが根拠になっている関係の本数。
-同じところが出すもの（SGD と SGD SPELL、BioGRID と PhosphoGRID）は includes で 1 つにまとめ、cite にサイトが引用を求める論文を並べる。
+同じところが出すもの（SGD と SGD SPELL、BioGRID と PhosphoGRID）は includes で 1 つにまとめ、cite にサイトが引用を求める論文、retrieved にデータを取った日を並べる。
 論文: data/papers.json（tools/fetch_paper_list.py が作る。1 本ずつ書誌と URL）。
 10 本ずつのページに分け（枠の縦幅に収まらないときはスクロール）、題名で絞り込める。サイトの本数は DB を開いたときに数える。
 サーバーがあれば、論文・サイトの情報はサーバーのものを使う（pathways_app/server.py。取れるまでは手元の写しか同梱のもの）。
@@ -149,6 +149,10 @@ class SourcesTab(QWidget):
             lic_text = i18n.tr(s["license"]) if s.get("license") else ""
             lic = (f"<br><span style='font-size:10px'>{link(s['license_url'], lic_text, '#888')}</span>" if s.get("license_url")
                    else f"<br><span style='color:#888;font-size:10px'>{html.escape(lic_text)}</span>" if lic_text else "")
+            # データを取った日（data/sources.json の retrieved。出典は更新されるので、いつの写しかを示す）
+            if s.get("retrieved"):
+                lic += (f"<br><span style='color:#888;font-size:10px'>"
+                        f"{html.escape(i18n.pick('取得 {d}', 'Retrieved {d}').format(d=s['retrieved']))}</span>")
             # サイトが引用を求める論文（著者と年だけ。押すと論文を開く。papers.json に書誌がなければ PMID で）
             def short(p: dict) -> str:
                 return p["cite"][:p["cite"].find(p["year"]) + len(p["year"])] if p.get("year") in p["cite"] else p["cite"]
