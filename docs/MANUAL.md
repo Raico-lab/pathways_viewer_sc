@@ -6,6 +6,8 @@ English: [MANUAL.en.md](MANUAL.en.md)
 「ある遺伝子の上流・下流に何があるか」「2 つの遺伝子がどんな経路でつながるか」を調べるアプリです。
 この文書では、初めて使う人に向けて、**地図（マップ）の操作**と**左側のタブの使い方**を順に説明します。
 
+要点をまとめたスライドは [Pathways_viewer_guide_JA.pdf](manual/Pathways_viewer_guide_JA.pdf) で読めます。人に紹介するときは、URL とこのスライドを一緒に送ってください。元の PowerPoint のファイルは [Pathways_viewer_guide_JA.pptx](manual/Pathways_viewer_guide_JA.pptx) です。
+
 細かい決まり（並べ方・階層の決め方など）はアプリの中の「Help」ボタンと [README](../README.md) にまとめてあります。
 
 画面の写しのうち、1 章・6 章（登録を除く）・7 章のものは今の版です。ほかは前の版のもので、地図の上の選択肢（「色」「条件」など）や左のタブの名前（「TFs」など）が今と違うことがありますが、操作は同じです。

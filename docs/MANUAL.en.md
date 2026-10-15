@@ -8,6 +8,8 @@ This app maps regulatory paths between budding yeast genes (phosphorylation, tra
 so you can explore "what lies upstream and downstream of a gene" and "which paths connect two genes".
 This guide walks first-time users through **map operations** and **the left tabs**.
 
+A slide summary is available as [Pathways_viewer_guide_EN.pdf](manual/Pathways_viewer_guide_EN.pdf). When introducing the app to others, please send the URL together with these slides. The original PowerPoint file is [Pathways_viewer_guide_EN.pptx](manual/Pathways_viewer_guide_EN.pptx).
+
 Detailed rules (layout, how levels are determined, etc.) are in the app's "Help" buttons and the [README](../README.md).
 
 Screenshots in sections 1, 6 (except Saved), and 7 are from the current version. Others are from an earlier version, so selectors above the map ("Color", "Condition", etc.) and left tab names ("TFs", etc.) may differ, but the operations are the same.

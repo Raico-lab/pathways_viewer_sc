@@ -40,3 +40,6 @@ docs/curation/signs_batch1.csv
 docs/curation/round2_needs_citation.csv
 docs/curation/complexes_review.csv
 docs/curation/pmid_check_*.tsv
+
+# PowerPoint・Office が開いている間に作るロックファイル
+~$*
