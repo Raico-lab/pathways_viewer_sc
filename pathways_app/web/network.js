@@ -1135,6 +1135,10 @@
     }
     const finals = new Map();
     genes.forEach((n) => finals.set(n.id(), { x: n.position("x"), y: n.position("y") }));
+    // 動かす前に、走っている線の経路計算と予約した引き直しを止める。止めないと、移動の途中で計算が終わり、
+    // 前の位置で引いた線が隠したはずの線の上に出てしまう（動き終わってから引き直す）
+    window.orthoRouter.cancel();
+    clearTimeout(rerouteTimer);
     animating = true;
     endBusy();   // 動かしている間は数えない（動き終わって線を引くときに数え直す）
     cy.batch(() => {
@@ -1186,6 +1190,11 @@
   function runLayout(name, prev = null, centerOn = null) {
     beginBusy();
     currentLayout = name;
+    // 遺伝子を動かす前に、走っている線の経路計算と予約した引き直しを止め、線を隠す。
+    // 止めないと、前の位置で引いた線が、動いた遺伝子の間に引き伸ばされて見える（経路を計算し終えてから出す）
+    window.orthoRouter.cancel();
+    clearTimeout(rerouteTimer);
+    if (orthogonal) cy.edges().addClass("routing");
     cy.remove(cy.nodes("[?isLabel]"));
     let base = LAYOUTS[name] || LAYOUTS.dagre_tb;
     // 直角の線では、段と段・遺伝子どうしの間に線を通す隙間が要るので間隔を広げる
@@ -1203,7 +1212,6 @@
                    complete: () => { viewportAnimationDone(); applyLod(true); } });
       return;
     }
-    if (orthogonal) cy.edges().addClass("routing");   // 動いている間は線を隠し、止まってから経路を計算して出す
     // 動いている間は線を引き直さない（枠に収めるときの拡大・縮小で線の計算が走り、途中の位置で線が出てしまうため）。
     // 前の配置の計算が後から終わっても、新しい配置の途中で線を引かないよう、最後に始めた配置だけを有効にする
     if (layoutRun) layoutRun.stop();
@@ -1513,6 +1521,7 @@
       cy.nodes().filter(isGene).forEach((n) => { prev[n.id()] = { x: n.position("x"), y: n.position("y") }; });
       const gen = ++renderGen;
       window.orthoRouter.cancel();   // 前の表示の線の経路計算を止める
+      clearTimeout(rerouteTimer);     // ズームなどで予約した引き直しも捨てる（新しい配置の前の位置で線を引かない）
       layoutToken++;                  // 前の表示の配置（同心円など）が後から終わっても線を引かない
       if (layoutRun) { layoutRun.stop(); layoutRun = null; }
       cy.stop(true, false);
@@ -1660,7 +1669,12 @@
           return a.x1 < b.x2 && b.x1 < a.x2 && a.y1 < b.y2 && b.y1 < a.y2;
         });
       });
-      if (overlapsOthers) { runLayout(currentLayout); return; }
+      if (overlapsOthers) {
+        const prev = {};
+        cy.nodes().filter(isGene).forEach((n) => { prev[n.id()] = { x: n.position("x"), y: n.position("y") }; });
+        runLayout(currentLayout, prev);
+        return;
+      }
       // 隠したときは引き直さない（残った線は隠す前の形のまま）。表示に戻した線に使える形がないときだけ引き直す
       // 縮小で省略している線（経路を引いていない）は数えない。実際に表示される線に経路がないときだけ引き直す
       const shownNow = (x) => x.style("display") !== "none";
